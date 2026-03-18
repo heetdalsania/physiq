@@ -10,35 +10,87 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
+  /* ─── THEME SYSTEM ─── */
+  :root, [data-theme="dark"] {
     --bg: #0B0F1A;
+    --bg-header: rgba(59,130,246,0.08);
     --surface: rgba(255,255,255,0.03);
     --surface-hover: rgba(255,255,255,0.06);
+    --surface-alt: rgba(255,255,255,0.02);
     --border: rgba(255,255,255,0.05);
     --border-active: rgba(59,130,246,0.4);
+    --border-faint: rgba(255,255,255,0.04);
+    --track: rgba(255,255,255,0.06);
     --text: #E2E8F0;
     --text-dim: #94A3B8;
     --text-muted: #64748B;
     --text-faint: #475569;
     --text-bright: #F1F5F9;
     --text-white: #F8FAFC;
-    --blue: #3B82F6;
-    --blue-light: #60A5FA;
-    --blue-glow: rgba(59,130,246,0.3);
-    --orange: #F97316;
-    --yellow: #EAB308;
-    --purple: #A855F7;
-    --purple-light: #C084FC;
-    --green: #22C55E;
-    --red: #EF4444;
-    --pink: #F43F5E;
-    --teal: #14B8A6;
-    --cyan: #06B6D4;
-    --sky: #38BDF8;
-    --amber: #FBBF24;
-    --indigo: #6366F1;
-    --magenta: #D946EF;
-    --rose: #EC4899;
+    --text-suggestion: #CBD5E1;
+    --nav-bg: rgba(11,15,26,0.95);
+    --input-bg: rgba(255,255,255,0.05);
+    --input-border: rgba(255,255,255,0.1);
+    --water-bg: rgba(56,189,248,0.06);
+    --water-border: rgba(56,189,248,0.12);
+    --water-btn-bg: rgba(56,189,248,0.12);
+    --water-btn-border: rgba(56,189,248,0.2);
+    --water-btn-hover: rgba(56,189,248,0.25);
+    --muscle-active-bg: rgba(168,85,247,0.12);
+    --muscle-active-border: rgba(168,85,247,0.4);
+    --muscle-tag-bg: rgba(168,85,247,0.12);
+    --muscle-tag-border: rgba(168,85,247,0.25);
+    --sex-active-bg: rgba(59,130,246,0.15);
+    --option-active-bg: rgba(59,130,246,0.1);
+    --option-active-border: rgba(59,130,246,0.3);
+    --stat-border: rgba(255,255,255,0.03);
+    --blue: #3B82F6; --blue-light: #60A5FA; --blue-glow: rgba(59,130,246,0.3);
+    --orange: #F97316; --yellow: #EAB308; --purple: #A855F7; --purple-light: #C084FC;
+    --green: #22C55E; --red: #EF4444; --pink: #F43F5E; --teal: #14B8A6;
+    --cyan: #06B6D4; --sky: #38BDF8; --amber: #FBBF24; --indigo: #6366F1;
+    --magenta: #D946EF; --rose: #EC4899;
+    --scrollbar-thumb: rgba(255,255,255,0.1);
+  }
+
+  [data-theme="light"] {
+    --bg: #F1F5F9;
+    --bg-header: rgba(59,130,246,0.06);
+    --surface: rgba(0,0,0,0.03);
+    --surface-hover: rgba(0,0,0,0.06);
+    --surface-alt: rgba(0,0,0,0.02);
+    --border: rgba(0,0,0,0.08);
+    --border-active: rgba(59,130,246,0.5);
+    --border-faint: rgba(0,0,0,0.04);
+    --track: rgba(0,0,0,0.07);
+    --text: #1E293B;
+    --text-dim: #475569;
+    --text-muted: #64748B;
+    --text-faint: #94A3B8;
+    --text-bright: #0F172A;
+    --text-white: #0F172A;
+    --text-suggestion: #334155;
+    --nav-bg: rgba(241,245,249,0.95);
+    --input-bg: rgba(0,0,0,0.04);
+    --input-border: rgba(0,0,0,0.12);
+    --water-bg: rgba(56,189,248,0.08);
+    --water-border: rgba(56,189,248,0.18);
+    --water-btn-bg: rgba(56,189,248,0.1);
+    --water-btn-border: rgba(56,189,248,0.25);
+    --water-btn-hover: rgba(56,189,248,0.2);
+    --muscle-active-bg: rgba(168,85,247,0.1);
+    --muscle-active-border: rgba(168,85,247,0.35);
+    --muscle-tag-bg: rgba(168,85,247,0.1);
+    --muscle-tag-border: rgba(168,85,247,0.25);
+    --sex-active-bg: rgba(59,130,246,0.1);
+    --option-active-bg: rgba(59,130,246,0.08);
+    --option-active-border: rgba(59,130,246,0.35);
+    --stat-border: rgba(0,0,0,0.06);
+    --blue: #2563EB; --blue-light: #3B82F6; --blue-glow: rgba(37,99,235,0.2);
+    --orange: #EA580C; --yellow: #CA8A04; --purple: #9333EA; --purple-light: #A855F7;
+    --green: #16A34A; --red: #DC2626; --pink: #E11D48; --teal: #0D9488;
+    --cyan: #0891B2; --sky: #0284C7; --amber: #D97706; --indigo: #4F46E5;
+    --magenta: #C026D3; --rose: #DB2777;
+    --scrollbar-thumb: rgba(0,0,0,0.15);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -47,28 +99,21 @@
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', -apple-system, sans-serif;
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100vh; min-height: 100dvh;
     overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
   }
 
-  #app {
-    max-width: 480px;
-    margin: 0 auto;
-    position: relative;
-    padding-bottom: 80px;
-  }
+  #app { max-width: 480px; margin: 0 auto; position: relative; padding-bottom: 80px; }
 
-  /* Typography */
   .mono { font-family: 'Space Mono', monospace; }
   .label {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 12px;
   }
 
-  /* Inputs */
   .input {
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    background: var(--input-bg); border: 1px solid var(--input-border);
     border-radius: 8px; padding: 10px 12px; color: var(--text-bright); font-size: 14px;
     font-family: 'Space Mono', monospace; outline: none; width: 100%;
     transition: border-color 0.2s;
@@ -76,14 +121,12 @@
   .input:focus { border-color: var(--blue); }
   .input::placeholder { color: var(--text-faint); }
 
-  /* Cards */
   .card {
     background: var(--surface); border-radius: 12px; padding: 14px;
     border: 1px solid var(--border); transition: all 0.2s;
   }
   .card:hover { background: var(--surface-hover); }
 
-  /* Buttons */
   .btn {
     border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
     transition: all 0.2s; -webkit-appearance: none;
@@ -97,20 +140,14 @@
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(59,130,246,0.4); }
   .btn-primary:active { transform: translateY(0); }
 
-  /* Progress bar */
-  .progress-track {
-    height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06); overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%; border-radius: 2px; transition: width 0.6s ease;
-  }
+  .progress-track { height: 4px; border-radius: 2px; background: var(--track); overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
 
-  /* Bottom Nav */
   .nav {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 480px; background: rgba(11,15,26,0.95);
+    width: 100%; max-width: 480px; background: var(--nav-bg);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid var(--border);
     display: flex; padding: 8px 0 max(12px, env(safe-area-inset-bottom)); z-index: 100;
   }
   .nav-btn {
@@ -122,107 +159,106 @@
   .nav-btn span:first-child { font-size: 18px; }
   .nav-btn span:last-child { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
 
-  /* Grids */
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .grid-2-10 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .flex-col { display: flex; flex-direction: column; }
   .flex-row { display: flex; align-items: center; }
-  .gap-6 { gap: 6px; }
-  .gap-8 { gap: 8px; }
-  .gap-10 { gap: 10px; }
+  .gap-6 { gap: 6px; } .gap-8 { gap: 8px; } .gap-10 { gap: 10px; }
 
-  /* Animations */
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .fade-in { animation: fadeIn 0.3s ease forwards; }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
 
-  /* Water button */
   .water-btn {
     flex: 1; padding: 8px 0; border-radius: 8px;
-    background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.2);
+    background: var(--water-btn-bg); border: 1px solid var(--water-btn-border);
     color: var(--sky); font-size: 12px; font-weight: 600; cursor: pointer;
     font-family: 'DM Sans', sans-serif; transition: all 0.2s;
   }
-  .water-btn:hover { background: rgba(56,189,248,0.25); }
+  .water-btn:hover { background: var(--water-btn-hover); }
+  .water-btn.subtract { color: var(--red); background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+  .water-btn.subtract:hover { background: rgba(239,68,68,0.15); }
 
-  /* Muscle button */
   .muscle-btn {
     padding: 16px 14px; border-radius: 12px; cursor: pointer; text-align: left;
-    background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
-    transition: all 0.2s; color: var(--text-dim);
+    background: var(--surface); border: 1px solid var(--border);
+    transition: all 0.2s; color: var(--text-dim); font-family: 'DM Sans', sans-serif;
   }
   .muscle-btn.active {
-    background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.4); color: var(--purple-light);
+    background: var(--muscle-active-bg); border-color: var(--muscle-active-border); color: var(--purple-light);
   }
 
-  /* Activity / Goal buttons */
   .option-btn {
     display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px;
-    cursor: pointer; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer; background: var(--surface-alt); border: 1px solid var(--border-faint);
     color: var(--text-dim); transition: all 0.2s; text-align: left; width: 100%;
     font-family: 'DM Sans', sans-serif;
   }
   .option-btn.active {
-    background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: var(--blue-light);
+    background: var(--option-active-bg); border-color: var(--option-active-border); color: var(--blue-light);
   }
 
-  /* Suggestion cards */
-  .suggestion { padding: 12px 14px; border-radius: 10px; font-size: 12px; line-height: 1.5; color: #CBD5E1; }
+  .suggestion { padding: 12px 14px; border-radius: 10px; font-size: 12px; line-height: 1.5; color: var(--text-suggestion); }
 
-  /* Meal row */
   .meal-row {
     display: flex; align-items: center; gap: 10px; padding: 10px 12px;
     border-radius: 10px; background: var(--surface); border: 1px solid var(--border);
   }
-  .meal-remove {
-    background: none; border: none; color: var(--text-faint); cursor: pointer;
-    font-size: 14px; padding: 0 4px;
-  }
+  .meal-remove { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 14px; padding: 0 4px; }
 
-  /* Nutrient compact row */
-  .nutrient-compact {
-    display: flex; align-items: center; gap: 8px; padding: 6px 0;
-  }
+  .nutrient-compact { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
 
-  /* Sex toggle */
   .sex-btn {
     flex: 1; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 13px;
-    font-weight: 600; background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
+    font-weight: 600; background: var(--surface); border: 1px solid var(--border);
     color: var(--text-muted); transition: all 0.2s; font-family: 'DM Sans', sans-serif;
   }
-  .sex-btn.active { background: rgba(59,130,246,0.15); border-color: var(--border-active); color: var(--blue-light); }
+  .sex-btn.active { background: var(--sex-active-bg); border-color: var(--border-active); color: var(--blue-light); }
 
-  /* Stat row */
-  .stat-row {
-    display: flex; justify-content: space-between; padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-  }
+  .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--stat-border); }
 
-  /* Tag */
   .muscle-tag {
     padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-    background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25); color: var(--purple-light);
+    background: var(--muscle-tag-bg); border: 1px solid var(--muscle-tag-border); color: var(--purple-light);
   }
 
-  /* Nutrient focus pill */
-  .nutrient-focus {
-    display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px;
-  }
+  .nutrient-focus { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; }
 
-  /* Reset button */
   .reset-btn {
     padding: 10px 16px; border-radius: 8px; background: rgba(239,68,68,0.1);
     border: 1px solid rgba(239,68,68,0.2); color: var(--red); font-size: 12px;
     font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
   }
   .reset-btn:hover { background: rgba(239,68,68,0.2); }
+
+  .theme-toggle {
+    width: 44px; height: 24px; border-radius: 12px; cursor: pointer;
+    background: var(--track); border: 1px solid var(--border); position: relative;
+    transition: all 0.3s; flex-shrink: 0;
+  }
+  .theme-toggle::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--blue); transition: transform 0.3s;
+  }
+  [data-theme="light"] .theme-toggle::after { transform: translateX(20px); }
+
+  .bmr-edit-btn {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text-muted); font-size: 10px; padding: 3px 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .bmr-edit-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .bmr-override-badge {
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--amber); margin-left: 6px;
+  }
 </style>
 </head>
-<body>
+<body data-theme="dark">
 <div id="app"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
@@ -230,27 +266,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 
 <script type="text/babel">
-const { useState, useEffect, useMemo, useCallback } = React;
-
-// ─── DATA ───────────────────────────────────────────────────────────────────
+const { useState, useEffect, useMemo } = React;
 
 const MUSCLE_GROUPS = [
-  { id: "chest", label: "Chest", icon: "◼", nutrients: ["protein", "creatine", "leucine"], recovery: 48 },
-  { id: "back", label: "Back", icon: "◆", nutrients: ["protein", "magnesium", "zinc"], recovery: 48 },
-  { id: "shoulders", label: "Shoulders", icon: "▲", nutrients: ["protein", "vitaminD", "calcium"], recovery: 48 },
-  { id: "biceps", label: "Biceps", icon: "●", nutrients: ["protein", "potassium", "b12"], recovery: 36 },
-  { id: "triceps", label: "Triceps", icon: "●", nutrients: ["protein", "potassium", "b12"], recovery: 36 },
-  { id: "legs", label: "Legs", icon: "▼", nutrients: ["protein", "iron", "glycogen"], recovery: 72 },
-  { id: "core", label: "Core", icon: "◇", nutrients: ["protein", "fiber", "omega3"], recovery: 24 },
-  { id: "glutes", label: "Glutes", icon: "■", nutrients: ["protein", "iron", "glycogen"], recovery: 72 },
+  { id: "chest", label: "Chest", icon: "\u25FC", nutrients: ["protein", "creatine", "leucine"], recovery: 48 },
+  { id: "back", label: "Back", icon: "\u25C6", nutrients: ["protein", "magnesium", "zinc"], recovery: 48 },
+  { id: "shoulders", label: "Shoulders", icon: "\u25B2", nutrients: ["protein", "vitaminD", "calcium"], recovery: 48 },
+  { id: "biceps", label: "Biceps", icon: "\u25CF", nutrients: ["protein", "potassium", "b12"], recovery: 36 },
+  { id: "triceps", label: "Triceps", icon: "\u25CF", nutrients: ["protein", "potassium", "b12"], recovery: 36 },
+  { id: "legs", label: "Legs", icon: "\u25BC", nutrients: ["protein", "iron", "glycogen"], recovery: 72 },
+  { id: "core", label: "Core", icon: "\u25C7", nutrients: ["protein", "fiber", "omega3"], recovery: 24 },
+  { id: "glutes", label: "Glutes", icon: "\u25A0", nutrients: ["protein", "iron", "glycogen"], recovery: 72 },
 ];
 
 const GOALS = [
-  { id: "build", label: "Build Muscle", surplus: 300, proteinMult: 1.0, icon: "↑" },
-  { id: "lean", label: "Lean Bulk", surplus: 150, proteinMult: 0.95, icon: "⬈" },
-  { id: "maintain", label: "Maintain", surplus: 0, proteinMult: 0.85, icon: "→" },
-  { id: "cut", label: "Cut Fat", surplus: -400, proteinMult: 1.1, icon: "↓" },
-  { id: "debloat", label: "Debloat + Cut", surplus: -300, proteinMult: 1.0, icon: "⬊" },
+  { id: "build", label: "Build Muscle", surplus: 300, proteinMult: 1.0, icon: "\u2191" },
+  { id: "lean", label: "Lean Bulk", surplus: 150, proteinMult: 0.95, icon: "\u2B08" },
+  { id: "maintain", label: "Maintain", surplus: 0, proteinMult: 0.85, icon: "\u2192" },
+  { id: "cut", label: "Cut Fat", surplus: -400, proteinMult: 1.1, icon: "\u2193" },
+  { id: "debloat", label: "Debloat + Cut", surplus: -300, proteinMult: 1.0, icon: "\u2B0A" },
 ];
 
 const ACTIVITY_LEVELS = [
@@ -264,7 +298,7 @@ const ACTIVITY_LEVELS = [
 const DEFAULT_PROFILE = {
   age: 28, weight: 180, height: 70, sex: "male", bodyfat: 18,
   goal: "build", activity: "moderate", gymDays: 5, steps: 8000,
-  todayMuscles: [], waterIntake: 0,
+  todayMuscles: [], bmrOverride: null,
 };
 
 const NUTRIENT_INFO = {
@@ -295,177 +329,147 @@ const EMPTY_INTAKE = {
 
 // ─── STORAGE ────────────────────────────────────────────────────────────────
 
-const STORAGE_KEYS = { profile: "pq_profile", intake: "pq_intake", meals: "pq_meals", date: "pq_date" };
+const SK = { profile: "pq_profile", intake: "pq_intake", meals: "pq_meals", date: "pq_date", theme: "pq_theme" };
 
 function loadState() {
   try {
     const today = new Date().toDateString();
-    const savedDate = localStorage.getItem(STORAGE_KEYS.date);
-    const profile = JSON.parse(localStorage.getItem(STORAGE_KEYS.profile)) || DEFAULT_PROFILE;
-
-    // Reset daily data if it's a new day
+    const savedDate = localStorage.getItem(SK.date);
+    const profile = JSON.parse(localStorage.getItem(SK.profile)) || { ...DEFAULT_PROFILE };
+    if (!profile.hasOwnProperty('bmrOverride')) profile.bmrOverride = null;
     if (savedDate !== today) {
-      localStorage.setItem(STORAGE_KEYS.date, today);
-      localStorage.removeItem(STORAGE_KEYS.intake);
-      localStorage.removeItem(STORAGE_KEYS.meals);
-      // Keep todayMuscles in profile reset
+      localStorage.setItem(SK.date, today);
+      localStorage.removeItem(SK.intake);
+      localStorage.removeItem(SK.meals);
       profile.todayMuscles = [];
       return { profile, intake: { ...EMPTY_INTAKE }, meals: [] };
     }
-
-    const intake = JSON.parse(localStorage.getItem(STORAGE_KEYS.intake)) || { ...EMPTY_INTAKE };
-    const meals = JSON.parse(localStorage.getItem(STORAGE_KEYS.meals)) || [];
-    return { profile, intake, meals };
-  } catch {
-    return { profile: DEFAULT_PROFILE, intake: { ...EMPTY_INTAKE }, meals: [] };
-  }
+    return {
+      profile,
+      intake: JSON.parse(localStorage.getItem(SK.intake)) || { ...EMPTY_INTAKE },
+      meals: JSON.parse(localStorage.getItem(SK.meals)) || [],
+    };
+  } catch { return { profile: { ...DEFAULT_PROFILE }, intake: { ...EMPTY_INTAKE }, meals: [] }; }
 }
 
-function saveProfile(p) { try { localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(p)); } catch {} }
-function saveIntake(i) { try { localStorage.setItem(STORAGE_KEYS.intake, JSON.stringify(i)); } catch {} }
-function saveMeals(m) { try { localStorage.setItem(STORAGE_KEYS.meals, JSON.stringify(m)); localStorage.setItem(STORAGE_KEYS.date, new Date().toDateString()); } catch {} }
+function loadTheme() {
+  try {
+    const saved = localStorage.getItem(SK.theme);
+    if (saved) { document.body.setAttribute("data-theme", saved); return saved; }
+  } catch {}
+  return "dark";
+}
 
-// ─── CALCULATIONS ───────────────────────────────────────────────────────────
+function sv(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
 
-function calcTargets(profile) {
-  const w = profile.weight;
-  const h = profile.height;
-  const a = profile.age;
-  const isMale = profile.sex === "male";
-  const wKg = w * 0.453592;
-  const hCm = h * 2.54;
+// ─── CALCULATIONS (Mifflin-St Jeor, verified) ──────────────────────────────
+// Male:   BMR = (10 x weight_kg) + (6.25 x height_cm) - (5 x age) + 5
+// Female: BMR = (10 x weight_kg) + (6.25 x height_cm) - (5 x age) - 161
 
-  const bmr = isMale ? 10 * wKg + 6.25 * hCm - 5 * a + 5 : 10 * wKg + 6.25 * hCm - 5 * a - 161;
-  const actMult = ACTIVITY_LEVELS.find(l => l.id === profile.activity)?.mult || 1.55;
-  const goalData = GOALS.find(g => g.id === profile.goal) || GOALS[0];
+function calcBMR(p) {
+  const wKg = p.weight * 0.453592;
+  const hCm = p.height * 2.54;
+  return p.sex === "male"
+    ? 10 * wKg + 6.25 * hCm - 5 * p.age + 5
+    : 10 * wKg + 6.25 * hCm - 5 * p.age - 161;
+}
+
+function calcTargets(p) {
+  const calculatedBMR = calcBMR(p);
+  const bmr = p.bmrOverride != null ? p.bmrOverride : calculatedBMR;
+  const isMale = p.sex === "male";
+  const actMult = ACTIVITY_LEVELS.find(l => l.id === p.activity)?.mult || 1.55;
+  const gd = GOALS.find(g => g.id === p.goal) || GOALS[0];
   const tdee = bmr * actMult;
-  const targetCal = Math.round(tdee + goalData.surplus);
-
-  const gymBonus = profile.todayMuscles.length > 0 ? 0.1 : 0;
-  const proteinPerLb = (isMale ? 1.0 : 0.85) * goalData.proteinMult + gymBonus;
-  const leanMass = w * (1 - profile.bodyfat / 100);
+  const targetCal = Math.round(tdee + gd.surplus);
+  const gymBonus = p.todayMuscles.length > 0 ? 0.1 : 0;
+  const proteinPerLb = (isMale ? 1.0 : 0.85) * gd.proteinMult + gymBonus;
+  const leanMass = p.weight * (1 - p.bodyfat / 100);
   const protein = Math.round(leanMass * proteinPerLb);
-
-  const fatPct = (profile.goal === "cut" || profile.goal === "debloat") ? 0.25 : 0.28;
+  const fatPct = (p.goal === "cut" || p.goal === "debloat") ? 0.25 : 0.28;
   const fats = Math.round((targetCal * fatPct) / 9);
   const carbs = Math.max(Math.round((targetCal - protein * 4 - fats * 9) / 4), 80);
-
-  const isDebloat = profile.goal === "debloat";
-  const waterBase = Math.round(w / 2);
-  const waterEx = profile.todayMuscles.length > 0 ? 24 : 0;
-  const waterSteps = profile.steps > 10000 ? 16 : profile.steps > 7000 ? 8 : 0;
-  const hasBigMuscle = profile.todayMuscles.some(m => ["legs", "back", "glutes"].includes(m));
+  const isDebloat = p.goal === "debloat";
+  const waterBase = Math.round(p.weight / 2);
+  const waterEx = p.todayMuscles.length > 0 ? 24 : 0;
+  const waterSteps = p.steps > 10000 ? 16 : p.steps > 7000 ? 8 : 0;
+  const hasBig = p.todayMuscles.some(m => ["legs","back","glutes"].includes(m));
 
   return {
     calories: targetCal, protein, carbs, fats,
-    fiber: isMale ? 38 : 25,
-    sugar: Math.round(targetCal * 0.05 / 4),
-    sodium: isDebloat ? 1500 : 2300,
-    potassium: isDebloat ? 4700 : 3500,
-    calcium: a > 50 ? 1200 : 1000,
-    magnesium: isMale ? 420 : 320,
-    iron: isMale ? 8 : 18,
-    zinc: isMale ? 11 : 8,
-    vitaminD: 2000, b12: 2.4, omega3: 1.6,
-    creatine: hasBigMuscle ? 5 : 3,
+    fiber: isMale ? 38 : 25, sugar: Math.round(targetCal * 0.05 / 4),
+    sodium: isDebloat ? 1500 : 2300, potassium: isDebloat ? 4700 : 3500,
+    calcium: p.age > 50 ? 1200 : 1000, magnesium: isMale ? 420 : 320,
+    iron: isMale ? 8 : 18, zinc: isMale ? 11 : 8,
+    vitaminD: 2000, b12: 2.4, omega3: 1.6, creatine: hasBig ? 5 : 3,
     water: waterBase + waterEx + waterSteps,
-    tdee: Math.round(tdee), bmr: Math.round(bmr), leanMass: Math.round(leanMass),
+    tdee: Math.round(tdee), bmr: Math.round(bmr),
+    calculatedBMR: Math.round(calculatedBMR), leanMass: Math.round(leanMass),
+    isOverridden: p.bmrOverride != null,
   };
 }
 
-function getSuggestions(profile, targets, intake) {
+function getSuggestions(p, t, i) {
   const s = [];
-  const goal = GOALS.find(g => g.id === profile.goal);
-  const muscles = profile.todayMuscles;
-
-  if (intake.protein < targets.protein * 0.8)
-    s.push({ type: "critical", text: `Protein is ${Math.round(targets.protein - intake.protein)}g below target. Add lean chicken, fish, Greek yogurt, or a whey shake to hit ${targets.protein}g.` });
-  if (intake.sodium > targets.sodium * 1.1)
-    s.push({ type: "warning", text: `Sodium is high (${intake.sodium}mg). This causes water retention and bloating. Cut processed foods and season with herbs instead.` });
-  if (intake.potassium < targets.potassium * 0.7)
-    s.push({ type: "warning", text: `Low potassium hurts muscle contractions and increases bloating. Add bananas, sweet potatoes, or spinach.` });
-  if (intake.sugar > targets.sugar * 1.2)
-    s.push({ type: "warning", text: `Sugar is ${Math.round(intake.sugar - targets.sugar)}g over limit. Excess sugar spikes insulin and promotes fat storage. Swap sugary snacks for berries.` });
-  if (intake.water < targets.water * 0.6)
-    s.push({ type: "critical", text: `You're dehydrated. Drink at least ${targets.water}oz today — especially important for ${muscles.length > 0 ? "muscle recovery" : "metabolism"}.` });
-  if (intake.fiber < targets.fiber * 0.7)
-    s.push({ type: "info", text: `Fiber aids digestion and reduces bloating. Add oats, lentils, or broccoli to reach ${targets.fiber}g.` });
-  if (muscles.includes("legs") || muscles.includes("glutes"))
-    s.push({ type: "muscle", text: `Leg/Glute day: prioritize 40g+ protein within 2hrs post-workout with fast carbs (rice, banana) for glycogen replenishment.` });
-  if (muscles.includes("chest") || muscles.includes("shoulders") || muscles.includes("triceps"))
-    s.push({ type: "muscle", text: `Push day: ensure 5g creatine and adequate carbs pre-workout for explosive pressing power.` });
-  if (muscles.includes("back") || muscles.includes("biceps"))
-    s.push({ type: "muscle", text: `Pull day: magnesium and zinc support grip strength and recovery. Consider ZMA supplement before bed.` });
-  if (intake.calories > 0 && intake.calories < targets.calories * 0.6 && (profile.goal === "build" || profile.goal === "lean"))
-    s.push({ type: "critical", text: `Eating too little for muscle gain! You need a surplus. Add calorie-dense foods: nuts, avocado, olive oil.` });
-  if (profile.goal === "debloat")
-    s.push({ type: "info", text: `Debloat focus: keep sodium under ${targets.sodium}mg, potassium above ${targets.potassium}mg, drink ${targets.water}oz water, and eat anti-inflammatory foods (ginger, turmeric, cucumber).` });
-  if (intake.omega3 < targets.omega3 * 0.5)
-    s.push({ type: "info", text: `Omega-3s reduce inflammation and support joint health for lifting. Add salmon, walnuts, or fish oil supplement.` });
-  if (intake.calories === 0)
-    s.push({ type: "info", text: `Start logging your meals to get personalized nutrition suggestions based on your ${goal?.label.toLowerCase()} goal.` });
+  const g = GOALS.find(x => x.id === p.goal);
+  const m = p.todayMuscles;
+  if (i.protein < t.protein * 0.8) s.push({ type:"critical", text:`Protein is ${Math.round(t.protein-i.protein)}g below target. Add lean chicken, fish, Greek yogurt, or a whey shake to hit ${t.protein}g.` });
+  if (i.sodium > t.sodium * 1.1) s.push({ type:"warning", text:`Sodium is high (${i.sodium}mg). This causes water retention and bloating. Cut processed foods and season with herbs instead.` });
+  if (i.potassium < t.potassium * 0.7) s.push({ type:"warning", text:`Low potassium hurts muscle contractions and increases bloating. Add bananas, sweet potatoes, or spinach.` });
+  if (i.sugar > t.sugar * 1.2) s.push({ type:"warning", text:`Sugar is ${Math.round(i.sugar-t.sugar)}g over limit. Excess sugar spikes insulin and promotes fat storage. Swap sugary snacks for berries.` });
+  if (i.water < t.water * 0.6) s.push({ type:"critical", text:`You're dehydrated. Drink at least ${t.water}oz today \u2014 especially important for ${m.length>0?"muscle recovery":"metabolism"}.` });
+  if (i.fiber < t.fiber * 0.7) s.push({ type:"info", text:`Fiber aids digestion and reduces bloating. Add oats, lentils, or broccoli to reach ${t.fiber}g.` });
+  if (m.includes("legs")||m.includes("glutes")) s.push({ type:"muscle", text:`Leg/Glute day: prioritize 40g+ protein within 2hrs post-workout with fast carbs (rice, banana) for glycogen replenishment.` });
+  if (m.includes("chest")||m.includes("shoulders")||m.includes("triceps")) s.push({ type:"muscle", text:`Push day: ensure 5g creatine and adequate carbs pre-workout for explosive pressing power.` });
+  if (m.includes("back")||m.includes("biceps")) s.push({ type:"muscle", text:`Pull day: magnesium and zinc support grip strength and recovery. Consider ZMA supplement before bed.` });
+  if (i.calories>0&&i.calories<t.calories*0.6&&(p.goal==="build"||p.goal==="lean")) s.push({ type:"critical", text:`Eating too little for muscle gain! You need a surplus. Add calorie-dense foods: nuts, avocado, olive oil.` });
+  if (p.goal==="debloat") s.push({ type:"info", text:`Debloat focus: keep sodium under ${t.sodium}mg, potassium above ${t.potassium}mg, drink ${t.water}oz water, and eat anti-inflammatory foods (ginger, turmeric, cucumber).` });
+  if (i.omega3<t.omega3*0.5) s.push({ type:"info", text:`Omega-3s reduce inflammation and support joint health for lifting. Add salmon, walnuts, or fish oil supplement.` });
+  if (i.calories===0) s.push({ type:"info", text:`Start logging your meals to get personalized nutrition suggestions based on your ${g?.label.toLowerCase()} goal.` });
   return s;
 }
 
 // ─── COMPONENTS ─────────────────────────────────────────────────────────────
 
-function ProgressRing({ value, max, size = 100, stroke = 7, color, children }) {
-  const r = (size - stroke) / 2;
-  const circ = 2 * Math.PI * r;
-  const pct = Math.min(value / (max || 1), 1.3);
-  const offset = circ * (1 - pct);
-  const over = value > max;
-
+function ProgressRing({ value, max, size=100, stroke=7, color, children }) {
+  const r=(size-stroke)/2, circ=2*Math.PI*r, pct=Math.min(value/(max||1),1.3), off=circ*(1-pct), over=value>max;
   return (
-    <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
-      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke} />
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={over ? "var(--red)" : color}
-          strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={Math.max(offset, 0)}
-          strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
+    <div style={{ position:"relative", width:size, height:size, flexShrink:0 }}>
+      <svg width={size} height={size} style={{ transform:"rotate(-90deg)" }}>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--track)" strokeWidth={stroke} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={over?"var(--red)":color}
+          strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={Math.max(off,0)}
+          strokeLinecap="round" style={{ transition:"stroke-dashoffset 0.6s ease" }} />
       </svg>
-      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-        {children}
-      </div>
+      <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column" }}>{children}</div>
     </div>
   );
 }
 
 function NutrientCard({ id, value, target, compact }) {
-  const info = NUTRIENT_INFO[id];
-  if (!info) return null;
-  const pct = target > 0 ? Math.round((value / target) * 100) : 0;
-  const over = value > target * 1.1;
-  const low = value < target * 0.5;
-
-  if (compact) {
-    return (
-      <div className="nutrient-compact">
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: info.color, flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: 12, color: "var(--text-dim)" }}>{info.label}</span>
-        <span className="mono" style={{ fontSize: 12, fontWeight: 600,
-          color: over ? "var(--red)" : low ? "var(--amber)" : "var(--text)" }}>
-          {value} / {target}{info.unit}
-        </span>
-      </div>
-    );
-  }
-
+  const info = NUTRIENT_INFO[id]; if (!info) return null;
+  const pct = target>0?Math.round((value/target)*100):0, over=value>target*1.1, low=value<target*0.5;
+  if (compact) return (
+    <div className="nutrient-compact">
+      <div style={{ width:8, height:8, borderRadius:"50%", background:info.color, flexShrink:0 }} />
+      <span style={{ flex:1, fontSize:12, color:"var(--text-dim)" }}>{info.label}</span>
+      <span className="mono" style={{ fontSize:12, fontWeight:600, color:over?"var(--red)":low?"var(--amber)":"var(--text)" }}>{value} / {target}{info.unit}</span>
+    </div>
+  );
   return (
-    <div className="card" style={{ borderColor: "transparent" }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = info.color + "44"}
-      onMouseLeave={e => e.currentTarget.style.borderColor = "transparent"}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: info.color }}>{info.label}</span>
-        <span className="mono" style={{ fontSize: 10, color: over ? "var(--red)" : "var(--text-muted)" }}>{pct}%</span>
+    <div className="card" style={{ borderColor:"transparent" }}
+      onMouseEnter={e=>e.currentTarget.style.borderColor=info.color+"44"}
+      onMouseLeave={e=>e.currentTarget.style.borderColor="transparent"}>
+      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+        <span style={{ fontSize:11, fontWeight:600, textTransform:"uppercase", letterSpacing:1, color:info.color }}>{info.label}</span>
+        <span className="mono" style={{ fontSize:10, color:over?"var(--red)":"var(--text-muted)" }}>{pct}%</span>
       </div>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 8 }}>
-        <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--text-bright)" }}>{value}</span>
-        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>/ {target} {info.unit}</span>
+      <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:8 }}>
+        <span className="mono" style={{ fontSize:20, fontWeight:700, color:"var(--text-bright)" }}>{value}</span>
+        <span style={{ fontSize:11, color:"var(--text-muted)" }}>/ {target} {info.unit}</span>
       </div>
       <div className="progress-track">
-        <div className="progress-fill" style={{ width: `${Math.min(pct, 130)}%`,
-          background: over ? "var(--red)" : `linear-gradient(90deg, ${info.color}88, ${info.color})` }} />
+        <div className="progress-fill" style={{ width:`${Math.min(pct,130)}%`, background:over?"var(--red)":`linear-gradient(90deg,${info.color}88,${info.color})` }} />
       </div>
     </div>
   );
@@ -475,359 +479,320 @@ function NutrientCard({ id, value, target, compact }) {
 
 function App() {
   const initial = loadState();
+  const [theme, setTheme] = useState(loadTheme);
   const [tab, setTab] = useState("dashboard");
   const [profile, setProfile] = useState(initial.profile);
   const [intake, setIntake] = useState(initial.intake);
   const [mealLog, setMealLog] = useState(initial.meals);
-  const [mealForm, setMealForm] = useState({ name: "", calories: "", protein: "", carbs: "", fats: "", fiber: "", sugar: "", sodium: "", potassium: "" });
+  const [mealForm, setMealForm] = useState({ name:"", calories:"", protein:"", carbs:"", fats:"", fiber:"", sugar:"", sodium:"", potassium:"" });
+  const [editingBMR, setEditingBMR] = useState(false);
+  const [bmrInput, setBmrInput] = useState("");
 
   const targets = useMemo(() => calcTargets(profile), [profile]);
   const suggestions = useMemo(() => getSuggestions(profile, targets, intake), [profile, targets, intake]);
 
-  // Persist on change
-  useEffect(() => { saveProfile(profile); }, [profile]);
-  useEffect(() => { saveIntake(intake); }, [intake]);
-  useEffect(() => { saveMeals(mealLog); }, [mealLog]);
+  useEffect(() => { document.body.setAttribute("data-theme", theme); document.querySelector('meta[name="theme-color"]').content=theme==="dark"?"#0B0F1A":"#F1F5F9"; try{localStorage.setItem(SK.theme,theme);}catch{} }, [theme]);
+  useEffect(() => { sv(SK.profile, profile); }, [profile]);
+  useEffect(() => { sv(SK.intake, intake); }, [intake]);
+  useEffect(() => { sv(SK.meals, mealLog); try{localStorage.setItem(SK.date,new Date().toDateString());}catch{} }, [mealLog]);
 
-  const updateProfile = (key, val) => setProfile(p => ({ ...p, [key]: val }));
-
-  const toggleMuscle = (id) => {
-    setProfile(p => {
-      const has = p.todayMuscles.includes(id);
-      return { ...p, todayMuscles: has ? p.todayMuscles.filter(m => m !== id) : [...p.todayMuscles, id] };
-    });
-  };
+  const up = (k,v) => setProfile(p=>({...p,[k]:v}));
+  const toggleMuscle = id => setProfile(p=>({...p,todayMuscles:p.todayMuscles.includes(id)?p.todayMuscles.filter(m=>m!==id):[...p.todayMuscles,id]}));
 
   const addMeal = () => {
-    const nums = {};
-    Object.keys(mealForm).forEach(k => { if (k !== "name") nums[k] = parseFloat(mealForm[k]) || 0; });
-    const meal = { id: Date.now(), name: mealForm.name || "Meal", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), ...nums };
-    setMealLog(prev => [...prev, meal]);
-    setIntake(prev => {
-      const next = { ...prev };
-      Object.keys(nums).forEach(k => { next[k] = (next[k] || 0) + nums[k]; });
-      return next;
-    });
-    setMealForm({ name: "", calories: "", protein: "", carbs: "", fats: "", fiber: "", sugar: "", sodium: "", potassium: "" });
+    const nums={}; Object.keys(mealForm).forEach(k=>{if(k!=="name")nums[k]=parseFloat(mealForm[k])||0;});
+    setMealLog(prev=>[...prev,{id:Date.now(),name:mealForm.name||"Meal",time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),...nums}]);
+    setIntake(prev=>{const n={...prev};Object.keys(nums).forEach(k=>{n[k]=(n[k]||0)+nums[k];});return n;});
+    setMealForm({name:"",calories:"",protein:"",carbs:"",fats:"",fiber:"",sugar:"",sodium:"",potassium:""});
     setTab("dashboard");
   };
 
-  const removeMeal = (id) => {
-    const meal = mealLog.find(m => m.id === id);
-    if (!meal) return;
-    setMealLog(prev => prev.filter(m => m.id !== id));
-    setIntake(prev => {
-      const next = { ...prev };
-      ["calories","protein","carbs","fats","fiber","sugar","sodium","potassium"].forEach(k => {
-        next[k] = Math.max(0, (next[k] || 0) - (meal[k] || 0));
-      });
-      return next;
-    });
+  const removeMeal = id => {
+    const meal=mealLog.find(m=>m.id===id); if(!meal)return;
+    setMealLog(prev=>prev.filter(m=>m.id!==id));
+    setIntake(prev=>{const n={...prev};["calories","protein","carbs","fats","fiber","sugar","sodium","potassium"].forEach(k=>{n[k]=Math.max(0,(n[k]||0)-(meal[k]||0));});return n;});
   };
 
-  const addWater = (oz) => setIntake(prev => ({ ...prev, water: prev.water + oz }));
+  const addWater = oz => setIntake(prev=>({...prev,water:Math.max(0,prev.water+oz)}));
+  const resetDay = () => { if(!confirm("Reset all of today's data?"))return; setIntake({...EMPTY_INTAKE}); setMealLog([]); setProfile(p=>({...p,todayMuscles:[]})); };
 
-  const resetDay = () => {
-    setIntake({ ...EMPTY_INTAKE });
-    setMealLog([]);
-    setProfile(p => ({ ...p, todayMuscles: [] }));
-  };
+  const startBMREdit = () => { setBmrInput(String(targets.bmr)); setEditingBMR(true); };
+  const saveBMROverride = () => { const v=parseInt(bmrInput); if(v&&v>0&&v<10000) up("bmrOverride",v); setEditingBMR(false); };
+  const clearBMROverride = () => { up("bmrOverride",null); setEditingBMR(false); };
 
   const macroData = [
-    { label: "Protein", val: intake.protein, target: targets.protein, cal: intake.protein * 4, color: "var(--blue)" },
-    { label: "Carbs", val: intake.carbs, target: targets.carbs, cal: intake.carbs * 4, color: "var(--yellow)" },
-    { label: "Fats", val: intake.fats, target: targets.fats, cal: intake.fats * 9, color: "var(--purple)" },
+    { label:"Protein", val:intake.protein, target:targets.protein, cal:intake.protein*4, color:"var(--blue)" },
+    { label:"Carbs", val:intake.carbs, target:targets.carbs, cal:intake.carbs*4, color:"var(--yellow)" },
+    { label:"Fats", val:intake.fats, target:targets.fats, cal:intake.fats*9, color:"var(--purple)" },
   ];
-  const totalMacroCal = macroData.reduce((s, m) => s + m.cal, 0) || 1;
-
-  const suggestionColors = { critical: "#EF4444", warning: "#FBBF24", info: "#3B82F6", muscle: "#A855F7" };
-  const suggestionIcons = { critical: "⚠", warning: "⚡", info: "💡", muscle: "💪" };
+  const totalMC = macroData.reduce((s,m)=>s+m.cal,0)||1;
+  const sC = {critical:"#EF4444",warning:"#FBBF24",info:"#3B82F6",muscle:"#A855F7"};
+  const sI = {critical:"\u26A0",warning:"\u26A1",info:"\uD83D\uDCA1",muscle:"\uD83D\uDCAA"};
 
   return (
     <React.Fragment>
       {/* Header */}
-      <div style={{ padding: "20px 20px 16px", background: "linear-gradient(180deg, rgba(59,130,246,0.08) 0%, transparent 100%)" }}>
-        <div className="mono" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: "var(--blue)", marginBottom: 4 }}>
-          PHYSIQ ENGINE
+      <div style={{ padding:"20px 20px 16px", background:"linear-gradient(180deg, var(--bg-header) 0%, transparent 100%)" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:4 }}>
+          <div className="mono" style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:2, color:"var(--blue)" }}>PHYSIQ ENGINE</div>
+          <div className="flex-row" style={{ gap:8 }}>
+            <span style={{ fontSize:11, color:"var(--text-muted)" }}>{theme==="dark"?"\uD83C\uDF19":"\u2600\uFE0F"}</span>
+            <button className="theme-toggle" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} aria-label="Toggle theme" />
+          </div>
         </div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", lineHeight: 1.2 }}>
-          {GOALS.find(g => g.id === profile.goal)?.icon} {GOALS.find(g => g.id === profile.goal)?.label} Mode
+        <div style={{ fontSize:22, fontWeight:700, color:"var(--text-white)", lineHeight:1.2 }}>
+          {GOALS.find(g=>g.id===profile.goal)?.icon} {GOALS.find(g=>g.id===profile.goal)?.label} Mode
         </div>
-        <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
-          {targets.tdee} TDEE · {targets.leanMass}lb lean · {profile.steps.toLocaleString()} steps
+        <div style={{ fontSize:12, color:"var(--text-muted)", marginTop:4 }}>
+          {targets.tdee} TDEE \u00B7 {targets.leanMass}lb lean \u00B7 {profile.steps.toLocaleString()} steps
+          {targets.isOverridden && <span className="bmr-override-badge">\u00B7 BMR Override</span>}
         </div>
       </div>
 
-      <div style={{ padding: "0 16px" }}>
+      <div style={{ padding:"0 16px" }}>
 
-        {/* ═══ DASHBOARD ═══ */}
-        {tab === "dashboard" && (
+        {/* DASHBOARD */}
+        {tab==="dashboard" && (
           <div className="fade-in">
-            {/* Calorie Ring + Macros */}
-            <div className="flex-row" style={{ gap: 20, padding: "16px 0 20px" }}>
+            <div className="flex-row" style={{ gap:20, padding:"16px 0 20px" }}>
               <ProgressRing value={intake.calories} max={targets.calories} color="var(--orange)">
-                <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--text-white)" }}>{intake.calories}</span>
-                <span style={{ fontSize: 9, color: "var(--text-muted)" }}>/ {targets.calories}</span>
+                <span className="mono" style={{ fontSize:20, fontWeight:700, color:"var(--text-white)" }}>{intake.calories}</span>
+                <span style={{ fontSize:9, color:"var(--text-muted)" }}>/ {targets.calories}</span>
               </ProgressRing>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 8 }}>MACRO SPLIT</div>
-                <div style={{ display: "flex", gap: 2, height: 8, borderRadius: 4, overflow: "hidden", marginBottom: 10 }}>
-                  {macroData.map(m => <div key={m.label} style={{ flex: m.cal / totalMacroCal, background: m.color, transition: "flex 0.4s" }} />)}
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:11, color:"var(--text-muted)", marginBottom:8 }}>MACRO SPLIT</div>
+                <div style={{ display:"flex", gap:2, height:8, borderRadius:4, overflow:"hidden", marginBottom:10 }}>
+                  {macroData.map(m=><div key={m.label} style={{ flex:m.cal/totalMC, background:m.color, transition:"flex 0.4s" }} />)}
                 </div>
-                {macroData.map(m => (
-                  <div key={m.label} className="flex-row" style={{ gap: 6, marginBottom: 4 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: m.color }} />
-                    <span style={{ fontSize: 11, color: "var(--text-dim)", flex: 1 }}>{m.label}</span>
-                    <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: m.val >= m.target ? "var(--green)" : "var(--text)" }}>{m.val}g</span>
-                    <span style={{ fontSize: 10, color: "var(--text-faint)" }}>/{m.target}g</span>
+                {macroData.map(m=>(
+                  <div key={m.label} className="flex-row" style={{ gap:6, marginBottom:4 }}>
+                    <div style={{ width:6, height:6, borderRadius:"50%", background:m.color }} />
+                    <span style={{ fontSize:11, color:"var(--text-dim)", flex:1 }}>{m.label}</span>
+                    <span className="mono" style={{ fontSize:12, fontWeight:600, color:m.val>=m.target?"var(--green)":"var(--text)" }}>{m.val}g</span>
+                    <span style={{ fontSize:10, color:"var(--text-faint)" }}>/{m.target}g</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Water */}
-            <div style={{ background: "rgba(56,189,248,0.06)", borderRadius: 12, padding: 14, border: "1px solid rgba(56,189,248,0.12)", marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sky)" }}>💧 Water</span>
-                <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: "var(--text-bright)" }}>
-                  {intake.water}oz <span style={{ color: "var(--text-faint)", fontWeight: 400 }}>/ {targets.water}oz</span>
+            <div style={{ background:"var(--water-bg)", borderRadius:12, padding:14, border:"1px solid var(--water-border)", marginBottom:16 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                <span style={{ fontSize:12, fontWeight:600, color:"var(--sky)" }}>{"\uD83D\uDCA7"} Water</span>
+                <span className="mono" style={{ fontSize:13, fontWeight:700, color:"var(--text-bright)" }}>
+                  {intake.water}oz <span style={{ color:"var(--text-faint)", fontWeight:400 }}>/ {targets.water}oz</span>
                 </span>
               </div>
-              <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 10 }}>
-                <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(intake.water / (targets.water || 1) * 100, 100)}%`,
-                  background: "linear-gradient(90deg, #0EA5E9, #38BDF8)", transition: "width 0.4s" }} />
+              <div style={{ height:6, borderRadius:3, background:"var(--track)", overflow:"hidden", marginBottom:10 }}>
+                <div style={{ height:"100%", borderRadius:3, width:`${Math.min(intake.water/(targets.water||1)*100,100)}%`, background:"linear-gradient(90deg,#0EA5E9,#38BDF8)", transition:"width 0.4s" }} />
               </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                {[8, 16, 24].map(oz => <button key={oz} className="water-btn" onClick={() => addWater(oz)}>+{oz}oz</button>)}
+              <div style={{ display:"flex", gap:6 }}>
+                <button className="water-btn subtract" onClick={()=>addWater(-8)}>{"\u2212"}8oz</button>
+                {[8,16,24].map(oz=><button key={oz} className="water-btn" onClick={()=>addWater(oz)}>+{oz}oz</button>)}
               </div>
             </div>
 
-            {/* Key Nutrients */}
             <div className="label">Key Nutrients</div>
-            <div className="grid-2" style={{ marginBottom: 20 }}>
-              {["protein", "sodium", "potassium", "sugar", "fiber", "creatine"].map(id =>
-                <NutrientCard key={id} id={id} value={intake[id] || 0} target={targets[id]} />
-              )}
+            <div className="grid-2" style={{ marginBottom:20 }}>
+              {["protein","sodium","potassium","sugar","fiber","creatine"].map(id=><NutrientCard key={id} id={id} value={intake[id]||0} target={targets[id]} />)}
             </div>
 
-            {/* Micros */}
             <div className="label">Micronutrients & Supps</div>
-            <div className="card" style={{ padding: "8px 14px", marginBottom: 20 }}>
-              {["calcium", "magnesium", "iron", "zinc", "vitaminD", "b12", "omega3"].map(id =>
-                <NutrientCard key={id} id={id} value={intake[id] || 0} target={targets[id]} compact />
-              )}
+            <div className="card" style={{ padding:"8px 14px", marginBottom:20 }}>
+              {["calcium","magnesium","iron","zinc","vitaminD","b12","omega3"].map(id=><NutrientCard key={id} id={id} value={intake[id]||0} target={targets[id]} compact />)}
             </div>
 
-            {/* Suggestions */}
-            {suggestions.length > 0 && (
-              <React.Fragment>
-                <div className="label">Smart Suggestions</div>
-                <div className="flex-col gap-8" style={{ marginBottom: 20 }}>
-                  {suggestions.map((s, i) => (
-                    <div key={i} className="suggestion"
-                      style={{ background: suggestionColors[s.type] + "08", border: `1px solid ${suggestionColors[s.type]}22` }}>
-                      <span style={{ marginRight: 8 }}>{suggestionIcons[s.type]}</span>{s.text}
-                    </div>
-                  ))}
-                </div>
-              </React.Fragment>
-            )}
+            {suggestions.length>0 && (<React.Fragment>
+              <div className="label">Smart Suggestions</div>
+              <div className="flex-col gap-8" style={{ marginBottom:20 }}>
+                {suggestions.map((s,i)=><div key={i} className="suggestion" style={{ background:sC[s.type]+"08", border:`1px solid ${sC[s.type]}22` }}><span style={{ marginRight:8 }}>{sI[s.type]}</span>{s.text}</div>)}
+              </div>
+            </React.Fragment>)}
 
-            {/* Today's Muscles */}
-            {profile.todayMuscles.length > 0 && (
-              <React.Fragment>
-                <div className="label">Today's Target Muscles</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
-                  {profile.todayMuscles.map(id => {
-                    const mg = MUSCLE_GROUPS.find(m => m.id === id);
-                    return <div key={id} className="muscle-tag">{mg?.icon} {mg?.label} · {mg?.recovery}h recovery</div>;
-                  })}
-                </div>
-              </React.Fragment>
-            )}
+            {profile.todayMuscles.length>0 && (<React.Fragment>
+              <div className="label">Today's Target Muscles</div>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:20 }}>
+                {profile.todayMuscles.map(id=>{const mg=MUSCLE_GROUPS.find(m=>m.id===id);return <div key={id} className="muscle-tag">{mg?.icon} {mg?.label} \u00B7 {mg?.recovery}h recovery</div>;})}
+              </div>
+            </React.Fragment>)}
 
-            {/* Meal Log */}
-            {mealLog.length > 0 && (
-              <React.Fragment>
-                <div className="label">Today's Meals</div>
-                <div className="flex-col gap-6" style={{ marginBottom: 20 }}>
-                  {mealLog.map(m => (
-                    <div key={m.id} className="meal-row">
-                      <span className="mono" style={{ fontSize: 10, color: "var(--text-faint)" }}>{m.time}</span>
-                      <span style={{ flex: 1, fontSize: 13, fontWeight: 500 }}>{m.name}</span>
-                      <span className="mono" style={{ fontSize: 12, color: "var(--orange)" }}>{m.calories}cal</span>
-                      <span className="mono" style={{ fontSize: 12, color: "var(--blue)" }}>{m.protein}g P</span>
-                      <button className="meal-remove" onClick={() => removeMeal(m.id)}>×</button>
-                    </div>
-                  ))}
-                </div>
-              </React.Fragment>
-            )}
+            {mealLog.length>0 && (<React.Fragment>
+              <div className="label">Today's Meals</div>
+              <div className="flex-col gap-6" style={{ marginBottom:20 }}>
+                {mealLog.map(m=>(
+                  <div key={m.id} className="meal-row">
+                    <span className="mono" style={{ fontSize:10, color:"var(--text-faint)" }}>{m.time}</span>
+                    <span style={{ flex:1, fontSize:13, fontWeight:500 }}>{m.name}</span>
+                    <span className="mono" style={{ fontSize:12, color:"var(--orange)" }}>{m.calories}cal</span>
+                    <span className="mono" style={{ fontSize:12, color:"var(--blue)" }}>{m.protein}g P</span>
+                    <button className="meal-remove" onClick={()=>removeMeal(m.id)}>{"\u00D7"}</button>
+                  </div>
+                ))}
+              </div>
+            </React.Fragment>)}
 
-            {/* Reset Day */}
-            <div style={{ display: "flex", justifyContent: "center", paddingBottom: 20 }}>
+            <div style={{ display:"flex", justifyContent:"center", paddingBottom:20 }}>
               <button className="reset-btn" onClick={resetDay}>Reset Today's Data</button>
             </div>
           </div>
         )}
 
-        {/* ═══ LOG MEAL ═══ */}
-        {tab === "log" && (
-          <div className="fade-in" style={{ paddingTop: 16 }}>
+        {/* LOG MEAL */}
+        {tab==="log" && (
+          <div className="fade-in" style={{ paddingTop:16 }}>
             <div className="label">Log a Meal</div>
             <div className="flex-col gap-10">
-              <input className="input" placeholder="Meal name (e.g., Grilled Chicken Bowl)" value={mealForm.name}
-                onChange={e => setMealForm(f => ({ ...f, name: e.target.value }))} />
-
-              <div className="label" style={{ marginBottom: 0 }}>Macros</div>
+              <input className="input" placeholder="Meal name (e.g., Grilled Chicken Bowl)" value={mealForm.name} onChange={e=>setMealForm(f=>({...f,name:e.target.value}))} />
+              <div className="label" style={{ marginBottom:0 }}>Macros</div>
               <div className="grid-2">
-                {[{ k: "calories", l: "Calories", c: "#F97316" }, { k: "protein", l: "Protein (g)", c: "#3B82F6" },
-                  { k: "carbs", l: "Carbs (g)", c: "#EAB308" }, { k: "fats", l: "Fats (g)", c: "#A855F7" }].map(f => (
+                {[{k:"calories",l:"Calories",c:"#F97316"},{k:"protein",l:"Protein (g)",c:"#3B82F6"},{k:"carbs",l:"Carbs (g)",c:"#EAB308"},{k:"fats",l:"Fats (g)",c:"#A855F7"}].map(f=>(
                   <div key={f.k}>
-                    <label style={{ fontSize: 10, color: f.c, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{f.l}</label>
-                    <input className="input" type="number" placeholder="0" value={mealForm[f.k]} style={{ marginTop: 4 }}
-                      onChange={e => setMealForm(fm => ({ ...fm, [f.k]: e.target.value }))} />
+                    <label style={{ fontSize:10, color:f.c, fontWeight:600, textTransform:"uppercase", letterSpacing:0.5 }}>{f.l}</label>
+                    <input className="input" type="number" inputMode="decimal" placeholder="0" value={mealForm[f.k]} style={{ marginTop:4 }} onChange={e=>setMealForm(fm=>({...fm,[f.k]:e.target.value}))} />
                   </div>
                 ))}
               </div>
-
-              <div className="label" style={{ marginBottom: 0 }}>Additional</div>
+              <div className="label" style={{ marginBottom:0 }}>Additional</div>
               <div className="grid-2">
-                {[{ k: "fiber", l: "Fiber (g)" }, { k: "sugar", l: "Sugar (g)" },
-                  { k: "sodium", l: "Sodium (mg)" }, { k: "potassium", l: "Potassium (mg)" }].map(f => (
+                {[{k:"fiber",l:"Fiber (g)"},{k:"sugar",l:"Sugar (g)"},{k:"sodium",l:"Sodium (mg)"},{k:"potassium",l:"Potassium (mg)"}].map(f=>(
                   <div key={f.k}>
-                    <label style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{f.l}</label>
-                    <input className="input" type="number" placeholder="0" value={mealForm[f.k]} style={{ marginTop: 4 }}
-                      onChange={e => setMealForm(fm => ({ ...fm, [f.k]: e.target.value }))} />
+                    <label style={{ fontSize:10, color:"var(--text-muted)", fontWeight:600, textTransform:"uppercase", letterSpacing:0.5 }}>{f.l}</label>
+                    <input className="input" type="number" inputMode="decimal" placeholder="0" value={mealForm[f.k]} style={{ marginTop:4 }} onChange={e=>setMealForm(fm=>({...fm,[f.k]:e.target.value}))} />
                   </div>
                 ))}
               </div>
-
               <button className="btn btn-primary" onClick={addMeal}>+ Log Meal</button>
             </div>
           </div>
         )}
 
-        {/* ═══ MUSCLES ═══ */}
-        {tab === "muscles" && (
-          <div className="fade-in" style={{ paddingTop: 16 }}>
-            <div className="label">Today's Workout — Select Muscle Groups</div>
-            <div className="grid-2-10" style={{ marginBottom: 20 }}>
-              {MUSCLE_GROUPS.map(mg => {
-                const active = profile.todayMuscles.includes(mg.id);
-                return (
-                  <button key={mg.id} className={`muscle-btn${active ? " active" : ""}`} onClick={() => toggleMuscle(mg.id)}>
-                    <div style={{ fontSize: 18, marginBottom: 4 }}>{mg.icon}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600 }}>{mg.label}</div>
-                    <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 2 }}>{mg.recovery}h recovery</div>
-                  </button>
-                );
+        {/* MUSCLES */}
+        {tab==="muscles" && (
+          <div className="fade-in" style={{ paddingTop:16 }}>
+            <div className="label">Today's Workout \u2014 Select Muscle Groups</div>
+            <div className="grid-2-10" style={{ marginBottom:20 }}>
+              {MUSCLE_GROUPS.map(mg=>{
+                const active=profile.todayMuscles.includes(mg.id);
+                return (<button key={mg.id} className={`muscle-btn${active?" active":""}`} onClick={()=>toggleMuscle(mg.id)}>
+                  <div style={{ fontSize:18, marginBottom:4 }}>{mg.icon}</div>
+                  <div style={{ fontSize:14, fontWeight:600 }}>{mg.label}</div>
+                  <div style={{ fontSize:10, color:"var(--text-faint)", marginTop:2 }}>{mg.recovery}h recovery</div>
+                </button>);
               })}
             </div>
-
-            {profile.todayMuscles.length > 0 && (
-              <React.Fragment>
-                <div className="label">Nutrient Focus for Your Workout</div>
-                <div className="flex-col gap-8" style={{ marginBottom: 20 }}>
-                  {[...new Set(profile.todayMuscles.flatMap(id => MUSCLE_GROUPS.find(m => m.id === id)?.nutrients || []))].map(n => {
-                    const info = NUTRIENT_INFO[n];
-                    return info ? (
-                      <div key={n} className="nutrient-focus" style={{ background: info.color + "08", border: `1px solid ${info.color}22` }}>
-                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: info.color }} />
-                        <span style={{ fontSize: 13, fontWeight: 600, color: info.color }}>{info.label}</span>
-                        <span style={{ flex: 1 }} />
-                        <span className="mono" style={{ fontSize: 12, color: "var(--text-dim)" }}>Target: {targets[n]}{info.unit}</span>
-                      </div>
-                    ) : null;
-                  })}
-                </div>
-              </React.Fragment>
-            )}
+            {profile.todayMuscles.length>0 && (<React.Fragment>
+              <div className="label">Nutrient Focus for Your Workout</div>
+              <div className="flex-col gap-8" style={{ marginBottom:20 }}>
+                {[...new Set(profile.todayMuscles.flatMap(id=>MUSCLE_GROUPS.find(m=>m.id===id)?.nutrients||[]))].map(n=>{
+                  const info=NUTRIENT_INFO[n]; return info?(<div key={n} className="nutrient-focus" style={{ background:info.color+"08", border:`1px solid ${info.color}22` }}>
+                    <div style={{ width:8, height:8, borderRadius:"50%", background:info.color }} />
+                    <span style={{ fontSize:13, fontWeight:600, color:info.color }}>{info.label}</span>
+                    <span style={{ flex:1 }} />
+                    <span className="mono" style={{ fontSize:12, color:"var(--text-dim)" }}>Target: {targets[n]}{info.unit}</span>
+                  </div>):null;
+                })}
+              </div>
+            </React.Fragment>)}
           </div>
         )}
 
-        {/* ═══ PROFILE ═══ */}
-        {tab === "profile" && (
-          <div className="fade-in" style={{ paddingTop: 16 }}>
+        {/* PROFILE */}
+        {tab==="profile" && (
+          <div className="fade-in" style={{ paddingTop:16 }}>
             <div className="label">Your Build</div>
-            <div className="grid-2-10" style={{ marginBottom: 20 }}>
-              {[
-                { k: "age", l: "Age", u: "yrs" }, { k: "weight", l: "Weight", u: "lbs" },
-                { k: "height", l: "Height", u: "in" }, { k: "bodyfat", l: "Body Fat", u: "%" },
-                { k: "steps", l: "Avg Steps", u: "/day" }, { k: "gymDays", l: "Gym Days", u: "/week" },
-              ].map(f => (
+            <div className="grid-2-10" style={{ marginBottom:20 }}>
+              {[{k:"age",l:"Age",u:"yrs"},{k:"weight",l:"Weight",u:"lbs"},{k:"height",l:"Height",u:"in"},{k:"bodyfat",l:"Body Fat",u:"%"},{k:"steps",l:"Avg Steps",u:"/day"},{k:"gymDays",l:"Gym Days",u:"/week"}].map(f=>(
                 <div key={f.k}>
-                  <label style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                    {f.l} <span style={{ color: "var(--text-faint)" }}>({f.u})</span>
-                  </label>
-                  <input className="input" type="number" value={profile[f.k]} style={{ marginTop: 4 }}
-                    onChange={e => updateProfile(f.k, parseFloat(e.target.value) || 0)} />
+                  <label style={{ fontSize:10, color:"var(--text-muted)", fontWeight:600, textTransform:"uppercase", letterSpacing:0.5 }}>{f.l} <span style={{ color:"var(--text-faint)" }}>({f.u})</span></label>
+                  <input className="input" type="number" inputMode="decimal" value={profile[f.k]} style={{ marginTop:4 }} onChange={e=>up(f.k,parseFloat(e.target.value)||0)} />
                 </div>
               ))}
             </div>
 
             <div className="label">Sex</div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-              {[{ id: "male", label: "Male" }, { id: "female", label: "Female" }].map(s =>
-                <button key={s.id} className={`sex-btn${profile.sex === s.id ? " active" : ""}`}
-                  onClick={() => updateProfile("sex", s.id)}>{s.label}</button>
-              )}
+            <div style={{ display:"flex", gap:8, marginBottom:20 }}>
+              {[{id:"male",label:"Male"},{id:"female",label:"Female"}].map(s=><button key={s.id} className={`sex-btn${profile.sex===s.id?" active":""}`} onClick={()=>up("sex",s.id)}>{s.label}</button>)}
             </div>
 
             <div className="label">Activity Level</div>
-            <div className="flex-col gap-6" style={{ marginBottom: 20 }}>
-              {ACTIVITY_LEVELS.map(a => (
-                <button key={a.id} className={`option-btn${profile.activity === a.id ? " active" : ""}`}
-                  onClick={() => updateProfile("activity", a.id)}>
-                  <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{a.label}</span>
-                  <span className="mono" style={{ fontSize: 10, color: "var(--text-faint)" }}>{a.steps}</span>
-                </button>
-              ))}
+            <div className="flex-col gap-6" style={{ marginBottom:20 }}>
+              {ACTIVITY_LEVELS.map(a=>(<button key={a.id} className={`option-btn${profile.activity===a.id?" active":""}`} onClick={()=>up("activity",a.id)}>
+                <span style={{ fontSize:13, fontWeight:500, flex:1 }}>{a.label}</span>
+                <span className="mono" style={{ fontSize:10, color:"var(--text-faint)" }}>{a.steps}</span>
+              </button>))}
             </div>
 
             <div className="label">Goal</div>
-            <div className="flex-col gap-6" style={{ marginBottom: 20 }}>
-              {GOALS.map(g => (
-                <button key={g.id} className={`option-btn${profile.goal === g.id ? " active" : ""}`}
-                  onClick={() => updateProfile("goal", g.id)} style={{ padding: 14 }}>
-                  <span style={{ fontSize: 18, flexShrink: 0 }}>{g.icon}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>{g.label}</div>
-                    <div style={{ fontSize: 10, color: "var(--text-faint)" }}>
-                      {g.surplus > 0 ? `+${g.surplus}` : g.surplus} cal · {Math.round(g.proteinMult * 100)}% protein
-                    </div>
-                  </div>
-                </button>
-              ))}
+            <div className="flex-col gap-6" style={{ marginBottom:20 }}>
+              {GOALS.map(g=>(<button key={g.id} className={`option-btn${profile.goal===g.id?" active":""}`} onClick={()=>up("goal",g.id)} style={{ padding:14 }}>
+                <span style={{ fontSize:18, flexShrink:0 }}>{g.icon}</span>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:13, fontWeight:600 }}>{g.label}</div>
+                  <div style={{ fontSize:10, color:"var(--text-faint)" }}>{g.surplus>0?`+${g.surplus}`:g.surplus} cal \u00B7 {Math.round(g.proteinMult*100)}% protein</div>
+                </div>
+              </button>))}
             </div>
 
+            {/* Computed Stats with editable BMR */}
             <div className="label">Your Computed Stats</div>
-            <div className="card" style={{ padding: 14, marginBottom: 20 }}>
-              {[
-                { l: "BMR", v: `${targets.bmr} kcal` }, { l: "TDEE", v: `${targets.tdee} kcal` },
-                { l: "Target Calories", v: `${targets.calories} kcal` }, { l: "Lean Body Mass", v: `${targets.leanMass} lbs` },
-                { l: "Protein Target", v: `${targets.protein}g` }, { l: "Water Target", v: `${targets.water} oz` },
-              ].map(s => (
+            <div className="card" style={{ padding:14, marginBottom:20 }}>
+              <div className="stat-row" style={{ flexWrap:"wrap" }}>
+                <span style={{ fontSize:12, color:"var(--text-muted)", display:"flex", alignItems:"center", gap:4 }}>
+                  BMR {targets.isOverridden && <span className="bmr-override-badge">(custom)</span>}
+                </span>
+                {editingBMR ? (
+                  <div className="flex-row gap-6" style={{ flexWrap:"wrap" }}>
+                    <input className="input mono" type="number" inputMode="numeric" value={bmrInput} onChange={e=>setBmrInput(e.target.value)}
+                      style={{ width:90, padding:"4px 8px", fontSize:13, textAlign:"right" }} autoFocus
+                      onKeyDown={e=>{if(e.key==="Enter")saveBMROverride();if(e.key==="Escape")setEditingBMR(false);}} />
+                    <button className="bmr-edit-btn" onClick={saveBMROverride} style={{ color:"var(--green)", borderColor:"var(--green)" }}>Save</button>
+                    {targets.isOverridden && <button className="bmr-edit-btn" onClick={clearBMROverride} style={{ color:"var(--red)", borderColor:"var(--red)" }}>Reset</button>}
+                    <button className="bmr-edit-btn" onClick={()=>setEditingBMR(false)}>Cancel</button>
+                  </div>
+                ) : (
+                  <div className="flex-row gap-6">
+                    <span className="mono" style={{ fontSize:13, fontWeight:600, color:"var(--text)" }}>{targets.bmr} kcal</span>
+                    <button className="bmr-edit-btn" onClick={startBMREdit}>Edit</button>
+                  </div>
+                )}
+              </div>
+              {targets.isOverridden && <div style={{ fontSize:10, color:"var(--text-faint)", padding:"4px 0", borderBottom:"1px solid var(--stat-border)" }}>Calculated: {targets.calculatedBMR} kcal (Mifflin-St Jeor)</div>}
+              {[{l:"TDEE",v:`${targets.tdee} kcal`},{l:"Target Calories",v:`${targets.calories} kcal`},{l:"Lean Body Mass",v:`${targets.leanMass} lbs`},{l:"Protein Target",v:`${targets.protein}g`},{l:"Water Target",v:`${targets.water} oz`}].map(s=>(
                 <div key={s.l} className="stat-row">
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{s.l}</span>
-                  <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{s.v}</span>
+                  <span style={{ fontSize:12, color:"var(--text-muted)" }}>{s.l}</span>
+                  <span className="mono" style={{ fontSize:13, fontWeight:600, color:"var(--text)" }}>{s.v}</span>
                 </div>
               ))}
             </div>
+
+            {/* BMR Formula Reference */}
+            <div className="card" style={{ padding:14, marginBottom:20, background:"var(--surface-alt)" }}>
+              <div style={{ fontSize:11, fontWeight:700, color:"var(--text-muted)", marginBottom:8, textTransform:"uppercase", letterSpacing:1 }}>BMR Formula Reference</div>
+              <div style={{ fontSize:11, lineHeight:1.7, color:"var(--text-dim)" }}>
+                <strong>Mifflin-St Jeor Equation</strong><br/>
+                Male: (10 \u00D7 kg) + (6.25 \u00D7 cm) \u2212 (5 \u00D7 age) + 5<br/>
+                Female: (10 \u00D7 kg) + (6.25 \u00D7 cm) \u2212 (5 \u00D7 age) \u2212 161<br/>
+                <span style={{ color:"var(--text-faint)", fontSize:10 }}>
+                  Your inputs: {(profile.weight*0.453592).toFixed(1)}kg \u00B7 {(profile.height*2.54).toFixed(1)}cm \u00B7 {profile.age}yrs<br/>
+                  = (10\u00D7{(profile.weight*0.453592).toFixed(1)}) + (6.25\u00D7{(profile.height*2.54).toFixed(1)}) \u2212 (5\u00D7{profile.age}) {profile.sex==="male"?"+ 5":"\u2212 161"} = <strong>{targets.calculatedBMR} kcal</strong>
+                </span>
+              </div>
+              {targets.isOverridden && <div style={{ marginTop:8, fontSize:11, color:"var(--amber)" }}>You are using a custom BMR of {targets.bmr} kcal. All targets are based on this override.</div>}
+            </div>
+
+            <div className="label">Appearance</div>
+            <div className="flex-row" style={{ gap:12, marginBottom:30 }}>
+              <span style={{ fontSize:13, color:"var(--text-dim)", flex:1 }}>{theme==="dark"?"\uD83C\uDF19 Dark Mode":"\u2600\uFE0F Light Mode"}</span>
+              <button className="theme-toggle" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} aria-label="Toggle theme" />
+            </div>
           </div>
         )}
-
       </div>
 
       {/* Nav */}
       <div className="nav">
-        {[
-          { id: "dashboard", label: "Dashboard", icon: "◉" },
-          { id: "log", label: "Log Meal", icon: "+" },
-          { id: "muscles", label: "Muscles", icon: "◆" },
-          { id: "profile", label: "Profile", icon: "⚙" },
-        ].map(t => (
-          <button key={t.id} className={`nav-btn${tab === t.id ? " active" : ""}`} onClick={() => setTab(t.id)}>
+        {[{id:"dashboard",label:"Dashboard",icon:"\u25C9"},{id:"log",label:"Log Meal",icon:"+"},{id:"muscles",label:"Muscles",icon:"\u25C6"},{id:"profile",label:"Profile",icon:"\u2699"}].map(t=>(
+          <button key={t.id} className={`nav-btn${tab===t.id?" active":""}`} onClick={()=>setTab(t.id)}>
             <span>{t.icon}</span><span>{t.label}</span>
           </button>
         ))}
