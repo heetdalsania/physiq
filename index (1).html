@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0B0F1A">
+<title>PHYSIQ ENGINE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B0F1A;
+    --surface: rgba(255,255,255,0.03);
+    --surface-hover: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.05);
+    --border-active: rgba(59,130,246,0.4);
+    --text: #E2E8F0;
+    --text-dim: #94A3B8;
+    --text-muted: #64748B;
+    --text-faint: #475569;
+    --text-bright: #F1F5F9;
+    --text-white: #F8FAFC;
+    --blue: #3B82F6;
+    --blue-light: #60A5FA;
+    --blue-glow: rgba(59,130,246,0.3);
+    --orange: #F97316;
+    --yellow: #EAB308;
+    --purple: #A855F7;
+    --purple-light: #C084FC;
+    --green: #22C55E;
+    --red: #EF4444;
+    --pink: #F43F5E;
+    --teal: #14B8A6;
+    --cyan: #06B6D4;
+    --sky: #38BDF8;
+    --amber: #FBBF24;
+    --indigo: #6366F1;
+    --magenta: #D946EF;
+    --rose: #EC4899;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    padding-bottom: 80px;
+  }
+
+  /* Typography */
+  .mono { font-family: 'Space Mono', monospace; }
+  .label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 12px;
+  }
+
+  /* Inputs */
+  .input {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 10px 12px; color: var(--text-bright); font-size: 14px;
+    font-family: 'Space Mono', monospace; outline: none; width: 100%;
+    transition: border-color 0.2s;
+  }
+  .input:focus { border-color: var(--blue); }
+  .input::placeholder { color: var(--text-faint); }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border-radius: 12px; padding: 14px;
+    border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .card:hover { background: var(--surface-hover); }
+
+  /* Buttons */
+  .btn {
+    border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s; -webkit-appearance: none;
+  }
+  .btn-primary {
+    padding: 14px; border-radius: 10px; width: 100%;
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+    box-shadow: 0 4px 20px var(--blue-glow);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(59,130,246,0.4); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* Progress bar */
+  .progress-track {
+    height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06); overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 2px; transition: width 0.6s ease;
+  }
+
+  /* Bottom Nav */
+  .nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; background: rgba(11,15,26,0.95);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; padding: 8px 0 max(12px, env(safe-area-inset-bottom)); z-index: 100;
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: none; border: none; cursor: pointer; padding: 6px 0;
+    color: var(--text-faint); transition: color 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .nav-btn.active { color: var(--blue); }
+  .nav-btn span:first-child { font-size: 18px; }
+  .nav-btn span:last-child { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
+
+  /* Grids */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .grid-2-10 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .flex-col { display: flex; flex-direction: column; }
+  .flex-row { display: flex; align-items: center; }
+  .gap-6 { gap: 6px; }
+  .gap-8 { gap: 8px; }
+  .gap-10 { gap: 10px; }
+
+  /* Animations */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+  /* Water button */
+  .water-btn {
+    flex: 1; padding: 8px 0; border-radius: 8px;
+    background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.2);
+    color: var(--sky); font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .water-btn:hover { background: rgba(56,189,248,0.25); }
+
+  /* Muscle button */
+  .muscle-btn {
+    padding: 16px 14px; border-radius: 12px; cursor: pointer; text-align: left;
+    background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.2s; color: var(--text-dim);
+  }
+  .muscle-btn.active {
+    background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.4); color: var(--purple-light);
+  }
+
+  /* Activity / Goal buttons */
+  .option-btn {
+    display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px;
+    cursor: pointer; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+    color: var(--text-dim); transition: all 0.2s; text-align: left; width: 100%;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .option-btn.active {
+    background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: var(--blue-light);
+  }
+
+  /* Suggestion cards */
+  .suggestion { padding: 12px 14px; border-radius: 10px; font-size: 12px; line-height: 1.5; color: #CBD5E1; }
+
+  /* Meal row */
+  .meal-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-radius: 10px; background: var(--surface); border: 1px solid var(--border);
+  }
+  .meal-remove {
+    background: none; border: none; color: var(--text-faint); cursor: pointer;
+    font-size: 14px; padding: 0 4px;
+  }
+
+  /* Nutrient compact row */
+  .nutrient-compact {
+    display: flex; align-items: center; gap: 8px; padding: 6px 0;
+  }
+
+  /* Sex toggle */
+  .sex-btn {
+    flex: 1; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 13px;
+    font-weight: 600; background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text-muted); transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .sex-btn.active { background: rgba(59,130,246,0.15); border-color: var(--border-active); color: var(--blue-light); }
+
+  /* Stat row */
+  .stat-row {
+    display: flex; justify-content: space-between; padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  /* Tag */
+  .muscle-tag {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25); color: var(--purple-light);
+  }
+
+  /* Nutrient focus pill */
+  .nutrient-focus {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px;
+  }
+
+  /* Reset button */
+  .reset-btn {
+    padding: 10px 16px; border-radius: 8px; background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.2); color: var(--red); font-size: 12px;
+    font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .reset-btn:hover { background: rgba(239,68,68,0.2); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo, useCallback } = React;
+
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const MUSCLE_GROUPS = [
+  { id: "chest", label: "Chest", icon: "◼", nutrients: ["protein", "creatine", "leucine"], recovery: 48 },
+  { id: "back", label: "Back", icon: "◆", nutrients: ["protein", "magnesium", "zinc"], recovery: 48 },
+  { id: "shoulders", label: "Shoulders", icon: "▲", nutrients: ["protein", "vitaminD", "calcium"], recovery: 48 },
+  { id: "biceps", label: "Biceps", icon: "●", nutrients: ["protein", "potassium", "b12"], recovery: 36 },
+  { id: "triceps", label: "Triceps", icon: "●", nutrients: ["protein", "potassium", "b12"], recovery: 36 },
+  { id: "legs", label: "Legs", icon: "▼", nutrients: ["protein", "iron", "glycogen"], recovery: 72 },
+  { id: "core", label: "Core", icon: "◇", nutrients: ["protein", "fiber", "omega3"], recovery: 24 },
+  { id: "glutes", label: "Glutes", icon: "■", nutrients: ["protein", "iron", "glycogen"], recovery: 72 },
+];
+
+const GOALS = [
+  { id: "build", label: "Build Muscle", surplus: 300, proteinMult: 1.0, icon: "↑" },
+  { id: "lean", label: "Lean Bulk", surplus: 150, proteinMult: 0.95, icon: "⬈" },
+  { id: "maintain", label: "Maintain", surplus: 0, proteinMult: 0.85, icon: "→" },
+  { id: "cut", label: "Cut Fat", surplus: -400, proteinMult: 1.1, icon: "↓" },
+  { id: "debloat", label: "Debloat + Cut", surplus: -300, proteinMult: 1.0, icon: "⬊" },
+];
+
+const ACTIVITY_LEVELS = [
+  { id: "sedentary", label: "Sedentary", mult: 1.2, steps: "< 4k steps" },
+  { id: "light", label: "Lightly Active", mult: 1.375, steps: "4-7k steps" },
+  { id: "moderate", label: "Moderately Active", mult: 1.55, steps: "7-10k steps" },
+  { id: "active", label: "Very Active", mult: 1.725, steps: "10-14k steps" },
+  { id: "extreme", label: "Extremely Active", mult: 1.9, steps: "14k+ steps" },
+];
+
+const DEFAULT_PROFILE = {
+  age: 28, weight: 180, height: 70, sex: "male", bodyfat: 18,
+  goal: "build", activity: "moderate", gymDays: 5, steps: 8000,
+  todayMuscles: [], waterIntake: 0,
+};
+
+const NUTRIENT_INFO = {
+  calories: { unit: "kcal", label: "Calories", color: "#F97316" },
+  protein: { unit: "g", label: "Protein", color: "#3B82F6" },
+  carbs: { unit: "g", label: "Carbs", color: "#EAB308" },
+  fats: { unit: "g", label: "Fats", color: "#A855F7" },
+  fiber: { unit: "g", label: "Fiber", color: "#22C55E" },
+  sugar: { unit: "g", label: "Sugar", color: "#F43F5E" },
+  sodium: { unit: "mg", label: "Sodium", color: "#EF4444" },
+  potassium: { unit: "mg", label: "Potassium", color: "#14B8A6" },
+  calcium: { unit: "mg", label: "Calcium", color: "#E2E8F0" },
+  magnesium: { unit: "mg", label: "Magnesium", color: "#8B5CF6" },
+  iron: { unit: "mg", label: "Iron", color: "#B45309" },
+  zinc: { unit: "mg", label: "Zinc", color: "#6366F1" },
+  vitaminD: { unit: "IU", label: "Vitamin D", color: "#FBBF24" },
+  b12: { unit: "mcg", label: "B12", color: "#EC4899" },
+  omega3: { unit: "g", label: "Omega-3", color: "#06B6D4" },
+  creatine: { unit: "g", label: "Creatine", color: "#D946EF" },
+  water: { unit: "oz", label: "Water", color: "#38BDF8" },
+};
+
+const EMPTY_INTAKE = {
+  calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0, sugar: 0,
+  sodium: 0, potassium: 0, calcium: 0, magnesium: 0, iron: 0, zinc: 0,
+  vitaminD: 0, b12: 0, omega3: 0, creatine: 0, water: 0,
+};
+
+// ─── STORAGE ────────────────────────────────────────────────────────────────
+
+const STORAGE_KEYS = { profile: "pq_profile", intake: "pq_intake", meals: "pq_meals", date: "pq_date" };
+
+function loadState() {
+  try {
+    const today = new Date().toDateString();
+    const savedDate = localStorage.getItem(STORAGE_KEYS.date);
+    const profile = JSON.parse(localStorage.getItem(STORAGE_KEYS.profile)) || DEFAULT_PROFILE;
+
+    // Reset daily data if it's a new day
+    if (savedDate !== today) {
+      localStorage.setItem(STORAGE_KEYS.date, today);
+      localStorage.removeItem(STORAGE_KEYS.intake);
+      localStorage.removeItem(STORAGE_KEYS.meals);
+      // Keep todayMuscles in profile reset
+      profile.todayMuscles = [];
+      return { profile, intake: { ...EMPTY_INTAKE }, meals: [] };
+    }
+
+    const intake = JSON.parse(localStorage.getItem(STORAGE_KEYS.intake)) || { ...EMPTY_INTAKE };
+    const meals = JSON.parse(localStorage.getItem(STORAGE_KEYS.meals)) || [];
+    return { profile, intake, meals };
+  } catch {
+    return { profile: DEFAULT_PROFILE, intake: { ...EMPTY_INTAKE }, meals: [] };
+  }
+}
+
+function saveProfile(p) { try { localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(p)); } catch {} }
+function saveIntake(i) { try { localStorage.setItem(STORAGE_KEYS.intake, JSON.stringify(i)); } catch {} }
+function saveMeals(m) { try { localStorage.setItem(STORAGE_KEYS.meals, JSON.stringify(m)); localStorage.setItem(STORAGE_KEYS.date, new Date().toDateString()); } catch {} }
+
+// ─── CALCULATIONS ───────────────────────────────────────────────────────────
+
+function calcTargets(profile) {
+  const w = profile.weight;
+  const h = profile.height;
+  const a = profile.age;
+  const isMale = profile.sex === "male";
+  const wKg = w * 0.453592;
+  const hCm = h * 2.54;
+
+  const bmr = isMale ? 10 * wKg + 6.25 * hCm - 5 * a + 5 : 10 * wKg + 6.25 * hCm - 5 * a - 161;
+  const actMult = ACTIVITY_LEVELS.find(l => l.id === profile.activity)?.mult || 1.55;
+  const goalData = GOALS.find(g => g.id === profile.goal) || GOALS[0];
+  const tdee = bmr * actMult;
+  const targetCal = Math.round(tdee + goalData.surplus);
+
+  const gymBonus = profile.todayMuscles.length > 0 ? 0.1 : 0;
+  const proteinPerLb = (isMale ? 1.0 : 0.85) * goalData.proteinMult + gymBonus;
+  const leanMass = w * (1 - profile.bodyfat / 100);
+  const protein = Math.round(leanMass * proteinPerLb);
+
+  const fatPct = (profile.goal === "cut" || profile.goal === "debloat") ? 0.25 : 0.28;
+  const fats = Math.round((targetCal * fatPct) / 9);
+  const carbs = Math.max(Math.round((targetCal - protein * 4 - fats * 9) / 4), 80);
+
+  const isDebloat = profile.goal === "debloat";
+  const waterBase = Math.round(w / 2);
+  const waterEx = profile.todayMuscles.length > 0 ? 24 : 0;
+  const waterSteps = profile.steps > 10000 ? 16 : profile.steps > 7000 ? 8 : 0;
+  const hasBigMuscle = profile.todayMuscles.some(m => ["legs", "back", "glutes"].includes(m));
+
+  return {
+    calories: targetCal, protein, carbs, fats,
+    fiber: isMale ? 38 : 25,
+    sugar: Math.round(targetCal * 0.05 / 4),
+    sodium: isDebloat ? 1500 : 2300,
+    potassium: isDebloat ? 4700 : 3500,
+    calcium: a > 50 ? 1200 : 1000,
+    magnesium: isMale ? 420 : 320,
+    iron: isMale ? 8 : 18,
+    zinc: isMale ? 11 : 8,
+    vitaminD: 2000, b12: 2.4, omega3: 1.6,
+    creatine: hasBigMuscle ? 5 : 3,
+    water: waterBase + waterEx + waterSteps,
+    tdee: Math.round(tdee), bmr: Math.round(bmr), leanMass: Math.round(leanMass),
+  };
+}
+
+function getSuggestions(profile, targets, intake) {
+  const s = [];
+  const goal = GOALS.find(g => g.id === profile.goal);
+  const muscles = profile.todayMuscles;
+
+  if (intake.protein < targets.protein * 0.8)
+    s.push({ type: "critical", text: `Protein is ${Math.round(targets.protein - intake.protein)}g below target. Add lean chicken, fish, Greek yogurt, or a whey shake to hit ${targets.protein}g.` });
+  if (intake.sodium > targets.sodium * 1.1)
+    s.push({ type: "warning", text: `Sodium is high (${intake.sodium}mg). This causes water retention and bloating. Cut processed foods and season with herbs instead.` });
+  if (intake.potassium < targets.potassium * 0.7)
+    s.push({ type: "warning", text: `Low potassium hurts muscle contractions and increases bloating. Add bananas, sweet potatoes, or spinach.` });
+  if (intake.sugar > targets.sugar * 1.2)
+    s.push({ type: "warning", text: `Sugar is ${Math.round(intake.sugar - targets.sugar)}g over limit. Excess sugar spikes insulin and promotes fat storage. Swap sugary snacks for berries.` });
+  if (intake.water < targets.water * 0.6)
+    s.push({ type: "critical", text: `You're dehydrated. Drink at least ${targets.water}oz today — especially important for ${muscles.length > 0 ? "muscle recovery" : "metabolism"}.` });
+  if (intake.fiber < targets.fiber * 0.7)
+    s.push({ type: "info", text: `Fiber aids digestion and reduces bloating. Add oats, lentils, or broccoli to reach ${targets.fiber}g.` });
+  if (muscles.includes("legs") || muscles.includes("glutes"))
+    s.push({ type: "muscle", text: `Leg/Glute day: prioritize 40g+ protein within 2hrs post-workout with fast carbs (rice, banana) for glycogen replenishment.` });
+  if (muscles.includes("chest") || muscles.includes("shoulders") || muscles.includes("triceps"))
+    s.push({ type: "muscle", text: `Push day: ensure 5g creatine and adequate carbs pre-workout for explosive pressing power.` });
+  if (muscles.includes("back") || muscles.includes("biceps"))
+    s.push({ type: "muscle", text: `Pull day: magnesium and zinc support grip strength and recovery. Consider ZMA supplement before bed.` });
+  if (intake.calories > 0 && intake.calories < targets.calories * 0.6 && (profile.goal === "build" || profile.goal === "lean"))
+    s.push({ type: "critical", text: `Eating too little for muscle gain! You need a surplus. Add calorie-dense foods: nuts, avocado, olive oil.` });
+  if (profile.goal === "debloat")
+    s.push({ type: "info", text: `Debloat focus: keep sodium under ${targets.sodium}mg, potassium above ${targets.potassium}mg, drink ${targets.water}oz water, and eat anti-inflammatory foods (ginger, turmeric, cucumber).` });
+  if (intake.omega3 < targets.omega3 * 0.5)
+    s.push({ type: "info", text: `Omega-3s reduce inflammation and support joint health for lifting. Add salmon, walnuts, or fish oil supplement.` });
+  if (intake.calories === 0)
+    s.push({ type: "info", text: `Start logging your meals to get personalized nutrition suggestions based on your ${goal?.label.toLowerCase()} goal.` });
+  return s;
+}
+
+// ─── COMPONENTS ─────────────────────────────────────────────────────────────
+
+function ProgressRing({ value, max, size = 100, stroke = 7, color, children }) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const pct = Math.min(value / (max || 1), 1.3);
+  const offset = circ * (1 - pct);
+  const over = value > max;
+
+  return (
+    <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={over ? "var(--red)" : color}
+          strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={Math.max(offset, 0)}
+          strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
+      </svg>
+      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function NutrientCard({ id, value, target, compact }) {
+  const info = NUTRIENT_INFO[id];
+  if (!info) return null;
+  const pct = target > 0 ? Math.round((value / target) * 100) : 0;
+  const over = value > target * 1.1;
+  const low = value < target * 0.5;
+
+  if (compact) {
+    return (
+      <div className="nutrient-compact">
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: info.color, flexShrink: 0 }} />
+        <span style={{ flex: 1, fontSize: 12, color: "var(--text-dim)" }}>{info.label}</span>
+        <span className="mono" style={{ fontSize: 12, fontWeight: 600,
+          color: over ? "var(--red)" : low ? "var(--amber)" : "var(--text)" }}>
+          {value} / {target}{info.unit}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card" style={{ borderColor: "transparent" }}
+      onMouseEnter={e => e.currentTarget.style.borderColor = info.color + "44"}
+      onMouseLeave={e => e.currentTarget.style.borderColor = "transparent"}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: info.color }}>{info.label}</span>
+        <span className="mono" style={{ fontSize: 10, color: over ? "var(--red)" : "var(--text-muted)" }}>{pct}%</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 8 }}>
+        <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--text-bright)" }}>{value}</span>
+        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>/ {target} {info.unit}</span>
+      </div>
+      <div className="progress-track">
+        <div className="progress-fill" style={{ width: `${Math.min(pct, 130)}%`,
+          background: over ? "var(--red)" : `linear-gradient(90deg, ${info.color}88, ${info.color})` }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN APP ───────────────────────────────────────────────────────────────
+
+function App() {
+  const initial = loadState();
+  const [tab, setTab] = useState("dashboard");
+  const [profile, setProfile] = useState(initial.profile);
+  const [intake, setIntake] = useState(initial.intake);
+  const [mealLog, setMealLog] = useState(initial.meals);
+  const [mealForm, setMealForm] = useState({ name: "", calories: "", protein: "", carbs: "", fats: "", fiber: "", sugar: "", sodium: "", potassium: "" });
+
+  const targets = useMemo(() => calcTargets(profile), [profile]);
+  const suggestions = useMemo(() => getSuggestions(profile, targets, intake), [profile, targets, intake]);
+
+  // Persist on change
+  useEffect(() => { saveProfile(profile); }, [profile]);
+  useEffect(() => { saveIntake(intake); }, [intake]);
+  useEffect(() => { saveMeals(mealLog); }, [mealLog]);
+
+  const updateProfile = (key, val) => setProfile(p => ({ ...p, [key]: val }));
+
+  const toggleMuscle = (id) => {
+    setProfile(p => {
+      const has = p.todayMuscles.includes(id);
+      return { ...p, todayMuscles: has ? p.todayMuscles.filter(m => m !== id) : [...p.todayMuscles, id] };
+    });
+  };
+
+  const addMeal = () => {
+    const nums = {};
+    Object.keys(mealForm).forEach(k => { if (k !== "name") nums[k] = parseFloat(mealForm[k]) || 0; });
+    const meal = { id: Date.now(), name: mealForm.name || "Meal", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), ...nums };
+    setMealLog(prev => [...prev, meal]);
+    setIntake(prev => {
+      const next = { ...prev };
+      Object.keys(nums).forEach(k => { next[k] = (next[k] || 0) + nums[k]; });
+      return next;
+    });
+    setMealForm({ name: "", calories: "", protein: "", carbs: "", fats: "", fiber: "", sugar: "", sodium: "", potassium: "" });
+    setTab("dashboard");
+  };
+
+  const removeMeal = (id) => {
+    const meal = mealLog.find(m => m.id === id);
+    if (!meal) return;
+    setMealLog(prev => prev.filter(m => m.id !== id));
+    setIntake(prev => {
+      const next = { ...prev };
+      ["calories","protein","carbs","fats","fiber","sugar","sodium","potassium"].forEach(k => {
+        next[k] = Math.max(0, (next[k] || 0) - (meal[k] || 0));
+      });
+      return next;
+    });
+  };
+
+  const addWater = (oz) => setIntake(prev => ({ ...prev, water: prev.water + oz }));
+
+  const resetDay = () => {
+    setIntake({ ...EMPTY_INTAKE });
+    setMealLog([]);
+    setProfile(p => ({ ...p, todayMuscles: [] }));
+  };
+
+  const macroData = [
+    { label: "Protein", val: intake.protein, target: targets.protein, cal: intake.protein * 4, color: "var(--blue)" },
+    { label: "Carbs", val: intake.carbs, target: targets.carbs, cal: intake.carbs * 4, color: "var(--yellow)" },
+    { label: "Fats", val: intake.fats, target: targets.fats, cal: intake.fats * 9, color: "var(--purple)" },
+  ];
+  const totalMacroCal = macroData.reduce((s, m) => s + m.cal, 0) || 1;
+
+  const suggestionColors = { critical: "#EF4444", warning: "#FBBF24", info: "#3B82F6", muscle: "#A855F7" };
+  const suggestionIcons = { critical: "⚠", warning: "⚡", info: "💡", muscle: "💪" };
+
+  return (
+    <React.Fragment>
+      {/* Header */}
+      <div style={{ padding: "20px 20px 16px", background: "linear-gradient(180deg, rgba(59,130,246,0.08) 0%, transparent 100%)" }}>
+        <div className="mono" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: "var(--blue)", marginBottom: 4 }}>
+          PHYSIQ ENGINE
+        </div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", lineHeight: 1.2 }}>
+          {GOALS.find(g => g.id === profile.goal)?.icon} {GOALS.find(g => g.id === profile.goal)?.label} Mode
+        </div>
+        <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
+          {targets.tdee} TDEE · {targets.leanMass}lb lean · {profile.steps.toLocaleString()} steps
+        </div>
+      </div>
+
+      <div style={{ padding: "0 16px" }}>
+
+        {/* ═══ DASHBOARD ═══ */}
+        {tab === "dashboard" && (
+          <div className="fade-in">
+            {/* Calorie Ring + Macros */}
+            <div className="flex-row" style={{ gap: 20, padding: "16px 0 20px" }}>
+              <ProgressRing value={intake.calories} max={targets.calories} color="var(--orange)">
+                <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--text-white)" }}>{intake.calories}</span>
+                <span style={{ fontSize: 9, color: "var(--text-muted)" }}>/ {targets.calories}</span>
+              </ProgressRing>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 8 }}>MACRO SPLIT</div>
+                <div style={{ display: "flex", gap: 2, height: 8, borderRadius: 4, overflow: "hidden", marginBottom: 10 }}>
+                  {macroData.map(m => <div key={m.label} style={{ flex: m.cal / totalMacroCal, background: m.color, transition: "flex 0.4s" }} />)}
+                </div>
+                {macroData.map(m => (
+                  <div key={m.label} className="flex-row" style={{ gap: 6, marginBottom: 4 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: m.color }} />
+                    <span style={{ fontSize: 11, color: "var(--text-dim)", flex: 1 }}>{m.label}</span>
+                    <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: m.val >= m.target ? "var(--green)" : "var(--text)" }}>{m.val}g</span>
+                    <span style={{ fontSize: 10, color: "var(--text-faint)" }}>/{m.target}g</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Water */}
+            <div style={{ background: "rgba(56,189,248,0.06)", borderRadius: 12, padding: 14, border: "1px solid rgba(56,189,248,0.12)", marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sky)" }}>💧 Water</span>
+                <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: "var(--text-bright)" }}>
+                  {intake.water}oz <span style={{ color: "var(--text-faint)", fontWeight: 400 }}>/ {targets.water}oz</span>
+                </span>
+              </div>
+              <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 10 }}>
+                <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(intake.water / (targets.water || 1) * 100, 100)}%`,
+                  background: "linear-gradient(90deg, #0EA5E9, #38BDF8)", transition: "width 0.4s" }} />
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {[8, 16, 24].map(oz => <button key={oz} className="water-btn" onClick={() => addWater(oz)}>+{oz}oz</button>)}
+              </div>
+            </div>
+
+            {/* Key Nutrients */}
+            <div className="label">Key Nutrients</div>
+            <div className="grid-2" style={{ marginBottom: 20 }}>
+              {["protein", "sodium", "potassium", "sugar", "fiber", "creatine"].map(id =>
+                <NutrientCard key={id} id={id} value={intake[id] || 0} target={targets[id]} />
+              )}
+            </div>
+
+            {/* Micros */}
+            <div className="label">Micronutrients & Supps</div>
+            <div className="card" style={{ padding: "8px 14px", marginBottom: 20 }}>
+              {["calcium", "magnesium", "iron", "zinc", "vitaminD", "b12", "omega3"].map(id =>
+                <NutrientCard key={id} id={id} value={intake[id] || 0} target={targets[id]} compact />
+              )}
+            </div>
+
+            {/* Suggestions */}
+            {suggestions.length > 0 && (
+              <React.Fragment>
+                <div className="label">Smart Suggestions</div>
+                <div className="flex-col gap-8" style={{ marginBottom: 20 }}>
+                  {suggestions.map((s, i) => (
+                    <div key={i} className="suggestion"
+                      style={{ background: suggestionColors[s.type] + "08", border: `1px solid ${suggestionColors[s.type]}22` }}>
+                      <span style={{ marginRight: 8 }}>{suggestionIcons[s.type]}</span>{s.text}
+                    </div>
+                  ))}
+                </div>
+              </React.Fragment>
+            )}
+
+            {/* Today's Muscles */}
+            {profile.todayMuscles.length > 0 && (
+              <React.Fragment>
+                <div className="label">Today's Target Muscles</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
+                  {profile.todayMuscles.map(id => {
+                    const mg = MUSCLE_GROUPS.find(m => m.id === id);
+                    return <div key={id} className="muscle-tag">{mg?.icon} {mg?.label} · {mg?.recovery}h recovery</div>;
+                  })}
+                </div>
+              </React.Fragment>
+            )}
+
+            {/* Meal Log */}
+            {mealLog.length > 0 && (
+              <React.Fragment>
+                <div className="label">Today's Meals</div>
+                <div className="flex-col gap-6" style={{ marginBottom: 20 }}>
+                  {mealLog.map(m => (
+                    <div key={m.id} className="meal-row">
+                      <span className="mono" style={{ fontSize: 10, color: "var(--text-faint)" }}>{m.time}</span>
+                      <span style={{ flex: 1, fontSize: 13, fontWeight: 500 }}>{m.name}</span>
+                      <span className="mono" style={{ fontSize: 12, color: "var(--orange)" }}>{m.calories}cal</span>
+                      <span className="mono" style={{ fontSize: 12, color: "var(--blue)" }}>{m.protein}g P</span>
+                      <button className="meal-remove" onClick={() => removeMeal(m.id)}>×</button>
+                    </div>
+                  ))}
+                </div>
+              </React.Fragment>
+            )}
+
+            {/* Reset Day */}
+            <div style={{ display: "flex", justifyContent: "center", paddingBottom: 20 }}>
+              <button className="reset-btn" onClick={resetDay}>Reset Today's Data</button>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ LOG MEAL ═══ */}
+        {tab === "log" && (
+          <div className="fade-in" style={{ paddingTop: 16 }}>
+            <div className="label">Log a Meal</div>
+            <div className="flex-col gap-10">
+              <input className="input" placeholder="Meal name (e.g., Grilled Chicken Bowl)" value={mealForm.name}
+                onChange={e => setMealForm(f => ({ ...f, name: e.target.value }))} />
+
+              <div className="label" style={{ marginBottom: 0 }}>Macros</div>
+              <div className="grid-2">
+                {[{ k: "calories", l: "Calories", c: "#F97316" }, { k: "protein", l: "Protein (g)", c: "#3B82F6" },
+                  { k: "carbs", l: "Carbs (g)", c: "#EAB308" }, { k: "fats", l: "Fats (g)", c: "#A855F7" }].map(f => (
+                  <div key={f.k}>
+                    <label style={{ fontSize: 10, color: f.c, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{f.l}</label>
+                    <input className="input" type="number" placeholder="0" value={mealForm[f.k]} style={{ marginTop: 4 }}
+                      onChange={e => setMealForm(fm => ({ ...fm, [f.k]: e.target.value }))} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="label" style={{ marginBottom: 0 }}>Additional</div>
+              <div className="grid-2">
+                {[{ k: "fiber", l: "Fiber (g)" }, { k: "sugar", l: "Sugar (g)" },
+                  { k: "sodium", l: "Sodium (mg)" }, { k: "potassium", l: "Potassium (mg)" }].map(f => (
+                  <div key={f.k}>
+                    <label style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{f.l}</label>
+                    <input className="input" type="number" placeholder="0" value={mealForm[f.k]} style={{ marginTop: 4 }}
+                      onChange={e => setMealForm(fm => ({ ...fm, [f.k]: e.target.value }))} />
+                  </div>
+                ))}
+              </div>
+
+              <button className="btn btn-primary" onClick={addMeal}>+ Log Meal</button>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ MUSCLES ═══ */}
+        {tab === "muscles" && (
+          <div className="fade-in" style={{ paddingTop: 16 }}>
+            <div className="label">Today's Workout — Select Muscle Groups</div>
+            <div className="grid-2-10" style={{ marginBottom: 20 }}>
+              {MUSCLE_GROUPS.map(mg => {
+                const active = profile.todayMuscles.includes(mg.id);
+                return (
+                  <button key={mg.id} className={`muscle-btn${active ? " active" : ""}`} onClick={() => toggleMuscle(mg.id)}>
+                    <div style={{ fontSize: 18, marginBottom: 4 }}>{mg.icon}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{mg.label}</div>
+                    <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 2 }}>{mg.recovery}h recovery</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {profile.todayMuscles.length > 0 && (
+              <React.Fragment>
+                <div className="label">Nutrient Focus for Your Workout</div>
+                <div className="flex-col gap-8" style={{ marginBottom: 20 }}>
+                  {[...new Set(profile.todayMuscles.flatMap(id => MUSCLE_GROUPS.find(m => m.id === id)?.nutrients || []))].map(n => {
+                    const info = NUTRIENT_INFO[n];
+                    return info ? (
+                      <div key={n} className="nutrient-focus" style={{ background: info.color + "08", border: `1px solid ${info.color}22` }}>
+                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: info.color }} />
+                        <span style={{ fontSize: 13, fontWeight: 600, color: info.color }}>{info.label}</span>
+                        <span style={{ flex: 1 }} />
+                        <span className="mono" style={{ fontSize: 12, color: "var(--text-dim)" }}>Target: {targets[n]}{info.unit}</span>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              </React.Fragment>
+            )}
+          </div>
+        )}
+
+        {/* ═══ PROFILE ═══ */}
+        {tab === "profile" && (
+          <div className="fade-in" style={{ paddingTop: 16 }}>
+            <div className="label">Your Build</div>
+            <div className="grid-2-10" style={{ marginBottom: 20 }}>
+              {[
+                { k: "age", l: "Age", u: "yrs" }, { k: "weight", l: "Weight", u: "lbs" },
+                { k: "height", l: "Height", u: "in" }, { k: "bodyfat", l: "Body Fat", u: "%" },
+                { k: "steps", l: "Avg Steps", u: "/day" }, { k: "gymDays", l: "Gym Days", u: "/week" },
+              ].map(f => (
+                <div key={f.k}>
+                  <label style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    {f.l} <span style={{ color: "var(--text-faint)" }}>({f.u})</span>
+                  </label>
+                  <input className="input" type="number" value={profile[f.k]} style={{ marginTop: 4 }}
+                    onChange={e => updateProfile(f.k, parseFloat(e.target.value) || 0)} />
+                </div>
+              ))}
+            </div>
+
+            <div className="label">Sex</div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+              {[{ id: "male", label: "Male" }, { id: "female", label: "Female" }].map(s =>
+                <button key={s.id} className={`sex-btn${profile.sex === s.id ? " active" : ""}`}
+                  onClick={() => updateProfile("sex", s.id)}>{s.label}</button>
+              )}
+            </div>
+
+            <div className="label">Activity Level</div>
+            <div className="flex-col gap-6" style={{ marginBottom: 20 }}>
+              {ACTIVITY_LEVELS.map(a => (
+                <button key={a.id} className={`option-btn${profile.activity === a.id ? " active" : ""}`}
+                  onClick={() => updateProfile("activity", a.id)}>
+                  <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{a.label}</span>
+                  <span className="mono" style={{ fontSize: 10, color: "var(--text-faint)" }}>{a.steps}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="label">Goal</div>
+            <div className="flex-col gap-6" style={{ marginBottom: 20 }}>
+              {GOALS.map(g => (
+                <button key={g.id} className={`option-btn${profile.goal === g.id ? " active" : ""}`}
+                  onClick={() => updateProfile("goal", g.id)} style={{ padding: 14 }}>
+                  <span style={{ fontSize: 18, flexShrink: 0 }}>{g.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>{g.label}</div>
+                    <div style={{ fontSize: 10, color: "var(--text-faint)" }}>
+                      {g.surplus > 0 ? `+${g.surplus}` : g.surplus} cal · {Math.round(g.proteinMult * 100)}% protein
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="label">Your Computed Stats</div>
+            <div className="card" style={{ padding: 14, marginBottom: 20 }}>
+              {[
+                { l: "BMR", v: `${targets.bmr} kcal` }, { l: "TDEE", v: `${targets.tdee} kcal` },
+                { l: "Target Calories", v: `${targets.calories} kcal` }, { l: "Lean Body Mass", v: `${targets.leanMass} lbs` },
+                { l: "Protein Target", v: `${targets.protein}g` }, { l: "Water Target", v: `${targets.water} oz` },
+              ].map(s => (
+                <div key={s.l} className="stat-row">
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{s.l}</span>
+                  <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{s.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Nav */}
+      <div className="nav">
+        {[
+          { id: "dashboard", label: "Dashboard", icon: "◉" },
+          { id: "log", label: "Log Meal", icon: "+" },
+          { id: "muscles", label: "Muscles", icon: "◆" },
+          { id: "profile", label: "Profile", icon: "⚙" },
+        ].map(t => (
+          <button key={t.id} className={`nav-btn${tab === t.id ? " active" : ""}`} onClick={() => setTab(t.id)}>
+            <span>{t.icon}</span><span>{t.label}</span>
+          </button>
+        ))}
+      </div>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+</script>
+</body>
+</html>
