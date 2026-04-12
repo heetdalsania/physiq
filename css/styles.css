@@ -1,0 +1,2374 @@
+/* ─── PHYSIQ ENGINE — Styles ─────────────────────────────────────────────── */
+
+/* ─── Theme Variables ────────────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+    --bg: #0B0F1A;
+    --bg-header: rgba(59, 130, 246, 0.08);
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.06);
+    --surface-alt: rgba(255, 255, 255, 0.02);
+    --border: rgba(255, 255, 255, 0.05);
+    --border-active: rgba(59, 130, 246, 0.4);
+    --border-faint: rgba(255, 255, 255, 0.04);
+    --track: rgba(255, 255, 255, 0.06);
+    --text: #E2E8F0;
+    --text-dim: #94A3B8;
+    --text-muted: #64748B;
+    --text-faint: #475569;
+    --text-bright: #F1F5F9;
+    --text-white: #F8FAFC;
+    --text-suggestion: #CBD5E1;
+    --nav-bg: rgba(11, 15, 26, 0.95);
+    --input-bg: rgba(255, 255, 255, 0.05);
+    --input-border: rgba(255, 255, 255, 0.1);
+    --water-bg: rgba(56, 189, 248, 0.06);
+    --water-border: rgba(56, 189, 248, 0.12);
+    --water-btn-bg: rgba(56, 189, 248, 0.12);
+    --water-btn-border: rgba(56, 189, 248, 0.2);
+    --water-btn-hover: rgba(56, 189, 248, 0.25);
+    --muscle-active-bg: rgba(168, 85, 247, 0.12);
+    --muscle-active-border: rgba(168, 85, 247, 0.4);
+    --muscle-tag-bg: rgba(168, 85, 247, 0.12);
+    --muscle-tag-border: rgba(168, 85, 247, 0.25);
+    --sex-active-bg: rgba(59, 130, 246, 0.15);
+    --option-active-bg: rgba(59, 130, 246, 0.1);
+    --option-active-border: rgba(59, 130, 246, 0.3);
+    --stat-border: rgba(255, 255, 255, 0.03);
+    --blue: #3B82F6;
+    --blue-light: #60A5FA;
+    --blue-glow: rgba(59, 130, 246, 0.3);
+    --orange: #F97316;
+    --yellow: #EAB308;
+    --purple: #A855F7;
+    --purple-light: #C084FC;
+    --green: #22C55E;
+    --red: #EF4444;
+    --pink: #F43F5E;
+    --teal: #14B8A6;
+    --cyan: #06B6D4;
+    --sky: #38BDF8;
+    --amber: #FBBF24;
+    --indigo: #6366F1;
+    --magenta: #D946EF;
+    --rose: #EC4899;
+    --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+    --chart-grid: rgba(255, 255, 255, 0.05);
+    --chart-text: rgba(255, 255, 255, 0.3)
+}
+
+[data-theme="light"] {
+    --bg: #F1F5F9;
+    --bg-header: rgba(59, 130, 246, 0.06);
+    --surface: rgba(0, 0, 0, 0.03);
+    --surface-hover: rgba(0, 0, 0, 0.06);
+    --surface-alt: rgba(0, 0, 0, 0.02);
+    --border: rgba(0, 0, 0, 0.08);
+    --border-active: rgba(59, 130, 246, 0.5);
+    --border-faint: rgba(0, 0, 0, 0.04);
+    --track: rgba(0, 0, 0, 0.07);
+    --text: #1E293B;
+    --text-dim: #475569;
+    --text-muted: #64748B;
+    --text-faint: #94A3B8;
+    --text-bright: #0F172A;
+    --text-white: #0F172A;
+    --text-suggestion: #334155;
+    --nav-bg: rgba(241, 245, 249, 0.95);
+    --input-bg: rgba(0, 0, 0, 0.04);
+    --input-border: rgba(0, 0, 0, 0.12);
+    --water-bg: rgba(56, 189, 248, 0.08);
+    --water-border: rgba(56, 189, 248, 0.18);
+    --water-btn-bg: rgba(56, 189, 248, 0.1);
+    --water-btn-border: rgba(56, 189, 248, 0.25);
+    --water-btn-hover: rgba(56, 189, 248, 0.2);
+    --muscle-active-bg: rgba(168, 85, 247, 0.1);
+    --muscle-active-border: rgba(168, 85, 247, 0.35);
+    --muscle-tag-bg: rgba(168, 85, 247, 0.1);
+    --muscle-tag-border: rgba(168, 85, 247, 0.25);
+    --sex-active-bg: rgba(59, 130, 246, 0.1);
+    --option-active-bg: rgba(59, 130, 246, 0.08);
+    --option-active-border: rgba(59, 130, 246, 0.35);
+    --stat-border: rgba(0, 0, 0, 0.06);
+    --blue: #2563EB;
+    --blue-light: #3B82F6;
+    --blue-glow: rgba(37, 99, 235, 0.2);
+    --orange: #EA580C;
+    --yellow: #CA8A04;
+    --purple: #9333EA;
+    --purple-light: #A855F7;
+    --green: #16A34A;
+    --red: #DC2626;
+    --pink: #E11D48;
+    --teal: #0D9488;
+    --cyan: #0891B2;
+    --sky: #0284C7;
+    --amber: #D97706;
+    --indigo: #4F46E5;
+    --magenta: #C026D3;
+    --rose: #DB2777;
+    --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+    --chart-grid: rgba(0, 0, 0, 0.06);
+    --chart-text: rgba(0, 0, 0, 0.3)
+}
+
+/* ─── Reset & Base ───────────────────────────────────────────────────────── */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    transition: background .3s, color .3s
+}
+
+#app {
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    padding-bottom: 80px
+}
+
+/* ─── Typography ─────────────────────────────────────────────────────────── */
+.mono {
+    font-family: 'Space Mono', monospace
+}
+
+.label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 12px
+}
+
+/* ─── Inputs ─────────────────────────────────────────────────────────────── */
+.input {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-bright);
+    font-size: 14px;
+    font-family: 'Space Mono', monospace;
+    outline: none;
+    width: 100%;
+    transition: border-color .2s
+}
+
+.input:focus {
+    border-color: var(--blue)
+}
+
+.input::placeholder {
+    color: var(--text-faint)
+}
+
+/* ─── Cards ──────────────────────────────────────────────────────────────── */
+.card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    transition: all .2s
+}
+
+.card:hover {
+    background: var(--surface-hover)
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+    -webkit-appearance: none
+}
+
+.btn-primary {
+    padding: 14px;
+    border-radius: 10px;
+    width: 100%;
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    box-shadow: 0 4px 20px var(--blue-glow)
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px)
+}
+
+.btn-primary:active {
+    transform: translateY(0)
+}
+
+.btn-primary:disabled {
+    opacity: .5;
+    cursor: default;
+    transform: none
+}
+
+/* ─── Progress ───────────────────────────────────────────────────────────── */
+.progress-track {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--track);
+    overflow: hidden
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width .6s ease
+}
+
+/* ─── Navigation ─────────────────────────────────────────────────────────── */
+.nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 8px 0 max(12px, env(safe-area-inset-bottom));
+    z-index: 100
+}
+
+.nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 0;
+    color: var(--text-faint);
+    transition: color .2s;
+    font-family: 'DM Sans', sans-serif
+}
+
+.nav-btn.active {
+    color: var(--blue)
+}
+
+.nav-btn span:first-child {
+    font-size: 16px
+}
+
+.nav-btn span:last-child {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .5px
+}
+
+/* ─── Layout Helpers ─────────────────────────────────────────────────────── */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px
+}
+
+.grid-2-10 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column
+}
+
+.flex-row {
+    display: flex;
+    align-items: center
+}
+
+.gap-6 {
+    gap: 6px
+}
+
+.gap-8 {
+    gap: 8px
+}
+
+.gap-10 {
+    gap: 10px
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px)
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0)
+    }
+}
+
+.fade-in {
+    animation: fadeIn .3s ease forwards
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px)
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0)
+    }
+}
+
+.slide-up {
+    animation: slideUp .5s ease forwards
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 4px
+}
+
+::-webkit-scrollbar-track {
+    background: transparent
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 2px
+}
+
+/* ─── Water Tracker ──────────────────────────────────────────────────────── */
+.water-btn {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 8px;
+    background: var(--water-btn-bg);
+    border: 1px solid var(--water-btn-border);
+    color: var(--sky);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s
+}
+
+.water-btn:hover {
+    background: var(--water-btn-hover)
+}
+
+.water-btn.subtract {
+    color: var(--red);
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2)
+}
+
+.water-btn.subtract:hover {
+    background: rgba(239, 68, 68, 0.15)
+}
+
+/* ─── Muscle & Option Buttons ────────────────────────────────────────────── */
+.muscle-btn {
+    padding: 16px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: all .2s;
+    color: var(--text-dim);
+    font-family: 'DM Sans', sans-serif
+}
+
+.muscle-btn.active {
+    background: var(--muscle-active-bg);
+    border-color: var(--muscle-active-border);
+    color: var(--purple-light)
+}
+
+.option-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    background: var(--surface-alt);
+    border: 1px solid var(--border-faint);
+    color: var(--text-dim);
+    transition: all .2s;
+    text-align: left;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif
+}
+
+.option-btn.active {
+    background: var(--option-active-bg);
+    border-color: var(--option-active-border);
+    color: var(--blue-light)
+}
+
+/* ─── Suggestions ────────────────────────────────────────────────────────── */
+.suggestion {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-suggestion)
+}
+
+/* ─── Meal Log ───────────────────────────────────────────────────────────── */
+.meal-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border)
+}
+
+.meal-remove {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 4px
+}
+
+/* ─── Nutrients ──────────────────────────────────────────────────────────── */
+.nutrient-compact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0
+}
+
+.nutrient-focus {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px
+}
+
+/* ─── Sex Toggle ─────────────────────────────────────────────────────────── */
+.sex-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif
+}
+
+.sex-btn.active {
+    background: var(--sex-active-bg);
+    border-color: var(--border-active);
+    color: var(--blue-light)
+}
+
+/* ─── Stats ──────────────────────────────────────────────────────────────── */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--stat-border)
+}
+
+.muscle-tag {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--muscle-tag-bg);
+    border: 1px solid var(--muscle-tag-border);
+    color: var(--purple-light)
+}
+
+/* ─── Reset & Utility Buttons ────────────────────────────────────────────── */
+.reset-btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s
+}
+
+.reset-btn:hover {
+    background: rgba(239, 68, 68, 0.2)
+}
+
+/* ─── Theme Toggle ───────────────────────────────────────────────────────── */
+.theme-toggle {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    background: var(--track);
+    border: 1px solid var(--border);
+    position: relative;
+    transition: all .3s;
+    flex-shrink: 0
+}
+
+.theme-toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--blue);
+    transition: transform .3s
+}
+
+[data-theme="light"] .theme-toggle::after {
+    transform: translateX(20px)
+}
+
+/* ─── BMR Controls ───────────────────────────────────────────────────────── */
+.bmr-edit-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 10px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s
+}
+
+.bmr-edit-btn:hover {
+    border-color: var(--blue);
+    color: var(--blue)
+}
+
+.bmr-override-badge {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--amber);
+    margin-left: 6px
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* ─── EATS TAB — MyFitnessPal-Inspired Design System ─────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Eats Tab Container ────────────────────────────────────────────────── */
+.eats-tab {
+    padding-top: 12px
+}
+
+/* ─── Daily Summary (Calorie Ring + Macros) ──────────────────────────────── */
+.eats-daily-summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 16px
+}
+
+.calorie-ring-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0
+}
+
+.calorie-ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg)
+}
+
+.calorie-ring-bg {
+    fill: none;
+    stroke: var(--track);
+    stroke-width: 7
+}
+
+.calorie-ring-fill {
+    fill: none;
+    stroke-width: 7;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)
+}
+
+.calorie-ring-fill.over {
+    animation: ringPulse 1.5s ease infinite
+}
+
+@keyframes ringPulse {
+    0%, 100% { opacity: 1 }
+    50% { opacity: 0.6 }
+}
+
+.calorie-ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
+}
+
+.calorie-ring-number {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-white);
+    line-height: 1
+}
+
+.calorie-ring-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px
+}
+
+.eats-macros-summary {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px
+}
+
+.macro-mini-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 3px
+}
+
+.macro-mini-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.macro-mini-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim)
+}
+
+.macro-mini-value {
+    font-size: 10px;
+    color: var(--text-muted)
+}
+
+.macro-mini-sep {
+    opacity: 0.4;
+    margin: 0 1px
+}
+
+.macro-mini-track {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--track);
+    overflow: hidden
+}
+
+.macro-mini-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1)
+}
+
+/* ─── Meal Period Cards ─────────────────────────────────────────────────── */
+.meal-periods-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px
+}
+
+.meal-period-card {
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: all 0.2s
+}
+
+.meal-period-card.expanded {
+    border-color: var(--border-active)
+}
+
+.meal-period-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background 0.15s
+}
+
+.meal-period-header:hover {
+    background: var(--surface-hover)
+}
+
+.meal-period-left {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.meal-period-icon {
+    font-size: 18px;
+    width: 28px;
+    text-align: center
+}
+
+.meal-period-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-bright)
+}
+
+.meal-period-count {
+    font-size: 10px;
+    color: var(--text-faint)
+}
+
+.meal-period-right {
+    display: flex;
+    align-items: center;
+    gap: 8px
+}
+
+.meal-period-cals {
+    font-size: 12px;
+    color: var(--text-faint)
+}
+
+.meal-period-cals.has-cals {
+    color: var(--text-bright)
+}
+
+.meal-period-add-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--green);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif
+}
+
+.meal-period-add-btn:hover {
+    border-color: var(--green);
+    background: rgba(34, 197, 94, 0.1)
+}
+
+.meal-period-chevron {
+    font-size: 14px;
+    color: var(--text-faint);
+    transition: transform 0.2s;
+    display: inline-block
+}
+
+.meal-period-chevron.open {
+    transform: rotate(90deg)
+}
+
+.meal-period-items {
+    border-top: 1px solid var(--border);
+    padding: 6px 8px;
+    animation: fadeIn 0.2s ease
+}
+
+.meal-period-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 6px;
+    border-radius: 8px;
+    transition: background 0.1s
+}
+
+.meal-period-item:hover {
+    background: var(--surface-hover)
+}
+
+.meal-period-item-info {
+    flex: 1;
+    min-width: 0
+}
+
+.meal-period-item-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+.meal-period-item-macros {
+    display: flex;
+    gap: 6px;
+    font-size: 10px;
+    margin-top: 1px
+}
+
+.meal-period-item-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: 8px
+}
+
+.meal-period-item-cal {
+    font-size: 11px;
+    color: var(--text-dim)
+}
+
+.meal-period-item-remove {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 4px;
+    opacity: 0.5;
+    transition: all 0.15s
+}
+
+.meal-period-item-remove:hover {
+    opacity: 1;
+    color: var(--red)
+}
+
+.meal-period-empty {
+    padding: 16px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    animation: fadeIn 0.2s ease
+}
+
+.meal-period-empty span {
+    font-size: 12px;
+    color: var(--text-faint);
+    display: block;
+    margin-bottom: 8px
+}
+
+.meal-period-empty-add {
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s
+}
+
+.meal-period-empty-add:hover {
+    border-color: var(--green);
+    background: rgba(34, 197, 94, 0.06)
+}
+
+/* ─── Drag & Drop States ────────────────────────────────────────────────── */
+.meal-period-item-grip {
+    font-size: 10px;
+    color: var(--text-faint);
+    cursor: grab;
+    padding: 2px 4px 2px 0;
+    flex-shrink: 0;
+    user-select: none;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+    letter-spacing: -1px
+}
+
+.meal-period-item:hover .meal-period-item-grip {
+    opacity: 0.8
+}
+
+.meal-period-item-grip:active {
+    cursor: grabbing
+}
+
+.meal-period-item.dragging {
+    opacity: 0.3;
+    background: var(--surface-hover);
+    border: 1px dashed var(--border)
+}
+
+.meal-period-item[draggable="true"] {
+    cursor: grab;
+    touch-action: none
+}
+
+.meal-period-item[draggable="true"]:active {
+    cursor: grabbing
+}
+
+.meal-period-card.drag-over {
+    border-color: var(--green) !important;
+    background: rgba(34, 197, 94, 0.04);
+    transform: scale(1.01);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.15)
+}
+
+.meal-period-card.drag-active {
+    transition: all 0.15s ease
+}
+
+.meal-period-drop-hint {
+    color: var(--green);
+    font-weight: 600;
+    font-size: 10px;
+    animation: fadeIn 0.2s ease
+}
+
+.meal-period-drop-hint-lg {
+    color: var(--green);
+    font-weight: 700;
+    font-size: 13px;
+    display: block;
+    padding: 8px 0;
+    animation: fadeIn 0.2s ease
+}
+
+.meal-period-empty.drag-over {
+    border-top-color: var(--green);
+    background: rgba(34, 197, 94, 0.04)
+}
+
+.meal-drag-hint {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-faint);
+    padding: 6px;
+    margin-top: 4px;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px dashed var(--border)
+}
+
+/* ─── Segmented Control ─────────────────────────────────────────────────── */
+.eats-segmented-control {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 16px
+}
+
+.eats-seg-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif
+}
+
+.eats-seg-btn.active {
+    background: var(--bg);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2)
+}
+
+.eats-seg-icon {
+    font-size: 14px
+}
+
+.eats-seg-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-faint);
+    letter-spacing: 0.3px
+}
+
+.eats-seg-btn.active .eats-seg-label {
+    color: var(--text-bright)
+}
+
+/* ─── Diary Section ─────────────────────────────────────────────────────── */
+.eats-empty-state {
+    text-align: center;
+    padding: 32px 16px
+}
+
+.eats-empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.5
+}
+
+.eats-empty-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 6px
+}
+
+.eats-empty-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 260px;
+    margin: 0 auto
+}
+
+.eats-diary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+.eats-diary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 2px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim)
+}
+
+.eats-diary-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: all 0.15s
+}
+
+.eats-diary-item:hover {
+    background: var(--surface-hover)
+}
+
+.eats-diary-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0
+}
+
+.eats-diary-item-period {
+    font-size: 16px;
+    flex-shrink: 0
+}
+
+.eats-diary-item-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+.eats-diary-item-time {
+    font-size: 10px;
+    color: var(--text-faint)
+}
+
+.eats-diary-item-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: 10px
+}
+
+.eats-diary-item-cal {
+    font-size: 12px;
+    color: var(--orange)
+}
+
+.eats-diary-item-remove {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 4px;
+    opacity: 0.4;
+    transition: all 0.15s
+}
+
+.eats-diary-item-remove:hover {
+    opacity: 1;
+    color: var(--red)
+}
+
+/* ─── Search Section ────────────────────────────────────────────────────── */
+.eats-search-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px
+}
+
+.eats-search-input-wrap {
+    flex: 1;
+    position: relative
+}
+
+.eats-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    pointer-events: none
+}
+
+.eats-search-input {
+    width: 100%;
+    padding: 10px 32px 10px 34px;
+    border-radius: 10px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-bright);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s
+}
+
+.eats-search-input:focus {
+    border-color: var(--green)
+}
+
+.eats-search-input::placeholder {
+    color: var(--text-faint)
+}
+
+.eats-search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 4px
+}
+
+.eats-search-btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--green), var(--teal));
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap
+}
+
+.eats-search-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3)
+}
+
+.eats-search-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+    box-shadow: none
+}
+
+.eats-search-source {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px
+}
+
+.eats-source-badge {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 4px
+}
+
+.eats-source-badge.off {
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--green)
+}
+
+.eats-source-count {
+    font-size: 10px;
+    color: var(--text-faint)
+}
+
+.eats-search-error {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    color: var(--red);
+    font-size: 12px;
+    margin-bottom: 12px
+}
+
+/* ─── Food Result Cards ─────────────────────────────────────────────────── */
+.eats-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px
+}
+
+.food-result-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s
+}
+
+.food-result-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--green)
+}
+
+.food-result-card:active {
+    transform: scale(0.985)
+}
+
+.food-result-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--surface-hover)
+}
+
+.food-result-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover
+}
+
+.food-result-info {
+    flex: 1;
+    min-width: 0
+}
+
+.food-result-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 1px
+}
+
+.food-result-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+.food-result-brand {
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px
+}
+
+.food-result-macros {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px
+}
+
+.food-result-dot {
+    color: var(--text-faint);
+    font-size: 8px
+}
+
+.food-result-serving {
+    font-size: 9px;
+    color: var(--text-faint);
+    margin-top: 1px
+}
+
+.food-result-add {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    color: var(--green);
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s
+}
+
+.food-result-card:hover .food-result-add {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: var(--green)
+}
+
+/* ─── Nutri-Score Badge ─────────────────────────────────────────────────── */
+.nutri-score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0
+}
+
+.portion-nutri-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    vertical-align: middle
+}
+
+/* ─── Portion Modal (enhanced) ──────────────────────────────────────────── */
+.portion-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 150;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease
+}
+
+.portion-modal {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px max(20px, env(safe-area-inset-bottom));
+    animation: slideUp 0.3s ease
+}
+
+.portion-modal-header {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px
+}
+
+.portion-modal-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--surface)
+}
+
+.portion-modal-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover
+}
+
+.portion-modal-title-wrap {
+    flex: 1;
+    min-width: 0
+}
+
+.portion-slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--track);
+    outline: none;
+    margin: 12px 0
+}
+
+.portion-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--green);
+    cursor: pointer;
+    border: 2px solid var(--bg)
+}
+
+.portion-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--green);
+    cursor: pointer;
+    border: 2px solid var(--bg)
+}
+
+.portion-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px
+}
+
+.portion-preset {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s
+}
+
+.portion-preset:hover {
+    border-color: var(--green);
+    color: var(--green)
+}
+
+.portion-preset.active {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(34, 197, 94, 0.1)
+}
+
+/* ─── Recent & Popular Sections ─────────────────────────────────────────── */
+.eats-search-empty {
+    padding: 8px 0
+}
+
+.eats-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.eats-section-badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    text-transform: none;
+    letter-spacing: 0
+}
+
+.eats-recent-section {
+    margin-bottom: 20px;
+    padding-bottom: 16px
+}
+
+.eats-recent-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px
+}
+
+.eats-recent-food-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s
+}
+
+.eats-recent-food-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--green)
+}
+
+.eats-recent-food-card:active {
+    transform: scale(0.985)
+}
+
+.eats-recent-food-info {
+    flex: 1;
+    min-width: 0
+}
+
+.eats-recent-food-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px
+}
+
+.eats-recent-food-macros {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px
+}
+
+.eats-recent-food-dot {
+    color: var(--text-faint);
+    font-size: 8px
+}
+
+.eats-recent-food-add {
+    padding: 5px 12px;
+    border-radius: 8px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: all 0.15s
+}
+
+.eats-recent-food-card:hover .eats-recent-food-add {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: var(--green)
+}
+
+.eats-recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+.eats-recent-chip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif
+}
+
+.eats-recent-chip:hover {
+    background: var(--surface-hover);
+    border-color: var(--green)
+}
+
+.eats-recent-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-bright)
+}
+
+.eats-recent-cal {
+    font-size: 11px;
+    color: var(--orange)
+}
+
+.eats-popular-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px
+}
+
+.eats-popular-chip {
+    padding: 7px 14px;
+    border-radius: 18px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s
+}
+
+.eats-popular-chip:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(34, 197, 94, 0.06)
+}
+
+/* ─── Nearby Restaurants ────────────────────────────────────────────────── */
+.eats-nearby-section {
+    padding-bottom: 16px
+}
+
+.eats-nearby-locating {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: var(--blue-light)
+}
+
+.eats-locating-pulse {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--blue);
+    animation: locatingPulse 1.5s ease infinite
+}
+
+@keyframes locatingPulse {
+    0% { transform: scale(1); opacity: 1 }
+    50% { transform: scale(1.6); opacity: 0.3 }
+    100% { transform: scale(1); opacity: 1 }
+}
+
+.eats-nearby-error {
+    text-align: center;
+    padding: 30px 16px
+}
+
+.eats-nearby-error-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+    opacity: 0.5
+}
+
+.eats-nearby-error-msg {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 260px;
+    margin: 0 auto
+}
+
+.eats-nearby-group {
+    margin-bottom: 20px
+}
+
+.nearby-restaurant-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 4px;
+    transition: all 0.15s
+}
+
+.nearby-restaurant-card.is-chain {
+    cursor: pointer
+}
+
+.nearby-restaurant-card.is-chain:hover {
+    background: var(--surface-hover);
+    border-color: var(--orange)
+}
+
+.nearby-restaurant-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0
+}
+
+.nearby-restaurant-info {
+    flex: 1;
+    min-width: 0
+}
+
+.nearby-restaurant-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+.nearby-restaurant-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px
+}
+
+.nearby-restaurant-distance {
+    font-size: 10px;
+    color: var(--text-muted)
+}
+
+.nearby-restaurant-cuisine {
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: capitalize
+}
+
+.nearby-restaurant-action {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+    flex-shrink: 0
+}
+
+.nearby-restaurant-action.chain {
+    background: rgba(249, 115, 22, 0.1);
+    color: var(--orange);
+    border: 1px solid rgba(249, 115, 22, 0.2)
+}
+
+.nearby-restaurant-action.local {
+    background: var(--surface-hover);
+    color: var(--text-faint);
+    border: 1px solid var(--border)
+}
+
+.eats-nearby-tip {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.4
+}
+
+/* ─── All Chains Grid ───────────────────────────────────────────────────── */
+.eats-all-chains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px
+}
+
+.eats-chain-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    position: relative
+}
+
+.eats-chain-pill:hover {
+    background: var(--surface-hover);
+    border-color: var(--orange)
+}
+
+.eats-chain-pill.nearby {
+    background: rgba(249, 115, 22, 0.06)
+}
+
+.eats-chain-nearby-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0
+}
+
+/* ─── Chain Detail View ─────────────────────────────────────────────────── */
+.eats-chain-detail {
+    padding-bottom: 16px
+}
+
+.eats-chain-back {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 0;
+    margin-bottom: 10px;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.15s
+}
+
+.eats-chain-back:hover {
+    color: var(--text-bright)
+}
+
+.eats-chain-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 12px
+}
+
+.eats-chain-header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0
+}
+
+.eats-chain-header-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-white)
+}
+
+.eats-chain-header-count {
+    font-size: 11px;
+    color: var(--text-muted)
+}
+
+.eats-chain-search-wrap {
+    position: relative;
+    margin-bottom: 10px
+}
+
+.eats-chain-search {
+    width: 100%;
+    padding: 10px 12px 10px 34px;
+    border-radius: 10px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-bright);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s
+}
+
+.eats-chain-search:focus {
+    border-color: var(--orange)
+}
+
+.eats-chain-search::placeholder {
+    color: var(--text-faint)
+}
+
+.eats-chain-categories {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px
+}
+
+.eats-cat-chip {
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif
+}
+
+.eats-cat-chip.active {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: rgba(59, 130, 246, 0.08)
+}
+
+.eats-chain-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+.eats-chain-empty {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-faint);
+    font-size: 13px
+}
+
+.eats-chain-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s
+}
+
+.eats-chain-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--orange)
+}
+
+.eats-chain-item:active {
+    transform: scale(0.985)
+}
+
+.eats-chain-item-info {
+    flex: 1;
+    min-width: 0
+}
+
+.eats-chain-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 2px
+}
+
+.eats-chain-item-macros {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px
+}
+
+.eats-chain-item-dot {
+    color: var(--text-faint);
+    font-size: 8px
+}
+
+.eats-chain-item-micro {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+    font-size: 9px;
+    color: var(--text-faint)
+}
+
+.eats-chain-item-add {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(249, 115, 22, 0.08);
+    border: 1px solid rgba(249, 115, 22, 0.2);
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: all 0.15s
+}
+
+.eats-chain-item:hover .eats-chain-item-add {
+    background: rgba(249, 115, 22, 0.15)
+}
+
+/* ─── Manual Entry Section ──────────────────────────────────────────────── */
+.eats-manual-section {
+    padding-bottom: 16px
+}
+
+.eats-manual-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 4px
+}
+
+.eats-manual-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 14px
+}
+
+.eats-manual-name {
+    margin-bottom: 12px !important
+}
+
+.eats-manual-macros-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px
+}
+
+.eats-manual-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+.eats-manual-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted)
+}
+
+.eats-manual-input-wrap {
+    position: relative
+}
+
+.eats-manual-input {
+    padding-right: 28px !important
+}
+
+.eats-manual-unit {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: var(--text-faint);
+    pointer-events: none
+}
+
+.eats-manual-extras {
+    margin-top: 12px
+}
+
+.eats-manual-extras-toggle {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px 0;
+    list-style: none
+}
+
+.eats-manual-extras-toggle::-webkit-details-marker {
+    display: none
+}
+
+/* ─── Skeleton Loading ──────────────────────────────────────────────────── */
+.skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px
+}
+
+.skeleton-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    animation: fadeIn 0.3s ease forwards;
+    opacity: 0
+}
+
+.skeleton-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--track);
+    flex-shrink: 0
+}
+
+.skeleton-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px
+}
+
+.skeleton-line {
+    height: 10px;
+    border-radius: 4px;
+    background: var(--track)
+}
+
+.skeleton-line.long {
+    width: 75%
+}
+
+.skeleton-line.short {
+    width: 45%
+}
+
+.pulse {
+    animation: skeletonPulse 1.5s ease infinite
+}
+
+@keyframes skeletonPulse {
+    0%, 100% { opacity: 0.4 }
+    50% { opacity: 0.8 }
+}
+
+/* ─── Toast ──────────────────────────────────────────────────────────────── */
+.added-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--green), var(--teal));
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 200;
+    animation: toastIn .3s ease, toastOut .3s ease 1.5s forwards;
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3)
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px)
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0)
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1
+    }
+
+    to {
+        opacity: 0
+    }
+}
+
+/* ─── Onboarding ─────────────────────────────────────────────────────────── */
+.onboard-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center
+}
+
+.onboard-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 32px 24px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border)
+}
+
+.onboard-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 8px;
+    line-height: 1.2
+}
+
+.onboard-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.5
+}
+
+.onboard-step {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--blue);
+    margin-bottom: 16px
+}
+
+.onboard-input-group {
+    text-align: left;
+    margin-bottom: 14px
+}
+
+.onboard-input-group label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px
+}
+
+/* ─── Charts ─────────────────────────────────────────────────────────────── */
+.chart-container {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px
+}
+
+.chart-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 12px
+}
+
+/* ─── Account Bar ────────────────────────────────────────────────────────── */
+.account-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 16px
+}
+
+.account-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0
+}
+
+.logout-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 10px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+    margin-left: auto
+}
+
+.logout-btn:hover {
+    border-color: var(--red);
+    color: var(--red)
+}
