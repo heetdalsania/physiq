@@ -469,6 +469,7 @@ window.PhysIQ = window.PhysIQ || {};
               updateExercise={updateExercise}
               removeExercise={removeExercise}
               startEditWorkout={startEditWorkout}
+              profile={profile}
             />
           )}
 
