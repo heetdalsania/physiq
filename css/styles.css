@@ -2372,3 +2372,388 @@ body {
     border-color: var(--red);
     color: var(--red)
 }
+
+/* ─── Muscle Card Wrapper (Exercise Expansion) ───────────────────────────── */
+.muscle-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all .3s ease
+}
+
+.muscle-card.expanded {
+    grid-column: 1 / -1;
+    background: var(--muscle-active-bg);
+    border-radius: 14px;
+    border: 1px solid var(--muscle-active-border)
+}
+
+.muscle-card.expanded .muscle-btn {
+    border: none;
+    border-radius: 14px 14px 0 0
+}
+
+.exercise-toggle-wrapper {
+    padding: 0 12px 8px;
+    text-align: center
+}
+
+.exercise-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--muscle-active-border);
+    border-radius: 20px;
+    color: var(--purple-light);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 14px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+    letter-spacing: .3px
+}
+
+.exercise-toggle-btn:hover {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: var(--purple-light)
+}
+
+.exercise-chevron {
+    display: inline-block;
+    transition: transform .25s ease;
+    font-size: 12px
+}
+
+.exercise-chevron.open {
+    transform: rotate(180deg)
+}
+
+.exercise-list {
+    padding: 4px 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px
+}
+
+.exercise-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 9px;
+    background: rgba(168, 85, 247, 0.06);
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    transition: all .15s
+}
+
+.exercise-item:hover {
+    background: rgba(168, 85, 247, 0.12);
+    border-color: rgba(168, 85, 247, 0.2)
+}
+
+.exercise-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--purple-light);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'Space Mono', monospace
+}
+
+.exercise-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3
+}
+
+.exercise-item-add {
+    cursor: pointer
+}
+
+.exercise-item-add:hover {
+    border-color: var(--green);
+    background: rgba(34, 197, 94, 0.08)
+}
+
+.exercise-add-icon {
+    margin-left: auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all .15s
+}
+
+.exercise-item-add:hover .exercise-add-icon {
+    background: rgba(34, 197, 94, 0.25)
+}
+
+.exercise-item-added {
+    background: rgba(168, 85, 247, 0.15) !important;
+    border-color: var(--purple-light) !important;
+    transition: all .3s ease
+}
+
+.exercise-add-icon.added {
+    background: rgba(168, 85, 247, 0.25) !important;
+    color: var(--purple-light) !important
+}
+
+/* ─── Exercise Tab ──────────────────────────────────────────────────────── */
+.day-selector {
+    display: flex;
+    gap: 6px
+}
+
+.day-pill {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 0;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative
+}
+
+.day-pill.active {
+    background: var(--option-active-bg);
+    border-color: var(--border-active);
+    color: var(--blue-light)
+}
+
+.day-pill.today {
+    border-color: rgba(34, 197, 94, 0.3)
+}
+
+.day-pill.today.active {
+    border-color: var(--border-active)
+}
+
+.day-pill-label {
+    font-size: 11px;
+    font-weight: 600
+}
+
+.day-pill-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--purple-light);
+    position: absolute;
+    bottom: 5px
+}
+
+.ex-empty {
+    text-align: center;
+    padding: 40px 20px;
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+    color: var(--text-faint)
+}
+
+.ex-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px
+}
+
+.ex-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px
+}
+
+.ex-remove-btn {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all .2s
+}
+
+.ex-remove-btn:hover {
+    color: var(--red);
+    background: rgba(239, 68, 68, 0.1)
+}
+
+.ex-controls {
+    display: flex;
+    gap: 10px
+}
+
+.ex-control-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+.ex-control-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--text-faint)
+}
+
+.ex-stepper {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--input-bg)
+}
+
+.ex-stepper-btn {
+    width: 32px;
+    height: 34px;
+    background: none;
+    border: none;
+    color: var(--blue-light);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background .15s
+}
+
+.ex-stepper-btn:hover {
+    background: rgba(59, 130, 246, 0.1)
+}
+
+.ex-stepper-value {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-white)
+}
+
+.ex-weight-input {
+    width: 100%;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text-white);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+    font-family: 'Space Mono', monospace;
+    transition: border-color .2s;
+    -moz-appearance: textfield
+}
+
+.ex-weight-input::-webkit-inner-spin-button,
+.ex-weight-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0
+}
+
+.ex-weight-input:focus {
+    border-color: var(--blue)
+}
+
+.ex-weight-input::placeholder {
+    color: var(--text-faint);
+    font-weight: 400
+}
+
+/* ─── Edit Workout Banner & Buttons ─────────────────────────────────────── */
+.edit-workout-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    margin-bottom: 16px
+}
+
+.edit-done-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--blue), #2563EB);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+    white-space: nowrap
+}
+
+.edit-done-btn:hover {
+    transform: translateY(-1px)
+}
+
+.edit-workout-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: var(--purple-light);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+    white-space: nowrap
+}
+
+.edit-workout-btn:hover {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: var(--purple-light)
+}
+
+.add-workouts-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: var(--purple-light);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+    margin-top: 4px
+}
+
+.add-workouts-btn:hover {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: var(--purple-light)
+}

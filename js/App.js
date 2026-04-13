@@ -39,6 +39,7 @@ window.PhysIQ = window.PhysIQ || {};
   var DashboardTab = Screens.DashboardTab;
   var EatsTab = Screens.EatsTab;
   var HealthTab = Screens.HealthTab;
+  var ExerciseTab = Screens.ExerciseTab;
   var ProfileTab = Screens.ProfileTab;
 
   // ─── App Component ─────────────────────────────────────────────────────
@@ -68,6 +69,19 @@ window.PhysIQ = window.PhysIQ || {};
     // Portion modal state
     var _portionItem = useState(null);           var portionItem = _portionItem[0], setPortionItem = _portionItem[1];
     var _portionGrams = useState(100);           var portionGrams = _portionGrams[0], setPortionGrams = _portionGrams[1];
+
+    // Weekly exercises: array of 7 days (0=Sun..6=Sat), each an array of exercise objects
+    var _weeklyExercises = useState(function() {
+      if (!email) return [[], [], [], [], [], [], []];
+      try {
+        return JSON.parse(localStorage.getItem(uKey(email, "weeklyEx"))) || [[], [], [], [], [], [], []];
+      } catch(e) { return [[], [], [], [], [], [], []]; }
+    });
+    var weeklyExercises = _weeklyExercises[0], setWeeklyExercises = _weeklyExercises[1];
+
+    // Which day we're editing exercises for (null = today, 0-6 = specific day)
+    var _editingDay = useState(null);
+    var editingDay = _editingDay[0], setEditingDay = _editingDay[1];
 
     // Active meal period for food logging
     var _activeMealPeriod = useState(getMealPeriod());
@@ -101,6 +115,7 @@ window.PhysIQ = window.PhysIQ || {};
           setIntake(d.intake);
           setMealLog(d.meals);
           setHistory(loadHistory(last));
+          try { setWeeklyExercises(JSON.parse(localStorage.getItem(uKey(last, "weeklyEx"))) || [[], [], [], [], [], [], []]); } catch(e) {}
           setScreen("app");
           return;
         }
@@ -141,6 +156,11 @@ window.PhysIQ = window.PhysIQ || {};
       }
     }, [intake, screen, email]);
 
+    // Persist weekly exercises
+    useEffect(function() {
+      if (screen === "app" && email) sv(email, "weeklyEx", weeklyExercises);
+    }, [weeklyExercises, screen, email]);
+
     // ── Handlers ──────────────────────────────────────────────────────
     var up = function(k, v) { setProfile(function(p) { return Object.assign({}, p, { [k]: v }); }); };
 
@@ -152,6 +172,51 @@ window.PhysIQ = window.PhysIQ || {};
             : p.todayMuscles.concat([id])
         });
       });
+    };
+
+    var DAYS_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    var addExercise = function(name, muscle) {
+      var dayIdx = editingDay !== null ? editingDay : new Date().getDay();
+      setWeeklyExercises(function(prev) {
+        var next = prev.map(function(d) { return d.slice(); });
+        if (next[dayIdx].some(function(e) { return e.name === name; })) return prev;
+        next[dayIdx] = next[dayIdx].concat([{ id: Date.now(), name: name, muscle: muscle, sets: 3, reps: 10, maxWeight: 0 }]);
+        return next;
+      });
+      var dayLabel = dayIdx === new Date().getDay() ? "today" : DAYS_FULL[dayIdx];
+      showToast(name + " added to " + dayLabel + "!");
+    };
+
+    var updateExercise = function(dayIdx, exId, field, value) {
+      setWeeklyExercises(function(prev) {
+        var next = prev.map(function(d) { return d.slice(); });
+        next[dayIdx] = next[dayIdx].map(function(e) {
+          if (e.id !== exId) return e;
+          var u = Object.assign({}, e);
+          u[field] = value;
+          return u;
+        });
+        return next;
+      });
+    };
+
+    var removeExercise = function(dayIdx, exId) {
+      setWeeklyExercises(function(prev) {
+        var next = prev.map(function(d) { return d.slice(); });
+        next[dayIdx] = next[dayIdx].filter(function(e) { return e.id !== exId; });
+        return next;
+      });
+    };
+
+    var startEditWorkout = function(dayIdx) {
+      setEditingDay(dayIdx);
+      setTab("health");
+    };
+
+    var stopEditWorkout = function() {
+      setEditingDay(null);
+      setTab("exercise");
     };
 
     var logNutrients = function(name, nums, period) {
@@ -280,6 +345,7 @@ window.PhysIQ = window.PhysIQ || {};
         setIntake(d.intake);
         setMealLog(d.meals);
         setHistory(loadHistory(e));
+        try { setWeeklyExercises(JSON.parse(localStorage.getItem(uKey(e, "weeklyEx"))) || [[], [], [], [], [], [], []]); } catch(err) {}
         setScreen("app");
       } else {
         setScreen("onboard");
@@ -392,6 +458,17 @@ window.PhysIQ = window.PhysIQ || {};
             <HealthTab
               profile={profile} targets={targets}
               up={up} toggleMuscle={toggleMuscle}
+              addExercise={addExercise}
+              editingDay={editingDay} stopEditWorkout={stopEditWorkout}
+            />
+          )}
+
+          {tab === "exercise" && (
+            <ExerciseTab
+              weeklyExercises={weeklyExercises}
+              updateExercise={updateExercise}
+              removeExercise={removeExercise}
+              startEditWorkout={startEditWorkout}
             />
           )}
 
@@ -414,6 +491,7 @@ window.PhysIQ = window.PhysIQ || {};
             { id: "dashboard", label: "Dashboard", icon: "\u25C9" },
             { id: "eats",      label: "Eats",      icon: "\u25A3" },
             { id: "health",    label: "Health",     icon: "\u2666" },
+            { id: "exercise",  label: "Exercise",   icon: "\uD83C\uDFCB" },
             { id: "profile",   label: "Profile",    icon: "\u2699" }
           ].map(function(t) {
             return (

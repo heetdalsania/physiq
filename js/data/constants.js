@@ -72,4 +72,16 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
     todayMuscles: [], bmrOverride: null, name: ""
   };
 
+  // ─── Recommended Exercises per Muscle Group ─────────────────────────────
+  Data.EXERCISES = {
+    chest:     ["Bench Press", "Incline Dumbbell Press", "Chest Fly", "Push-ups"],
+    back:      ["Pull-ups", "Lat Pulldown", "Seated Cable Row", "Deadlift"],
+    shoulders: ["Overhead Shoulder Press", "Lateral Raises", "Rear Delt Fly", "Arnold Press"],
+    biceps:    ["Barbell Curls", "Dumbbell Curls", "Hammer Curls", "Preacher Curls"],
+    triceps:   ["Tricep Pushdowns", "Overhead Tricep Extension", "Dips", "Close-Grip Bench Press"],
+    legs:      ["Squats", "Leg Press", "Lunges", "Leg Curl"],
+    core:      ["Plank", "Hanging Leg Raises"],
+    glutes:    ["Hip Thrusts", "Glute Bridges"]
+  };
+
 })(window.PhysIQ.Data);
