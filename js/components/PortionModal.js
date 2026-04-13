@@ -46,6 +46,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
     // has the actual serving size string like "30g", "1 cookie (28g)", etc.
     // We parse out the gram value from serving to know what 1 item weighs.
     var servingGrams = (function() {
+      if (portionItem._servingGrams) return portionItem._servingGrams;
       if (!portionItem.serving) return 100;
       // Try to extract gram value from strings like "30g", "1 cookie (28g)", "45 g"
       var match = portionItem.serving.match(/(\d+\.?\d*)\s*g/i);
@@ -55,10 +56,18 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
 
     // ── Compute nutrition based on current unit mode ────────────────────
     var scale;
-    if (unit === "count") {
-      scale = (portionCount * servingGrams) / 100;
+    if (portionItem._perServing) {
+      if (unit === "count") {
+        scale = portionCount; // Base values are ALREADY exactly 1 serving
+      } else {
+        scale = servingGrams > 0 ? (portionGrams / servingGrams) : 1;
+      }
     } else {
-      scale = portionGrams / 100;
+      if (unit === "count") {
+        scale = (portionCount * servingGrams) / 100;
+      } else {
+        scale = portionGrams / 100;
+      }
     }
 
     var previewNutrition = {
@@ -99,7 +108,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
               </div>
               {portionItem.brand && <div style={{ fontSize: 12, color: "var(--text-dim)", marginBottom: 2 }}>{portionItem.brand}</div>}
               <div style={{ fontSize: 11, color: "var(--text-faint)" }}>
-                {portionItem.source === "off" ? "Open Food Facts" : "USDA"} data per 100g — adjust your portion below
+                {portionItem.source === "off" ? "Open Food Facts" : "USDA"} data {portionItem._perServing ? "per serving" : "per 100g"} — adjust your portion below
               </div>
             </div>
           </div>

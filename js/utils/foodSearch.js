@@ -213,9 +213,8 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
 
         var n = p.nutriments || {};
 
-        // ── Prefer per-serving values (matches nutrition facts label) ──
-        // Fall back to per-100g only when per-serving data is unavailable
-        var hasServing = (
+        var servQty = p.serving_quantity;  // grams or ml per serving
+        var hasServing = servQty > 0 && (
           n["energy-kcal_serving"] != null ||
           n["proteins_serving"] != null ||
           n["carbohydrates_serving"] != null ||
@@ -225,7 +224,7 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
         var kcal, protein, carbs, fats, fiber, sugar, sodium, potassium;
 
         if (hasServing) {
-          // Use per-serving values — these match the nutrition facts label
+          // Use exact per-serving values from the product's nutrition label
           kcal = n["energy-kcal_serving"] || 0;
           if (kcal <= 0) {
             var kjServ = n["energy_serving"] || 0;
@@ -239,7 +238,7 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
           sodium    = n["sodium_serving"] || 0;
           potassium = n["potassium_serving"] || 0;
         } else {
-          // Fallback: per-100g values
+          // Fallback: use _100g values from the API
           kcal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
           if (kcal <= 0) {
             var kj100 = n["energy_100g"] || n["energy"] || 0;
@@ -266,11 +265,12 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
           fats:      Math.round(fats * 10) / 10,
           fiber:     Math.round(fiber * 10) / 10,
           sugar:     Math.round(sugar * 10) / 10,
-          sodium:    Math.round(sodium * 1000),    // convert g → mg
-          potassium: Math.round(potassium * 1000),  // convert g → mg
+          sodium:    hasServing ? Math.round(sodium) : Math.round(sodium * 1000), // _serving is usually in mg already, _100g is in g
+          potassium: hasServing ? Math.round(potassium) : Math.round(potassium * 1000),
           barcode:   barcode,
           source:    "off",
-          _perServing: hasServing  // flag: true = label values, false = per-100g fallback
+          _perServing: hasServing,
+          _servingGrams: servQty || 0
         };
       });
   };

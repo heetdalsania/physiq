@@ -268,16 +268,25 @@ window.PhysIQ = window.PhysIQ || {};
       if (!portionItem) return;
 
       var s;
-      if (portionUnit === "count") {
-        // Parse serving grams from the serving string (e.g. "30g", "1 cookie (28g)")
-        var servingGrams = 100;
-        if (portionItem.serving) {
-          var match = portionItem.serving.match(/(\d+\.?\d*)\s*g/i);
-          if (match) servingGrams = parseFloat(match[1]);
+      if (portionItem._perServing) {
+        var baseGrams = portionItem._servingGrams || 100;
+        if (portionUnit === "count") {
+          s = portionCount; // Exactly 1x multiplier for 1 count
+        } else {
+          s = baseGrams > 0 ? (portionGrams / baseGrams) : 1;
         }
-        s = (portionCount * servingGrams) / 100;
       } else {
-        s = portionGrams / 100;
+        if (portionUnit === "count") {
+          // Parse serving grams from the serving string (e.g. "30g", "1 cookie (28g)")
+          var servingGrams = 100;
+          if (portionItem.serving) {
+            var match = portionItem.serving.match(/(\d+\.?\d*)\s*g/i);
+            if (match) servingGrams = parseFloat(match[1]);
+          }
+          s = (portionCount * servingGrams) / 100;
+        } else {
+          s = portionGrams / 100;
+        }
       }
 
       var nums = {
