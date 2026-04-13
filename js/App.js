@@ -69,6 +69,8 @@ window.PhysIQ = window.PhysIQ || {};
     // Portion modal state
     var _portionItem = useState(null);           var portionItem = _portionItem[0], setPortionItem = _portionItem[1];
     var _portionGrams = useState(100);           var portionGrams = _portionGrams[0], setPortionGrams = _portionGrams[1];
+    var _portionUnit = useState("grams");        var portionUnit = _portionUnit[0], setPortionUnit = _portionUnit[1];
+    var _portionCount = useState(1);             var portionCount = _portionCount[0], setPortionCount = _portionCount[1];
 
     // Weekly exercises: array of 7 days (0=Sun..6=Sat), each an array of exercise objects
     var _weeklyExercises = useState(function() {
@@ -258,11 +260,26 @@ window.PhysIQ = window.PhysIQ || {};
     var addSearchFood = function(item) {
       setPortionItem(item);
       setPortionGrams(parseFloat(item.serving) || 100);
+      setPortionUnit("grams");
+      setPortionCount(1);
     };
 
     var confirmPortion = function() {
       if (!portionItem) return;
-      var s = portionGrams / 100;
+
+      var s;
+      if (portionUnit === "count") {
+        // Parse serving grams from the serving string (e.g. "30g", "1 cookie (28g)")
+        var servingGrams = 100;
+        if (portionItem.serving) {
+          var match = portionItem.serving.match(/(\d+\.?\d*)\s*g/i);
+          if (match) servingGrams = parseFloat(match[1]);
+        }
+        s = (portionCount * servingGrams) / 100;
+      } else {
+        s = portionGrams / 100;
+      }
+
       var nums = {
         calories: Math.round(portionItem.cal * s),
         protein: Math.round(portionItem.protein * s),
@@ -273,7 +290,12 @@ window.PhysIQ = window.PhysIQ || {};
         sodium: Math.round(portionItem.sodium * s),
         potassium: Math.round(portionItem.potassium * s)
       };
-      logNutrients(portionItem.name + (portionItem.brand ? " (" + portionItem.brand + ")" : ""), nums);
+
+      var suffix = portionUnit === "count"
+        ? " ×" + portionCount
+        : "";
+
+      logNutrients(portionItem.name + (portionItem.brand ? " (" + portionItem.brand + ")" : "") + suffix, nums);
       showToast(portionItem.name + " logged!");
       setPortionItem(null);
     };
@@ -408,6 +430,8 @@ window.PhysIQ = window.PhysIQ || {};
         <PortionModal
           portionItem={portionItem} setPortionItem={setPortionItem}
           portionGrams={portionGrams} setPortionGrams={setPortionGrams}
+          portionUnit={portionUnit} setPortionUnit={setPortionUnit}
+          portionCount={portionCount} setPortionCount={setPortionCount}
           confirmPortion={confirmPortion}
         />
 

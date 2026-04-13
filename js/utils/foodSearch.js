@@ -187,4 +187,55 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
     { id: "snacks",    label: "Snacks",    icon: "🍿", hours: "Anytime" }
   ];
 
+  /**
+   * Lookup a food product by barcode using Open Food Facts API
+   * Returns a normalized food object identical to search results, or null if not found
+   * @param {string} barcode - UPC/EAN barcode number
+   * @returns {Promise<Object|null>}
+   */
+  Utils.lookupBarcode = function(barcode) {
+    if (!barcode || !barcode.trim()) return Promise.resolve(null);
+
+    var url = "https://world.openfoodfacts.org/api/v2/product/" +
+      encodeURIComponent(barcode.trim()) +
+      ".json?fields=product_name,nutriments,brands,image_small_url,image_url,serving_size,nutrition_grades,categories_tags";
+
+    return fetch(url)
+      .then(function(res) {
+        if (!res.ok) throw new Error("OFF API error: " + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        if (!data || data.status !== 1 || !data.product) return null;
+
+        var p = data.product;
+        if (!p.product_name || !p.nutriments) return null;
+
+        var n = p.nutriments || {};
+        var kcal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
+        if (kcal <= 0) {
+          var kj = n["energy_100g"] || n["energy"] || 0;
+          if (kj > 0) kcal = kj / 4.184;
+        }
+
+        return {
+          name:      p.product_name,
+          brand:     p.brands || "",
+          image:     p.image_small_url || p.image_url || "",
+          nutriScore: (p.nutrition_grades || "").toUpperCase(),
+          serving:   p.serving_size || "100g",
+          cal:       Math.round(kcal),
+          protein:   Math.round((n["proteins_100g"] || n["proteins"] || 0) * 10) / 10,
+          carbs:     Math.round((n["carbohydrates_100g"] || n["carbohydrates"] || 0) * 10) / 10,
+          fats:      Math.round((n["fat_100g"] || n["fat"] || 0) * 10) / 10,
+          fiber:     Math.round((n["fiber_100g"] || n["fiber"] || 0) * 10) / 10,
+          sugar:     Math.round((n["sugars_100g"] || n["sugars"] || 0) * 10) / 10,
+          sodium:    Math.round((n["sodium_100g"] || n["sodium"] || 0) * 1000),
+          potassium: Math.round((n["potassium_100g"] || n["potassium"] || 0) * 1000),
+          barcode:   barcode,
+          source:    "off"
+        };
+      });
+  };
+
 })(window.PhysIQ.Utils);

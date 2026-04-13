@@ -9,10 +9,12 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   var useEffect = React.useEffect;
   var useMemo = React.useMemo;
   var useCallback = React.useCallback;
+  var useRef = React.useRef;
 
   var FF_RESTAURANTS = Data.FF_RESTAURANTS;
   var FF_MENU = Data.FF_MENU;
   var searchOpenFoodFacts = Utils.searchOpenFoodFacts;
+  var lookupBarcode = Utils.lookupBarcode;
   var getUserLocation = Utils.getUserLocation;
   var fetchNearbyRestaurants = Utils.fetchNearbyRestaurants;
   var matchChainRestaurant = Utils.matchChainRestaurant;
@@ -212,6 +214,16 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
     var _cs = useState("");       var chainSearch = _cs[0], setChainSearch = _cs[1];
     var _cc = useState("All");    var chainCat = _cc[0], setChainCat = _cc[1];
 
+    // Barcode scanner state
+    var _scanActive = useState(false);     var scanActive = _scanActive[0], setScanActive = _scanActive[1];
+    var _scanResult = useState(null);      var scanResult = _scanResult[0], setScanResult = _scanResult[1];
+    var _scanLoading = useState(false);    var scanLoading = _scanLoading[0], setScanLoading = _scanLoading[1];
+    var _scanError = useState("");         var scanError = _scanError[0], setScanError = _scanError[1];
+    var _scanHistory = useState([]);       var scanHistory = _scanHistory[0], setScanHistory = _scanHistory[1];
+    var _manualBarcode = useState("");     var manualBarcode = _manualBarcode[0], setManualBarcode = _manualBarcode[1];
+    var scannerRef = useRef(null);
+    var scannerDivId = "barcode-scanner-reader";
+
     // Recent foods from mealLog — unique foods user has logged, for quick re-add
     var recentFoods = useMemo(function() {
       var seen = {};
@@ -292,6 +304,116 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
       setEatsMode("search");
     };
 
+    // ── Barcode scanner helpers ────────────────────────────────────────
+    var stopScanner = useCallback(function() {
+      if (scannerRef.current) {
+        try {
+          scannerRef.current.stop().then(function() {
+            scannerRef.current.clear();
+            scannerRef.current = null;
+          }).catch(function() {
+            scannerRef.current = null;
+          });
+        } catch(e) {
+          scannerRef.current = null;
+        }
+      }
+      setScanActive(false);
+    }, []);
+
+    var handleBarcodeLookup = useCallback(function(code) {
+      setScanLoading(true);
+      setScanError("");
+      setScanResult(null);
+      stopScanner();
+
+      lookupBarcode(code)
+        .then(function(food) {
+          if (!food) {
+            setScanError("Product not found for barcode: " + code + ". It may not be in the Open Food Facts database.");
+            return;
+          }
+          setScanResult(food);
+          // Add to scan history (keep last 10)
+          setScanHistory(function(prev) {
+            var filtered = prev.filter(function(h) { return h.barcode !== code; });
+            return [food].concat(filtered).slice(0, 10);
+          });
+        })
+        .catch(function(err) {
+          setScanError("Failed to lookup barcode. Please check your connection and try again.");
+        })
+        .finally(function() {
+          setScanLoading(false);
+        });
+    }, [stopScanner]);
+
+    var startScanner = useCallback(function() {
+      setScanResult(null);
+      setScanError("");
+      setScanActive(true);
+
+      // Small delay so the DOM element mounts
+      setTimeout(function() {
+        if (scannerRef.current) {
+          try { scannerRef.current.stop().catch(function(){}); } catch(e) {}
+        }
+
+        var scanner = new Html5Qrcode(scannerDivId);
+        scannerRef.current = scanner;
+
+        scanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 280, height: 160 },
+            aspectRatio: 1.5,
+            formatsToSupport: [
+              Html5QrcodeSupportedFormats.EAN_13,
+              Html5QrcodeSupportedFormats.EAN_8,
+              Html5QrcodeSupportedFormats.UPC_A,
+              Html5QrcodeSupportedFormats.UPC_E,
+              Html5QrcodeSupportedFormats.CODE_128,
+              Html5QrcodeSupportedFormats.CODE_39
+            ]
+          },
+          function onScanSuccess(decodedText) {
+            handleBarcodeLookup(decodedText);
+          },
+          function onScanFailure() {
+            // Silence — continues scanning
+          }
+        ).catch(function(err) {
+          setScanActive(false);
+          var msg = (err && err.toString) ? err.toString() : "";
+          if (msg.indexOf("NotAllowedError") !== -1 || msg.indexOf("Permission") !== -1) {
+            setScanError("Camera permission denied. Please allow camera access in your browser settings, or enter the barcode manually below.");
+          } else if (msg.indexOf("NotFoundError") !== -1) {
+            setScanError("No camera found. Use the manual entry below to type the barcode number.");
+          } else {
+            setScanError("Could not start camera: " + msg + ". Try manual entry below.");
+          }
+        });
+      }, 300);
+    }, [handleBarcodeLookup]);
+
+    // Cleanup scanner when leaving scan mode
+    useEffect(function() {
+      if (eatsMode !== "scan") {
+        stopScanner();
+      }
+    }, [eatsMode, stopScanner]);
+
+    // Cleanup on unmount
+    useEffect(function() {
+      return function() {
+        if (scannerRef.current) {
+          try { scannerRef.current.stop().catch(function(){}); } catch(e) {}
+          scannerRef.current = null;
+        }
+      };
+    }, []);
+
     // ── Chain detail items ─────────────────────────────────────────────
     var chainItems = useMemo(function() {
       if (!chainDetail || !FF_MENU[chainDetail]) return [];
@@ -345,6 +467,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           {[
             { id: "recent",  label: "Recent",  icon: "🕐" },
             { id: "search",  label: "Search",  icon: "🔍" },
+            { id: "scan",    label: "Scan",    icon: "📷" },
             { id: "nearby",  label: "Nearby",  icon: "📍" },
             { id: "manual",  label: "Manual",  icon: "✏️" }
           ].map(function(t) {
@@ -479,6 +602,152 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─── SCAN MODE ────────────────────────────────────────────── */}
+        {eatsMode === "scan" && (
+          <div className="eats-scan-section fade-in">
+
+            {/* Scan result card */}
+            {scanResult && (
+              <div className="scan-result-card fade-in">
+                <div className="scan-result-header">
+                  <div className="scan-result-badge">✅ Product Found</div>
+                  <button className="scan-result-close" onClick={function() { setScanResult(null); }}>×</button>
+                </div>
+                <div className="scan-result-body">
+                  {scanResult.image && (
+                    <div className="scan-result-img">
+                      <img src={scanResult.image} alt="" onError={function(e) { e.target.parentElement.style.display = "none"; }} />
+                    </div>
+                  )}
+                  <div className="scan-result-info">
+                    <div className="scan-result-name">{scanResult.name}</div>
+                    {scanResult.brand && <div className="scan-result-brand">{scanResult.brand}</div>}
+                    {scanResult.nutriScore && NUTRI_SCORE_COLORS[scanResult.nutriScore] && (
+                      <span className="nutri-score-badge" style={{ background: NUTRI_SCORE_COLORS[scanResult.nutriScore], marginTop: 4 }}>{scanResult.nutriScore}</span>
+                    )}
+                    <div className="scan-result-macros">
+                      <span className="mono" style={{ color: "var(--orange)" }}>{scanResult.cal} cal</span>
+                      <span className="scan-result-dot">·</span>
+                      <span className="mono" style={{ color: "var(--blue)" }}>{scanResult.protein}P</span>
+                      <span className="mono" style={{ color: "var(--yellow)" }}>{scanResult.carbs}C</span>
+                      <span className="mono" style={{ color: "var(--purple)" }}>{scanResult.fats}F</span>
+                    </div>
+                    <div className="scan-result-serving">per {scanResult.serving}</div>
+                  </div>
+                </div>
+                <button className="btn btn-primary scan-result-add-btn" onClick={function() { addSearchFood(scanResult); }}>
+                  + Add to Log
+                </button>
+              </div>
+            )}
+
+            {/* Scanner viewport */}
+            {!scanResult && (
+              <div className="scan-camera-section">
+                {scanActive ? (
+                  <div className="scan-viewport-wrap">
+                    <div id={scannerDivId} className="scan-viewport" />
+                    <button className="scan-stop-btn" onClick={stopScanner}>Stop Camera</button>
+                  </div>
+                ) : (
+                  <div className="scan-start-section">
+                    <div className="scan-start-icon">📷</div>
+                    <div className="scan-start-title">Barcode Scanner</div>
+                    <div className="scan-start-sub">Point your camera at any food barcode to instantly look up nutrition info from Open Food Facts</div>
+                    <button className="btn btn-primary scan-start-btn" onClick={startScanner} disabled={scanLoading}>
+                      {scanLoading ? "Looking up..." : "Open Camera"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Loading */}
+            {scanLoading && (
+              <div className="scan-loading fade-in">
+                <div className="scan-loading-spinner" />
+                <span>Looking up product...</span>
+              </div>
+            )}
+
+            {/* Error */}
+            {scanError && (
+              <div className="scan-error fade-in">
+                <div className="scan-error-icon">⚠️</div>
+                <div className="scan-error-msg">{scanError}</div>
+                <button className="btn btn-primary" style={{ maxWidth: 200, margin: "12px auto 0" }} onClick={function() { setScanError(""); startScanner(); }}>
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {/* Manual barcode entry */}
+            {!scanResult && (
+              <div className="scan-manual-section">
+                <div className="scan-manual-divider">
+                  <span className="scan-manual-divider-line" />
+                  <span className="scan-manual-divider-text">or enter barcode manually</span>
+                  <span className="scan-manual-divider-line" />
+                </div>
+                <div className="scan-manual-row">
+                  <input
+                    className="input mono scan-manual-input"
+                    placeholder="Enter barcode number..."
+                    value={manualBarcode}
+                    onChange={function(e) { setManualBarcode(e.target.value.replace(/[^0-9]/g, '')); }}
+                    onKeyDown={function(e) { if (e.key === "Enter" && manualBarcode.trim()) handleBarcodeLookup(manualBarcode.trim()); }}
+                    inputMode="numeric"
+                  />
+                  <button className="btn btn-primary scan-manual-btn" onClick={function() { if (manualBarcode.trim()) handleBarcodeLookup(manualBarcode.trim()); }} disabled={scanLoading || !manualBarcode.trim()}>
+                    Lookup
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Scan history */}
+            {scanHistory.length > 0 && !scanResult && (
+              <div className="scan-history-section fade-in">
+                <div className="eats-section-label">
+                  <span>Recent Scans</span>
+                  <span className="eats-section-badge">{scanHistory.length}</span>
+                </div>
+                <div className="scan-history-list">
+                  {scanHistory.map(function(item, i) {
+                    return (
+                      <div key={item.barcode + i} className="scan-history-card fade-in" style={{ animationDelay: (i * 40) + "ms" }} onClick={function() { addSearchFood(item); }}>
+                        {item.image && (
+                          <div className="scan-history-img">
+                            <img src={item.image} alt="" onError={function(e) { e.target.style.display = "none"; }} />
+                          </div>
+                        )}
+                        <div className="scan-history-info">
+                          <div className="scan-history-name">{item.name}</div>
+                          {item.brand && <div className="scan-history-brand">{item.brand}</div>}
+                          <div className="scan-history-macros">
+                            <span className="mono" style={{ color: "var(--orange)" }}>{item.cal} cal</span>
+                            <span style={{ color: "var(--text-faint)", fontSize: 8 }}>·</span>
+                            <span style={{ color: "var(--blue)" }}>{item.protein}P</span>
+                            <span style={{ color: "var(--yellow)" }}>{item.carbs}C</span>
+                            <span style={{ color: "var(--purple)" }}>{item.fats}F</span>
+                          </div>
+                        </div>
+                        <div className="scan-history-add">+ Add</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Powered by badge */}
+            <div className="scan-powered-by">
+              <span className="eats-source-badge off">Open Food Facts</span>
+              <span style={{ fontSize: 10, color: "var(--text-faint)" }}>Free barcode database · 3M+ products</span>
+            </div>
           </div>
         )}
 

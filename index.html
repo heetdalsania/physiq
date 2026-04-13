@@ -10,7 +10,7 @@
 <title>PHYSIQ ENGINE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/styles.css?v=3">
 </head>
 <body data-theme="dark">
 <div id="app"></div>
@@ -19,6 +19,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
 <!-- ─── Data Layer (plain JS — no JSX) ───────────────────────────────── -->
 <script src="js/data/constants.js"></script>
@@ -27,26 +28,26 @@
 <!-- ─── Utility Layer (plain JS — no JSX) ────────────────────────────── -->
 <script src="js/utils/storage.js"></script>
 <script src="js/utils/calculations.js"></script>
-<script src="js/utils/foodSearch.js"></script>
+<script src="js/utils/foodSearch.js?v=2"></script>
 <script src="js/utils/nearbyRestaurants.js"></script>
 
 <!-- ─── Component Layer (JSX — requires Babel) ───────────────────────── -->
 <script type="text/babel" src="js/components/ProgressRing.js"></script>
 <script type="text/babel" src="js/components/NutrientCard.js"></script>
 <script type="text/babel" src="js/components/Charts.js"></script>
-<script type="text/babel" src="js/components/PortionModal.js"></script>
+<script type="text/babel" src="js/components/PortionModal.js?v=2"></script>
 <script type="text/babel" src="js/components/MealPeriodHeader.js"></script>
 
 <!-- ─── Screen Layer (JSX — requires Babel) ──────────────────────────── -->
 <script type="text/babel" src="js/screens/LoginScreen.js"></script>
 <script type="text/babel" src="js/screens/OnboardScreen.js"></script>
 <script type="text/babel" src="js/screens/DashboardTab.js"></script>
-<script type="text/babel" src="js/screens/EatsTab.js"></script>
+<script type="text/babel" src="js/screens/EatsTab.js?v=2"></script>
 <script type="text/babel" src="js/screens/HealthTab.js"></script>
 <script type="text/babel" src="js/screens/ExerciseTab.js"></script>
 <script type="text/babel" src="js/screens/ProfileTab.js"></script>
 
 <!-- ─── App Entry Point (JSX — requires Babel) ──────────────────────── -->
-<script type="text/babel" src="js/App.js"></script>
+<script type="text/babel" src="js/App.js?v=2"></script>
 </body>
 </html>
