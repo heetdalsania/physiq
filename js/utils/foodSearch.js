@@ -198,7 +198,7 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
 
     var url = "https://world.openfoodfacts.org/api/v2/product/" +
       encodeURIComponent(barcode.trim()) +
-      ".json?fields=product_name,nutriments,brands,image_small_url,image_url,serving_size,nutrition_grades,categories_tags";
+      ".json?fields=product_name,nutriments,brands,image_small_url,image_url,serving_size,serving_quantity,nutrition_grades,categories_tags";
 
     return fetch(url)
       .then(function(res) {
@@ -212,10 +212,46 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
         if (!p.product_name || !p.nutriments) return null;
 
         var n = p.nutriments || {};
-        var kcal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
-        if (kcal <= 0) {
-          var kj = n["energy_100g"] || n["energy"] || 0;
-          if (kj > 0) kcal = kj / 4.184;
+
+        // ── Prefer per-serving values (matches nutrition facts label) ──
+        // Fall back to per-100g only when per-serving data is unavailable
+        var hasServing = (
+          n["energy-kcal_serving"] != null ||
+          n["proteins_serving"] != null ||
+          n["carbohydrates_serving"] != null ||
+          n["fat_serving"] != null
+        );
+
+        var kcal, protein, carbs, fats, fiber, sugar, sodium, potassium;
+
+        if (hasServing) {
+          // Use per-serving values — these match the nutrition facts label
+          kcal = n["energy-kcal_serving"] || 0;
+          if (kcal <= 0) {
+            var kjServ = n["energy_serving"] || 0;
+            if (kjServ > 0) kcal = kjServ / 4.184;
+          }
+          protein   = n["proteins_serving"] || 0;
+          carbs     = n["carbohydrates_serving"] || 0;
+          fats      = n["fat_serving"] || 0;
+          fiber     = n["fiber_serving"] || 0;
+          sugar     = n["sugars_serving"] || 0;
+          sodium    = n["sodium_serving"] || 0;
+          potassium = n["potassium_serving"] || 0;
+        } else {
+          // Fallback: per-100g values
+          kcal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
+          if (kcal <= 0) {
+            var kj100 = n["energy_100g"] || n["energy"] || 0;
+            if (kj100 > 0) kcal = kj100 / 4.184;
+          }
+          protein   = n["proteins_100g"] || n["proteins"] || 0;
+          carbs     = n["carbohydrates_100g"] || n["carbohydrates"] || 0;
+          fats      = n["fat_100g"] || n["fat"] || 0;
+          fiber     = n["fiber_100g"] || n["fiber"] || 0;
+          sugar     = n["sugars_100g"] || n["sugars"] || 0;
+          sodium    = n["sodium_100g"] || n["sodium"] || 0;
+          potassium = n["potassium_100g"] || n["potassium"] || 0;
         }
 
         return {
@@ -223,17 +259,18 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
           brand:     p.brands || "",
           image:     p.image_small_url || p.image_url || "",
           nutriScore: (p.nutrition_grades || "").toUpperCase(),
-          serving:   p.serving_size || "100g",
+          serving:   p.serving_size || (hasServing ? "1 serving" : "100g"),
           cal:       Math.round(kcal),
-          protein:   Math.round((n["proteins_100g"] || n["proteins"] || 0) * 10) / 10,
-          carbs:     Math.round((n["carbohydrates_100g"] || n["carbohydrates"] || 0) * 10) / 10,
-          fats:      Math.round((n["fat_100g"] || n["fat"] || 0) * 10) / 10,
-          fiber:     Math.round((n["fiber_100g"] || n["fiber"] || 0) * 10) / 10,
-          sugar:     Math.round((n["sugars_100g"] || n["sugars"] || 0) * 10) / 10,
-          sodium:    Math.round((n["sodium_100g"] || n["sodium"] || 0) * 1000),
-          potassium: Math.round((n["potassium_100g"] || n["potassium"] || 0) * 1000),
+          protein:   Math.round(protein * 10) / 10,
+          carbs:     Math.round(carbs * 10) / 10,
+          fats:      Math.round(fats * 10) / 10,
+          fiber:     Math.round(fiber * 10) / 10,
+          sugar:     Math.round(sugar * 10) / 10,
+          sodium:    Math.round(sodium * 1000),    // convert g → mg
+          potassium: Math.round(potassium * 1000),  // convert g → mg
           barcode:   barcode,
-          source:    "off"
+          source:    "off",
+          _perServing: hasServing  // flag: true = label values, false = per-100g fallback
         };
       });
   };
