@@ -14,7 +14,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   var SUGGESTION_COLORS = { critical: "#EF4444", warning: "#FBBF24", info: "#3B82F6", muscle: "#A855F7" };
   var SUGGESTION_ICONS = { critical: "\u26A0", warning: "\u26A1", info: "\uD83D\uDCA1", muscle: "\uD83D\uDCAA" };
 
-  function DashboardTab({ intake, targets, profile, suggestions, mealLog, addWater, removeMeal, resetDay }) {
+  function DashboardTab({ intake, targets, profile, suggestions, mealLog, addWater, removeMeal, resetDay, onQuickNav }) {
     // Compute macro data locally
     var macroData = [
       { label: "Protein", val: intake.protein, target: targets.protein, cal: intake.protein * 4, color: "var(--blue)" },

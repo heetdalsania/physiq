@@ -9,31 +9,9 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
   var GOALS = Data.GOALS;
   var ACTIVITY_LEVELS = Data.ACTIVITY_LEVELS;
-  var MUSCLE_GROUPS = Data.MUSCLE_GROUPS;
   var NUTRIENT_INFO = Data.NUTRIENT_INFO;
-  var EXERCISES = Data.EXERCISES_BY_CATEGORY || Data.EXERCISES || {};
 
-  function HealthTab({ profile, targets, up, toggleMuscle }) {
-    var _expanded = useState(null);
-    var expandedMuscle = _expanded[0], setExpandedMuscle = _expanded[1];
-
-    var handleMuscleClick = function(id) {
-      toggleMuscle(id);
-      if (!profile.todayMuscles.includes(id)) {
-        setExpandedMuscle(id);
-      } else {
-        if (expandedMuscle === id) setExpandedMuscle(null);
-      }
-    };
-
-    var toggleExpand = function(id) {
-      if (expandedMuscle === id) {
-        setExpandedMuscle(null);
-        toggleMuscle(id);
-      } else {
-        setExpandedMuscle(id);
-      }
-    };
+  function HealthTab({ profile, targets, up, workoutLog }) {
 
     return (
       <div className="fade-in" style={{ paddingTop: 16 }}>
@@ -67,68 +45,46 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             );
           })}
         </div>
-
-        {/* Today's Workout — Muscle Groups */}
-        <div className="label">Today's Workout</div>
-        <div className="grid-2-10" style={{ marginBottom: 20 }}>
-          {MUSCLE_GROUPS.map(function(mg) {
-            var active = profile.todayMuscles.includes(mg.id);
-            var isExpanded = expandedMuscle === mg.id && active;
-            var exercises = EXERCISES[mg.id] || [];
-            return (
-              <div key={mg.id} className={"muscle-card" + (active ? " active" : "") + (isExpanded ? " expanded" : "")}>
-                <button className={"muscle-btn" + (active ? " active" : "")} onClick={function() { handleMuscleClick(mg.id); }} style={{ width: "100%" }}>
-                  <div style={{ fontSize: 18, marginBottom: 4 }}>{mg.icon}</div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>{mg.label}</div>
-                  <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 2 }}>{mg.recovery}h recovery</div>
-                </button>
-                {active && exercises.length > 0 && (
-                  <div className="exercise-toggle-wrapper">
-                    <button className="exercise-toggle-btn" onClick={function() { toggleExpand(mg.id); }}>
-                      <span>{isExpanded ? "Hide" : "View"} Exercises</span>
-                      <span className={"exercise-chevron" + (isExpanded ? " open" : "")}>{"\u25BE"}</span>
-                    </button>
-                  </div>
-                )}
-                {isExpanded && exercises.length > 0 && (
-                  <div className="exercise-list fade-in">
-                    {exercises.map(function(ex, i) {
-                      return (
-                        <div key={ex} className="exercise-item">
-                          <span className="exercise-num">{i + 1}</span>
-                          <span className="exercise-name">{ex}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Nutrient Focus (shown when muscles are selected) */}
-        {profile.todayMuscles.length > 0 && (
+        
+        {/* Lifetime Exercise Stats */}
+        {workoutLog && workoutLog.length > 0 && (
           <React.Fragment>
-            <div className="label">Nutrient Focus</div>
-            <div className="flex-col gap-8" style={{ marginBottom: 20 }}>
-              {Array.from(new Set(
-                profile.todayMuscles.flatMap(function(id) {
-                  var mg = MUSCLE_GROUPS.find(function(m) { return m.id === id; });
-                  return mg ? mg.nutrients : [];
-                })
-              )).map(function(n) {
-                var info = NUTRIENT_INFO[n];
-                if (!info) return null;
+            <div className="label" style={{ marginTop: 24 }}>Lifetime Stats</div>
+            <div className="flex-col gap-6" style={{ marginBottom: 20 }}>
+              {function() {
+                var totalW = workoutLog.length;
+                var totalS = 0;
+                var totalMin = 0;
+                workoutLog.forEach(function(w) {
+                  totalS += (w.completedSets || 0);
+                  if (w.startedAt && w.finishedAt) {
+                    totalMin += Math.round((w.finishedAt - w.startedAt) / 60000);
+                  }
+                });
+                // Rough estimation: weightlifting burns ~4-6 cals/min. Use 5.
+                var calsBurned = totalMin * 5;
+
                 return (
-                  <div key={n} className="nutrient-focus" style={{ background: info.color + "08", border: "1px solid " + info.color + "22" }}>
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: info.color }} />
-                    <span style={{ fontSize: 13, fontWeight: 600, color: info.color }}>{info.label}</span>
-                    <span style={{ flex: 1 }} />
-                    <span className="mono" style={{ fontSize: 12, color: "var(--text-dim)" }}>Target: {targets[n]}{info.unit}</span>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <div className="option-btn" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
+                      <span style={{ fontSize: 10, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: 0.5 }}>Workouts</span>
+                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--blue)" }}>{totalW}</span>
+                    </div>
+                    <div className="option-btn" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
+                      <span style={{ fontSize: 10, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: 0.5 }}>Sets Completed</span>
+                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--orange)" }}>{totalS}</span>
+                    </div>
+                    <div className="option-btn" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
+                      <span style={{ fontSize: 10, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: 0.5 }}>Total Minutes</span>
+                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--purple)" }}>{totalMin}</span>
+                    </div>
+                    <div className="option-btn" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
+                      <span style={{ fontSize: 10, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: 0.5 }}>Cals Burned (Est.)</span>
+                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--green)" }}>{calsBurned.toLocaleString()}</span>
+                    </div>
                   </div>
                 );
-              })}
+              }()}
             </div>
           </React.Fragment>
         )}

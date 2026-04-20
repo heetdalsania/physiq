@@ -22,14 +22,25 @@ A comprehensive nutrition and fitness optimizer — personalized to your body, y
 ### ▣ Eats (Unified Food Logging)
 - **AI Search** — type any food in natural language ("banana", "grilled chicken breast", "protein shake") and get instant nutrition data from the USDA FoodData Central database (380,000+ foods). One-tap to log. 100% free, no limits.
 - **Manual** — custom entry for any meal with full macro and nutrient fields
-- **Scan** — camera-based food scanning placeholder (coming soon)
+- **Scan Barcode** — Uses the device camera and HTML5-QRCode to instantly scan packaging barcodes. Automatically cross-references with OpenFoodFacts to log exact macro and nutrient information on a per-serving basis.
 - **Menu** — 6 fast food restaurant menus (McDonald's, Chipotle, Chick-fil-A, Taco Bell, Subway, Wendy's) with search, category filters, and one-tap logging
 - **Remaining budget bar** — always visible across all modes
 
 ### ♦ Health
 - **Goals** — Build Muscle, Lean Bulk, Maintain, Debloat + Cut, Cut Fat
 - **Activity Level** — Sedentary through Extreme with step ranges
-- **Muscle Groups** — 8 groups with recovery windows, nutrient focus pairing
+- **Lifetime Stats** — Tracks your total workouts, total sets, total minutes, and estimates your all-time calories burned from exercise.
+
+### 📅 Calendar
+- **Month & Year Filters** — Navigate through past months and years natively.
+- **Color-Coded Status** — Each day visually flags target completions (Green = Nutrition and Exercise met, Yellow = One met, Red = Neither met).
+- **Macro & Workout Snapshots** — Tap any day to expand a side panel showing the exact macros hit and workouts completed on that date.
+- **Gym Days Enforcer** — Automatically marks exercise target as "Met" for the rest of the week if you've already hit your weekly workout quota (e.g., 3x/week).
+
+### 🏋️ Exercise Tracker
+- **Routine Builder** — Create preset routines (e.g., "Push Day", "Pull Day") with selected muscle groups and sets.
+- **Live Workout Mode** — Run the routine with a live timer and toggle off sets as you conquer them.
+- **Data Persistence** — Pushes completed workouts to your local database, powering the Calendar tab's logic and the Health tab's lifetime stats.
 
 ### ⚙ Profile & Projections
 - 12-week weight projection chart with weekly labels
@@ -59,7 +70,7 @@ The AI Search feature uses the **USDA FoodData Central API** — a free, governm
 
 ## Tech Stack
 
-Modular multi-file architecture · React 18 + Babel (CDN) · USDA FoodData Central API · localStorage per-user · Pure SVG charts · CSS custom properties theming · Mobile-first
+Modular multi-file architecture · React 18 + Babel (CDN) · USDA FoodData Central API · OpenFoodFacts API · HTML5-QRCode · localStorage per-user · Pure SVG charts · CSS custom properties theming · Mobile-first
 
 ## Project Structure
 
@@ -85,7 +96,9 @@ physiq/
 │   │   ├── OnboardScreen.js   # 3-step onboarding wizard
 │   │   ├── DashboardTab.js    # Main dashboard (ring, water, nutrients, meals)
 │   │   ├── EatsTab.js         # Food logging (search, manual, scan, menu)
-│   │   ├── HealthTab.js       # Goals, activity, muscle groups
+│   │   ├── HealthTab.js       # Goals, activity, lifetime stats
+│   │   ├── CalendarTab.js     # Full calendar tracker with color-coded day analysis
+│   │   ├── ExerciseTab.js     # Routine builder and live workout tracker
 │   │   └── ProfileTab.js      # Projections, stats, settings
 │   └── App.js                 # Root component — state management + routing
 └── README.md

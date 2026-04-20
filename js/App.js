@@ -39,6 +39,7 @@ window.PhysIQ = window.PhysIQ || {};
   var DashboardTab = Screens.DashboardTab;
   var EatsTab = Screens.EatsTab;
   var HealthTab = Screens.HealthTab;
+  var CalendarTab = Screens.CalendarTab;
   var ExerciseTab = Screens.ExerciseTab;
   var ProfileTab = Screens.ProfileTab;
 
@@ -57,6 +58,7 @@ window.PhysIQ = window.PhysIQ || {};
 
     var _tab = useState("dashboard");            var tab = _tab[0], setTab = _tab[1];
     var _addMenuOpen = useState(false);          var addMenuOpen = _addMenuOpen[0], setAddMenuOpen = _addMenuOpen[1];
+    var _popupType = useState(null);             var popupType = _popupType[0], setPopupType = _popupType[1];
     var _mealForm = useState({ name: "", calories: "", protein: "", carbs: "", fats: "", fiber: "", sugar: "", sodium: "", potassium: "" });
     var mealForm = _mealForm[0], setMealForm = _mealForm[1];
 
@@ -468,6 +470,7 @@ window.PhysIQ = window.PhysIQ || {};
               intake={intake} targets={targets} profile={profile}
               suggestions={suggestions} mealLog={mealLog}
               addWater={addWater} removeMeal={removeMeal} resetDay={resetDay}
+              onQuickNav={function(tabId, mode) { setTab(tabId); setAddMenuOpen(false); setPopupType(null); }}
             />
           )}
 
@@ -489,7 +492,17 @@ window.PhysIQ = window.PhysIQ || {};
           {tab === "health" && (
             <HealthTab
               profile={profile} targets={targets}
-              up={up} toggleMuscle={toggleMuscle}
+              up={up} workoutLog={workoutLog}
+            />
+          )}
+
+          {tab === "calendar" && (
+            <CalendarTab
+              history={history}
+              workoutLog={workoutLog}
+              intake={intake}
+              targets={targets}
+              profile={profile}
             />
           )}
 
@@ -521,6 +534,7 @@ window.PhysIQ = window.PhysIQ || {};
             { id: "dashboard", label: "Dashboard", icon: "\u25C9" },
             { id: "health",    label: "Health",    icon: "\u2666" },
             { id: "__add",     label: "",          icon: "+"      },
+            { id: "calendar",  label: "Calendar",  icon: "\uD83D\uDCC5" },
             { id: "profile",   label: "Profile",   icon: "\u2699" }
           ].map(function(t) {
             if (t.id === "__add") {
@@ -537,7 +551,7 @@ window.PhysIQ = window.PhysIQ || {};
               );
             }
             return (
-              <button key={t.id} className={"nav-btn" + (tab === t.id ? " active" : "")} onClick={function() { setTab(t.id); setAddMenuOpen(false); }}>
+              <button key={t.id} className={"nav-btn" + (tab === t.id ? " active" : "")} onClick={function() { setTab(t.id); setAddMenuOpen(false); setPopupType(null); }}>
                 <span>{t.icon}</span>
                 <span>{t.label}</span>
               </button>
@@ -545,28 +559,82 @@ window.PhysIQ = window.PhysIQ || {};
           })}
         </div>
 
-        {/* Add Menu Bottom Sheet */}
-        {addMenuOpen && (
+        {/* Add Menu Bottom Sheet — Redesigned */}
+        {addMenuOpen && !popupType && (
           <div className="add-menu-backdrop" onClick={function() { setAddMenuOpen(false); }}>
             <div className="add-menu-sheet" onClick={function(e) { e.stopPropagation(); }}>
               <div className="add-menu-handle" />
               <div className="add-menu-title">Quick Access</div>
-              <button
-                className="add-menu-item"
-                onClick={function() { setTab("eats"); setAddMenuOpen(false); }}
-              >
-                <span className="add-menu-item-icon">{"\u25A3"}</span>
-                <span className="add-menu-item-label">Eats</span>
-                <span className="add-menu-item-arrow">{"\u203A"}</span>
-              </button>
-              <button
-                className="add-menu-item"
-                onClick={function() { setTab("exercise"); setAddMenuOpen(false); }}
-              >
-                <span className="add-menu-item-icon">{"\uD83C\uDFCB"}</span>
-                <span className="add-menu-item-label">Exercise</span>
-                <span className="add-menu-item-arrow">{"\u203A"}</span>
-              </button>
+              <div className="add-menu-cards">
+                <button
+                  className="add-menu-card eats-card"
+                  onClick={function() { setPopupType("eats"); }}
+                >
+                  <div className="add-menu-card-icon">{"\uD83C\uDF4E"}</div>
+                  <div className="add-menu-card-label">Eats</div>
+                  <div className="add-menu-card-sub">Log food & nutrition</div>
+                </button>
+                <button
+                  className="add-menu-card exercise-card"
+                  onClick={function() { setPopupType("exercise"); }}
+                >
+                  <div className="add-menu-card-icon">{"\uD83C\uDFCB\uFE0F"}</div>
+                  <div className="add-menu-card-label">Exercise</div>
+                  <div className="add-menu-card-sub">Routines & workouts</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Eats Popup Overlay — Full EatsTab embedded */}
+        {popupType === "eats" && (
+          <div className="popup-overlay">
+            <div className="popup-header">
+              <button className="popup-close-btn" onClick={function() { setPopupType(null); setAddMenuOpen(false); }} aria-label="Close">{"\u00D7"}</button>
+              <div className="popup-header-title">Log Food</div>
+              <span className="popup-header-icon">{"\uD83C\uDF4E"}</span>
+            </div>
+            <div className="popup-content">
+              <EatsTab
+                intake={intake} targets={targets}
+                mealLog={mealLog}
+                addSearchFood={addSearchFood}
+                addFF={addFF}
+                mealForm={mealForm} setMealForm={setMealForm} addMeal={addMeal}
+                removeMeal={removeMeal}
+                moveMealToPeriod={moveMealToPeriod}
+                activeMealPeriod={activeMealPeriod}
+                setActiveMealPeriod={setActiveMealPeriod}
+                reAddFood={reAddFood}
+              />
+            </div>
+            {/* Portion modal inside popup so it renders above the overlay */}
+            <PortionModal
+              portionItem={portionItem} setPortionItem={setPortionItem}
+              portionGrams={portionGrams} setPortionGrams={setPortionGrams}
+              portionUnit={portionUnit} setPortionUnit={setPortionUnit}
+              portionCount={portionCount} setPortionCount={setPortionCount}
+              confirmPortion={confirmPortion}
+            />
+          </div>
+        )}
+
+        {/* Exercise Popup Overlay — Full ExerciseTab embedded */}
+        {popupType === "exercise" && (
+          <div className="popup-overlay">
+            <div className="popup-header">
+              <button className="popup-close-btn" onClick={function() { setPopupType(null); setAddMenuOpen(false); }} aria-label="Close">{"\u00D7"}</button>
+              <div className="popup-header-title">Exercise</div>
+              <span className="popup-header-icon">{"\uD83C\uDFCB\uFE0F"}</span>
+            </div>
+            <div className="popup-content">
+              <ExerciseTab
+                routines={routines}
+                saveRoutine={saveRoutine}
+                deleteRoutine={deleteRoutine}
+                logCompletedWorkout={logCompletedWorkout}
+              />
             </div>
           </div>
         )}
