@@ -3516,3 +3516,679 @@ body {
     background: rgba(168, 85, 247, 0.1);
     border-color: var(--purple-light)
 }
+
+/* ─── Centered Nav "+" Button ─────────────────────────────────────────── */
+.nav-add-btn {
+    position: relative;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0
+}
+
+.nav-add-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple-light, #a855f7));
+    color: #fff !important;
+    font-size: 18px !important;
+    font-weight: 400;
+    line-height: 1;
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+    transition: transform .2s, box-shadow .2s
+}
+
+.nav-add-btn:hover .nav-add-circle {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.45)
+}
+
+.nav-add-btn.active .nav-add-circle {
+    box-shadow: 0 3px 14px rgba(168, 85, 247, 0.55)
+}
+
+/* ─── Add Menu Bottom Sheet ───────────────────────────────────────────── */
+.add-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 90;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: addMenuFade .2s ease-out
+}
+
+.add-menu-sheet {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg, #1a1a1f);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    padding: 10px 18px calc(24px + env(safe-area-inset-bottom));
+    margin-bottom: 72px;
+    animation: addMenuSlide .25s cubic-bezier(.2,.8,.2,1)
+}
+
+.add-menu-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin: 4px auto 12px
+}
+
+.add-menu-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+    text-align: center
+}
+
+.add-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    color: var(--text-white);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: all .2s
+}
+
+.add-menu-item:hover {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: var(--blue);
+    transform: translateY(-1px)
+}
+
+.add-menu-item-icon {
+    font-size: 20px;
+    width: 28px;
+    text-align: center
+}
+
+.add-menu-item-label {
+    flex: 1;
+    text-align: left
+}
+
+.add-menu-item-arrow {
+    color: var(--text-faint);
+    font-size: 18px
+}
+
+@keyframes addMenuFade {
+    from { opacity: 0 }
+    to   { opacity: 1 }
+}
+
+@keyframes addMenuSlide {
+    from { transform: translateY(100%) }
+    to   { transform: translateY(0) }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ROUTINE BUILDER + WORKOUT TRACKER
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Screen Header (shared across create/pick/active views) ──────────── */
+.screen-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px
+}
+
+.screen-back-btn {
+    padding: 6px 12px 6px 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all .2s
+}
+
+.screen-back-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-white)
+}
+
+.screen-primary-btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--blue), var(--purple-light, #a855f7));
+    border: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.25)
+}
+
+.screen-primary-btn:hover:not(.disabled):not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4)
+}
+
+.screen-primary-btn.disabled,
+.screen-primary-btn:disabled {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-faint);
+    box-shadow: none;
+    cursor: not-allowed
+}
+
+/* ─── Main Exercise Page: New Routine Hero Button ─────────────────────── */
+.new-routine-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(168, 85, 247, 0.08));
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s
+}
+
+.new-routine-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--purple-light);
+    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.2)
+}
+
+.new-routine-plus {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple-light, #a855f7));
+    color: #fff;
+    font-size: 22px;
+    font-weight: 400;
+    flex-shrink: 0
+}
+
+.new-routine-arrow {
+    color: var(--text-faint);
+    font-size: 20px
+}
+
+/* ─── My Routines: Empty State ────────────────────────────────────────── */
+.routines-empty {
+    text-align: center;
+    padding: 32px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed var(--border)
+}
+
+/* ─── Routine Card ────────────────────────────────────────────────────── */
+.routine-card {
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--card-bg, #1a1a1f);
+    border: 1px solid var(--border);
+    transition: all .2s
+}
+
+.routine-card:hover {
+    border-color: rgba(168, 85, 247, 0.4)
+}
+
+.routine-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px
+}
+
+.routine-edit-btn,
+.routine-delete-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-faint);
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all .2s
+}
+
+.routine-edit-btn:hover {
+    color: var(--blue);
+    border-color: var(--blue)
+}
+
+.routine-delete-btn:hover {
+    color: var(--red);
+    border-color: var(--red)
+}
+
+.routine-muscles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px
+}
+
+.routine-muscle-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(168, 85, 247, 0.12);
+    color: var(--purple-light);
+    text-transform: uppercase;
+    letter-spacing: .5px
+}
+
+.start-routine-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all .2s
+}
+
+.start-routine-btn:hover {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: var(--green);
+    transform: translateY(-1px)
+}
+
+/* ─── Create Routine: Title Input ─────────────────────────────────────── */
+.routine-title-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--text-white);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color .2s
+}
+
+.routine-title-input:focus {
+    border-color: var(--blue)
+}
+
+.routine-title-input::placeholder {
+    color: var(--text-faint);
+    font-weight: 400
+}
+
+/* ─── Draft Exercise Card (within Create Routine) ─────────────────────── */
+.draft-ex-card {
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--card-bg, #1a1a1f);
+    border: 1px solid var(--border)
+}
+
+.draft-ex-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px
+}
+
+.draft-ex-remove {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-faint);
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all .2s
+}
+
+.draft-ex-remove:hover {
+    color: var(--red);
+    border-color: var(--red)
+}
+
+.draft-set-header {
+    display: flex;
+    align-items: center;
+    padding: 0 4px 6px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px
+}
+
+.draft-set-header span {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--text-faint)
+}
+
+.draft-set-col-num {
+    width: 44px;
+    flex-shrink: 0;
+    text-align: center
+}
+
+.draft-set-col-reps,
+.draft-set-col-weight {
+    flex: 1;
+    text-align: center
+}
+
+.draft-set-col-del,
+.draft-set-col-done {
+    width: 44px;
+    flex-shrink: 0;
+    text-align: center
+}
+
+.draft-set-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 4px;
+    border-radius: 8px;
+    transition: background .2s
+}
+
+.draft-set-row.set-done {
+    background: rgba(34, 197, 94, 0.08)
+}
+
+.draft-set-row .draft-set-col-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim)
+}
+
+.draft-set-input {
+    width: 60px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text-white);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+    font-family: 'Space Mono', monospace;
+    transition: border-color .2s;
+    margin: 0 auto;
+    display: block;
+    -moz-appearance: textfield
+}
+
+.draft-set-input::-webkit-inner-spin-button,
+.draft-set-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0
+}
+
+.draft-set-input:focus {
+    border-color: var(--blue)
+}
+
+.draft-set-del {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-faint);
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    margin: 0 auto
+}
+
+.draft-set-del:hover {
+    color: var(--red);
+    border-color: var(--red)
+}
+
+.draft-add-set {
+    display: block;
+    width: 100%;
+    padding: 8px 0;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: 1px dashed rgba(168, 85, 247, 0.25);
+    background: rgba(168, 85, 247, 0.04);
+    color: var(--purple-light);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all .2s
+}
+
+.draft-add-set:hover {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: var(--purple-light)
+}
+
+/* ─── Add Exercise Full-width Button ──────────────────────────────────── */
+.add-exercise-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 14px;
+    border-radius: 12px;
+    border: 1px dashed rgba(59, 130, 246, 0.4);
+    background: rgba(59, 130, 246, 0.06);
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .3px
+}
+
+.add-exercise-btn:hover {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: var(--blue);
+    transform: translateY(-1px)
+}
+
+/* ─── Exercise Picker: Category Row ───────────────────────────────────── */
+.picker-cat-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    -webkit-overflow-scrolling: touch
+}
+
+.picker-cat-row::-webkit-scrollbar {
+    display: none
+}
+
+.picker-cat-pill {
+    padding: 8px 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all .2s
+}
+
+.picker-cat-pill:hover {
+    color: var(--text-white);
+    border-color: var(--text-dim)
+}
+
+.picker-cat-pill.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: var(--blue);
+    color: var(--blue)
+}
+
+/* ─── Exercise Picker: List Items ─────────────────────────────────────── */
+.picker-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    color: var(--text-white);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-align: left;
+    transition: all .15s
+}
+
+.picker-item:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(59, 130, 246, 0.04)
+}
+
+.picker-item.selected {
+    border-color: var(--blue);
+    background: rgba(59, 130, 246, 0.1)
+}
+
+.picker-item-name {
+    flex: 1;
+    font-weight: 500
+}
+
+.picker-item-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: transparent;
+    flex-shrink: 0;
+    transition: all .15s
+}
+
+.picker-item-check.checked {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff
+}
+
+/* ─── Exercise Picker: Floating Action Bar ────────────────────────────── */
+.picker-action-bar {
+    position: fixed;
+    bottom: 86px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 448px;
+    z-index: 50;
+    animation: pickerBarSlide .25s cubic-bezier(.2,.8,.2,1)
+}
+
+.picker-confirm-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--blue), var(--purple-light, #a855f7));
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    transition: all .2s
+}
+
+.picker-confirm-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5)
+}
+
+@keyframes pickerBarSlide {
+    from { transform: translateX(-50%) translateY(100%); opacity: 0 }
+    to   { transform: translateX(-50%) translateY(0); opacity: 1 }
+}
+
+/* ─── Active Workout Cards ────────────────────────────────────────────── */
+.active-ex-card {
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--card-bg, #1a1a1f);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    transition: all .3s
+}
+
+.active-ex-card.active-ex-done {
+    border-color: rgba(34, 197, 94, 0.5);
+    background: rgba(34, 197, 94, 0.04)
+}

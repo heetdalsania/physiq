@@ -1,4 +1,4 @@
-/* ─── PHYSIQ ENGINE — Exercise Tab ────────────────────────────────────────── */
+/* ─── PHYSIQ ENGINE — Exercise Tab (Routine Builder + Workout Tracker) ──── */
 
 window.PhysIQ = window.PhysIQ || {};
 window.PhysIQ.Screens = window.PhysIQ.Screens || {};
@@ -6,367 +6,532 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 (function(Screens, Data) {
 
   var useState = React.useState;
-  var useRef = React.useRef;
-  var useEffect = React.useEffect;
+  var useMemo = React.useMemo;
 
-  var DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  var DAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var CATEGORIES = Data.EXERCISE_CATEGORIES;
+  var EXERCISES = Data.EXERCISES_BY_CATEGORY;
 
-  // ─── Exercise categorization ─────────────────────────────────────────
-  var EXERCISE_CATEGORY = {
-    "Bench Press": "upper_compound",
-    "Incline Dumbbell Press": "upper_compound",
-    "Chest Fly": "isolation",
-    "Push-ups": "upper_compound",
-    "Pull-ups": "upper_compound",
-    "Lat Pulldown": "upper_compound",
-    "Seated Cable Row": "upper_compound",
-    "Deadlift": "lower_compound",
-    "Overhead Shoulder Press": "upper_compound",
-    "Lateral Raises": "isolation",
-    "Rear Delt Fly": "isolation",
-    "Arnold Press": "upper_compound",
-    "Barbell Curls": "isolation",
-    "Dumbbell Curls": "isolation",
-    "Hammer Curls": "isolation",
-    "Preacher Curls": "isolation",
-    "Tricep Pushdowns": "isolation",
-    "Overhead Tricep Extension": "isolation",
-    "Dips": "upper_compound",
-    "Close-Grip Bench Press": "upper_compound",
-    "Squats": "lower_compound",
-    "Leg Press": "lower_compound",
-    "Lunges": "lower_compound",
-    "Leg Curl": "isolation",
-    "Plank": "core",
-    "Hanging Leg Raises": "core",
-    "Hip Thrusts": "lower_compound",
-    "Glute Bridges": "lower_compound"
-  };
+  // Build reverse map: exercise name → category id
+  var NAME_TO_CAT = {};
+  Object.keys(EXERCISES).forEach(function(cat) {
+    EXERCISES[cat].forEach(function(n) { NAME_TO_CAT[n] = cat; });
+  });
 
-  var BASE_CALORIES = {
-    upper_compound: 4,
-    lower_compound: 6,
-    isolation: 3,
-    core: 2.5
-  };
-
-  function calcSetCalories(exerciseName, reps, userWeight, weight) {
-    var category = EXERCISE_CATEGORY[exerciseName] || "isolation";
-    var base = BASE_CALORIES[category] || 3;
-    var bodyweightFactor = userWeight / 180;
-    var repFactor = reps / 8;
-    if (repFactor < 0.75) repFactor = 0.75;
-    if (repFactor > 1.25) repFactor = 1.25;
-    var weightFactor = 1 + ((weight || 0) / userWeight) * 0.5;
-    return Math.round(base * bodyweightFactor * repFactor * weightFactor);
+  function categoryLabel(catId) {
+    var c = CATEGORIES.find(function(x) { return x.id === catId; });
+    return c ? c.label : catId;
   }
 
-  // ─── Floating +/- animation component ────────────────────────────────
-  function CaloriePop({ value, id }) {
-    var _visible = useState(true);
-    var visible = _visible[0], setVisible = _visible[1];
+  // ─── Main Component ───────────────────────────────────────────────────
+  function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout }) {
+    var _view = useState("main");
+    var view = _view[0], setView = _view[1];
 
-    useEffect(function() {
-      var t = setTimeout(function() { setVisible(false); }, 900);
-      return function() { clearTimeout(t); };
-    }, []);
+    // Draft routine under construction
+    var _draft = useState(null);
+    var draft = _draft[0], setDraft = _draft[1];
 
-    if (!visible) return null;
+    // Multi-select state for picker
+    var _picker = useState({ selected: [], category: "chest" });
+    var picker = _picker[0], setPicker = _picker[1];
 
-    var isPositive = value > 0;
-    return (
-      <span
-        key={id}
-        className="cal-pop"
-        style={{ color: isPositive ? "var(--green)" : "var(--red)" }}
-      >
-        {isPositive ? "+" : ""}{value}
-      </span>
-    );
-  }
+    // Active workout state
+    var _active = useState(null);
+    var active = _active[0], setActive = _active[1];
 
-  // ─── Main component ──────────────────────────────────────────────────
-  function ExerciseTab({ weeklyExercises, updateExercise, removeExercise, startEditWorkout, profile }) {
-    var today = new Date().getDay();
-    var _selectedDay = useState(today);
-    var selectedDay = _selectedDay[0], setSelectedDay = _selectedDay[1];
+    // ── Flow helpers ────────────────────────────────────────────────────
+    var startNewRoutine = function() {
+      setDraft({ id: Date.now(), title: "", exercises: [] });
+      setView("create");
+    };
 
-    var _workoutMode = useState(null);
-    var workoutMode = _workoutMode[0], setWorkoutMode = _workoutMode[1];
+    var editRoutine = function(r) {
+      // Deep clone so edits don't mutate saved routine until saved
+      setDraft({
+        id: r.id,
+        title: r.title,
+        exercises: r.exercises.map(function(ex) {
+          return {
+            id: ex.id,
+            name: ex.name,
+            muscle: ex.muscle,
+            sets: ex.sets.map(function(s) { return { reps: s.reps, weight: s.weight }; })
+          };
+        })
+      });
+      setView("create");
+    };
 
-    // Calorie animation pops
-    var _calPops = useState([]);
-    var calPops = _calPops[0], setCalPops = _calPops[1];
-    var popIdRef = useRef(0);
+    var cancelCreate = function() {
+      setDraft(null);
+      setView("main");
+    };
 
-    var dayExercises = weeklyExercises[selectedDay] || [];
-    var userWeight = (profile && profile.weight) || 180;
+    var openPicker = function() {
+      var existing = draft.exercises.map(function(e) { return e.name; });
+      setPicker({ selected: existing.slice(), category: "chest" });
+      setView("pick");
+    };
 
-    var startWorkout = function() {
-      var logs = {};
-      dayExercises.forEach(function(ex) {
-        var sets = [];
-        for (var i = 0; i < ex.sets; i++) {
-          sets.push({ reps: ex.reps, weight: ex.maxWeight || 0, done: false });
+    var togglePickerItem = function(name) {
+      setPicker(function(p) {
+        var idx = p.selected.indexOf(name);
+        if (idx >= 0) {
+          var next = p.selected.slice();
+          next.splice(idx, 1);
+          return Object.assign({}, p, { selected: next });
         }
-        logs[ex.id] = sets;
-      });
-      setWorkoutMode({ setLogs: logs });
-      setCalPops([]);
-    };
-
-    var endWorkout = function() {
-      setWorkoutMode(null);
-      setCalPops([]);
-    };
-
-    var updateSetLog = function(exId, setIdx, field, value) {
-      var clamped = value < 0 ? 0 : value;
-      setWorkoutMode(function(prev) {
-        if (!prev) return prev;
-        var newLogs = Object.assign({}, prev.setLogs);
-        var sets = newLogs[exId].slice();
-        sets[setIdx] = Object.assign({}, sets[setIdx]);
-        sets[setIdx][field] = clamped;
-        newLogs[exId] = sets;
-        return { setLogs: newLogs };
+        return Object.assign({}, p, { selected: p.selected.concat([name]) });
       });
     };
 
-    var addSetToExercise = function(exId) {
-      setWorkoutMode(function(prev) {
-        if (!prev) return prev;
-        var newLogs = Object.assign({}, prev.setLogs);
-        var sets = newLogs[exId].slice();
-        var lastSet = sets.length > 0 ? sets[sets.length - 1] : { reps: 10, weight: 0 };
-        sets.push({ reps: lastSet.reps, weight: lastSet.weight, done: false });
-        newLogs[exId] = sets;
-        return { setLogs: newLogs };
-      });
-    };
-
-    var removeSetFromExercise = function(exId, setIdx, exerciseName) {
-      var setToRemove = workoutMode.setLogs[exId][setIdx];
-      // If the set was completed, show calorie subtraction pop
-      if (setToRemove && setToRemove.done) {
-        var setCal = calcSetCalories(exerciseName, setToRemove.reps, userWeight, setToRemove.weight);
-        popIdRef.current += 1;
-        var newPop = { id: popIdRef.current, value: -setCal };
-        setCalPops(function(prev) { return prev.concat([newPop]); });
-        setTimeout(function() {
-          setCalPops(function(prev) { return prev.filter(function(p) { return p.id !== newPop.id; }); });
-        }, 1000);
-      }
-
-      setWorkoutMode(function(prev) {
-        if (!prev) return prev;
-        var newLogs = Object.assign({}, prev.setLogs);
-        var sets = newLogs[exId].slice();
-        sets.splice(setIdx, 1);
-        newLogs[exId] = sets;
-        return { setLogs: newLogs };
-      });
-    };
-
-    var toggleSetDone = function(exId, setIdx, exerciseName, reps, weight) {
-      var wasDone = workoutMode.setLogs[exId][setIdx].done;
-      var setCal = calcSetCalories(exerciseName, reps, userWeight, weight);
-      var delta = wasDone ? -setCal : setCal;
-
-      // Show pop animation
-      popIdRef.current += 1;
-      var newPop = { id: popIdRef.current, value: delta };
-      setCalPops(function(prev) { return prev.concat([newPop]); });
-      setTimeout(function() {
-        setCalPops(function(prev) { return prev.filter(function(p) { return p.id !== newPop.id; }); });
-      }, 1000);
-
-      setWorkoutMode(function(prev) {
-        if (!prev) return prev;
-        var newLogs = Object.assign({}, prev.setLogs);
-        var sets = newLogs[exId].slice();
-        sets[setIdx] = Object.assign({}, sets[setIdx]);
-        sets[setIdx].done = !sets[setIdx].done;
-        newLogs[exId] = sets;
-        return { setLogs: newLogs };
-      });
-    };
-
-    // Count completed sets and calories
-    var completedSets = 0;
-    var totalSets = 0;
-    var totalCalories = 0;
-    if (workoutMode) {
-      dayExercises.forEach(function(ex) {
-        var sets = workoutMode.setLogs[ex.id] || [];
-        sets.forEach(function(s) {
-          totalSets++;
-          if (s.done) {
-            completedSets++;
-            totalCalories += calcSetCalories(ex.name, s.reps, userWeight, s.weight);
-          }
+    var confirmPicker = function() {
+      var selected = picker.selected;
+      setDraft(function(d) {
+        if (!d) return d;
+        var existingByName = {};
+        d.exercises.forEach(function(e) { existingByName[e.name] = e; });
+        // Keep existing (preserves any set edits), add new, drop removed
+        var next = selected.map(function(name) {
+          if (existingByName[name]) return existingByName[name];
+          return {
+            id: Date.now() + Math.floor(Math.random() * 1000) + name.length,
+            name: name,
+            muscle: categoryLabel(NAME_TO_CAT[name] || "other"),
+            sets: [{ reps: 10, weight: 0 }, { reps: 10, weight: 0 }, { reps: 10, weight: 0 }]
+          };
         });
+        return Object.assign({}, d, { exercises: next });
       });
-    }
-
-    var handleDaySwitch = function(i) {
-      setSelectedDay(i);
-      setWorkoutMode(null);
-      setCalPops([]);
+      setView("create");
     };
 
-    return (
-      <div className="fade-in" style={{ paddingTop: 16 }}>
-        {/* Day selector */}
-        <div className="label">Weekly Plan</div>
-        <div className="day-selector" style={{ marginBottom: 20 }}>
-          {DAY_SHORT.map(function(d, i) {
-            var hasExercises = (weeklyExercises[i] || []).length > 0;
-            return (
-              <button
-                key={i}
-                className={"day-pill" + (selectedDay === i ? " active" : "") + (i === today ? " today" : "")}
-                onClick={function() { handleDaySwitch(i); }}
-              >
-                <span className="day-pill-label">{d}</span>
-                {hasExercises && <span className="day-pill-dot" />}
-              </button>
-            );
-          })}
-        </div>
+    var cancelPicker = function() {
+      setView("create");
+    };
 
-        {/* Day header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text-white)" }}>{DAYS[selectedDay]}</div>
-          {selectedDay === today && (
-            <span style={{ fontSize: 10, fontWeight: 700, color: "var(--green)", textTransform: "uppercase", letterSpacing: 1 }}>Today</span>
-          )}
-          <span style={{ flex: 1 }} />
-          {!workoutMode && (
-            <React.Fragment>
-              <span className="mono" style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                {dayExercises.length} exercise{dayExercises.length !== 1 ? "s" : ""}
-              </span>
-              {dayExercises.length > 0 && (
-                <button className="start-workout-btn" onClick={startWorkout}>
-                  Start Workout
-                </button>
-              )}
-              <button className="edit-workout-btn" onClick={function() { startEditWorkout(selectedDay); }}>
-                Edit Workout
-              </button>
-            </React.Fragment>
-          )}
-          {workoutMode && (
-            <React.Fragment>
-              <span className="mono" style={{ fontSize: 12, color: "var(--green)" }}>
-                {completedSets}/{totalSets} sets
-              </span>
-              <button className="end-workout-btn" onClick={endWorkout}>
-                End Workout
-              </button>
-            </React.Fragment>
-          )}
-        </div>
+    // ── Draft edits ─────────────────────────────────────────────────────
+    var setDraftTitle = function(v) {
+      setDraft(function(d) { return d ? Object.assign({}, d, { title: v }) : d; });
+    };
 
-        {/* Workout mode banner */}
-        {workoutMode && (
-          <React.Fragment>
-            <div className="workout-active-banner fade-in">
-              <span style={{ fontSize: 14 }}>{"\uD83D\uDCAA"}</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-white)" }}>Workout in progress</span>
-              <span style={{ flex: 1 }} />
-              <span className="mono" style={{ fontSize: 12, color: "var(--green)" }}>
-                {completedSets === totalSets && totalSets > 0 ? "All sets done!" : Math.round(completedSets / totalSets * 100) + "% complete"}
-              </span>
-            </div>
-            <div className="cal-burned-banner fade-in">
-              <span style={{ fontSize: 14 }}>{"\uD83D\uDD25"}</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-dim)" }}>Estimated Calories Burned</span>
-              <span style={{ flex: 1 }} />
-              <span className="cal-burned-value" style={{ position: "relative" }}>
-                <span className="mono" style={{ fontSize: 14, fontWeight: 700, color: "var(--orange)" }}>{totalCalories}</span>
-                {calPops.map(function(p) {
-                  return <CaloriePop key={p.id} value={p.value} id={p.id} />;
-                })}
-              </span>
-            </div>
-          </React.Fragment>
-        )}
+    var updateSet = function(exIdx, setIdx, field, value) {
+      var v = value < 0 ? 0 : value;
+      setDraft(function(d) {
+        if (!d) return d;
+        var exs = d.exercises.slice();
+        var ex = Object.assign({}, exs[exIdx]);
+        ex.sets = ex.sets.slice();
+        ex.sets[setIdx] = Object.assign({}, ex.sets[setIdx]);
+        ex.sets[setIdx][field] = v;
+        exs[exIdx] = ex;
+        return Object.assign({}, d, { exercises: exs });
+      });
+    };
 
-        {/* Exercises list */}
-        {dayExercises.length === 0 ? (
-          <div className="ex-empty">
-            <div style={{ fontSize: 24, marginBottom: 8, opacity: 0.4 }}>{"\uD83C\uDFCB"}</div>
-            <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8 }}>No exercises planned</div>
-            <button className="add-workouts-btn" onClick={function() { startEditWorkout(selectedDay); }}>
-              + Add Workouts
-            </button>
+    var addSetToDraft = function(exIdx) {
+      setDraft(function(d) {
+        if (!d) return d;
+        var exs = d.exercises.slice();
+        var ex = Object.assign({}, exs[exIdx]);
+        ex.sets = ex.sets.slice();
+        var last = ex.sets[ex.sets.length - 1] || { reps: 10, weight: 0 };
+        ex.sets.push({ reps: last.reps, weight: last.weight });
+        exs[exIdx] = ex;
+        return Object.assign({}, d, { exercises: exs });
+      });
+    };
+
+    var removeSetFromDraft = function(exIdx, setIdx) {
+      setDraft(function(d) {
+        if (!d) return d;
+        var exs = d.exercises.slice();
+        var ex = Object.assign({}, exs[exIdx]);
+        if (ex.sets.length <= 1) return d;
+        ex.sets = ex.sets.slice();
+        ex.sets.splice(setIdx, 1);
+        exs[exIdx] = ex;
+        return Object.assign({}, d, { exercises: exs });
+      });
+    };
+
+    var removeExerciseFromDraft = function(exIdx) {
+      setDraft(function(d) {
+        if (!d) return d;
+        var exs = d.exercises.slice();
+        exs.splice(exIdx, 1);
+        return Object.assign({}, d, { exercises: exs });
+      });
+    };
+
+    var saveDraft = function() {
+      if (!draft) return;
+      var title = (draft.title || "").trim();
+      if (!title) return;
+      if (draft.exercises.length === 0) return;
+      saveRoutine(Object.assign({}, draft, { title: title }));
+      setDraft(null);
+      setView("main");
+    };
+
+    // ── Active workout ──────────────────────────────────────────────────
+    var startRoutine = function(r) {
+      var logs = r.exercises.map(function(ex) {
+        return {
+          id: ex.id,
+          name: ex.name,
+          muscle: ex.muscle,
+          sets: ex.sets.map(function(s) {
+            return { reps: s.reps, weight: s.weight, done: false };
+          })
+        };
+      });
+      setActive({ routineId: r.id, title: r.title, startedAt: Date.now(), exercises: logs });
+      setView("active");
+    };
+
+    var updateActiveSet = function(exIdx, setIdx, field, value) {
+      var v = value < 0 ? 0 : value;
+      setActive(function(a) {
+        if (!a) return a;
+        var exs = a.exercises.slice();
+        var ex = Object.assign({}, exs[exIdx]);
+        ex.sets = ex.sets.slice();
+        ex.sets[setIdx] = Object.assign({}, ex.sets[setIdx]);
+        ex.sets[setIdx][field] = v;
+        exs[exIdx] = ex;
+        return Object.assign({}, a, { exercises: exs });
+      });
+    };
+
+    var toggleActiveSetDone = function(exIdx, setIdx) {
+      setActive(function(a) {
+        if (!a) return a;
+        var exs = a.exercises.slice();
+        var ex = Object.assign({}, exs[exIdx]);
+        ex.sets = ex.sets.slice();
+        ex.sets[setIdx] = Object.assign({}, ex.sets[setIdx]);
+        ex.sets[setIdx].done = !ex.sets[setIdx].done;
+        exs[exIdx] = ex;
+        return Object.assign({}, a, { exercises: exs });
+      });
+    };
+
+    var finishWorkout = function() {
+      if (!active) return;
+      var completedSets = 0, totalSets = 0;
+      active.exercises.forEach(function(ex) {
+        ex.sets.forEach(function(s) { totalSets++; if (s.done) completedSets++; });
+      });
+      if (logCompletedWorkout) {
+        logCompletedWorkout({
+          id: Date.now(),
+          routineId: active.routineId,
+          title: active.title,
+          startedAt: active.startedAt,
+          finishedAt: Date.now(),
+          completedSets: completedSets,
+          totalSets: totalSets,
+          exercises: active.exercises
+        });
+      }
+      setActive(null);
+      setView("main");
+    };
+
+    var cancelWorkout = function() {
+      setActive(null);
+      setView("main");
+    };
+
+    // ══════════════════════════════════════════════════════════════════════
+    // RENDER
+    // ══════════════════════════════════════════════════════════════════════
+
+    // ── View: Main ──────────────────────────────────────────────────────
+    if (view === "main") {
+      return (
+        <div className="fade-in" style={{ paddingTop: 16 }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", marginBottom: 4 }}>Workouts</div>
+          <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 18 }}>
+            Build routines and track sessions
           </div>
-        ) : !workoutMode ? (
-          /* ── Planning Mode ── */
-          <div className="flex-col gap-10">
-            {dayExercises.map(function(ex) {
-              return (
-                <div key={ex.id} className="ex-card fade-in">
-                  <div className="ex-card-header">
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-white)" }}>{ex.name}</div>
-                      <div style={{ fontSize: 11, color: "var(--purple-light)", marginTop: 2 }}>{ex.muscle}</div>
+
+          <button className="new-routine-btn" onClick={startNewRoutine}>
+            <span className="new-routine-plus">+</span>
+            <div style={{ flex: 1, textAlign: "left" }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-white)" }}>New Routine</div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Build a custom workout</div>
+            </div>
+            <span className="new-routine-arrow">{"\u203A"}</span>
+          </button>
+
+          <div className="label" style={{ marginTop: 24 }}>My Routines</div>
+          {routines.length === 0 ? (
+            <div className="routines-empty">
+              <div style={{ fontSize: 28, opacity: 0.35, marginBottom: 8 }}>{"\uD83D\uDCCB"}</div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No routines yet</div>
+              <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 4 }}>Tap "New Routine" to create your first one</div>
+            </div>
+          ) : (
+            <div className="flex-col gap-10">
+              {routines.map(function(r) {
+                var setCount = r.exercises.reduce(function(a, e) { return a + e.sets.length; }, 0);
+                return (
+                  <div key={r.id} className="routine-card fade-in">
+                    <div className="routine-card-header">
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-white)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {r.title}
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3 }}>
+                          {r.exercises.length} exercise{r.exercises.length !== 1 ? "s" : ""} {"\u00B7"} {setCount} set{setCount !== 1 ? "s" : ""}
+                        </div>
+                      </div>
+                      <button className="routine-edit-btn" onClick={function() { editRoutine(r); }} title="Edit">
+                        {"\u270E"}
+                      </button>
+                      <button className="routine-delete-btn" onClick={function() { deleteRoutine(r.id); }} title="Delete">
+                        {"\u2715"}
+                      </button>
                     </div>
-                    <button className="ex-remove-btn" onClick={function() { removeExercise(selectedDay, ex.id); }} title="Remove">
-                      {"\u2715"}
+                    <div className="routine-muscles">
+                      {Array.from(new Set(r.exercises.map(function(e) { return e.muscle; }))).map(function(m) {
+                        return <span key={m} className="routine-muscle-pill">{m}</span>;
+                      })}
+                    </div>
+                    <button className="start-routine-btn" onClick={function() { startRoutine(r); }}>
+                      <span style={{ marginRight: 6 }}>{"\u25B6"}</span>
+                      Start Routine
                     </button>
                   </div>
-                  <div className="ex-controls">
-                    <div className="ex-control-group">
-                      <label className="ex-control-label">Sets</label>
-                      <div className="ex-stepper">
-                        <button className="ex-stepper-btn" onClick={function() { if (ex.sets > 1) updateExercise(selectedDay, ex.id, "sets", ex.sets - 1); }}>{"\u2212"}</button>
-                        <span className="ex-stepper-value mono">{ex.sets}</span>
-                        <button className="ex-stepper-btn" onClick={function() { updateExercise(selectedDay, ex.id, "sets", ex.sets + 1); }}>+</button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ── View: Create Routine ────────────────────────────────────────────
+    if (view === "create" && draft) {
+      var titleValid = (draft.title || "").trim().length > 0;
+      var canSave = titleValid && draft.exercises.length > 0;
+      return (
+        <div className="fade-in" style={{ paddingTop: 16 }}>
+          <div className="screen-header">
+            <button className="screen-back-btn" onClick={cancelCreate}>{"\u2039"} Back</button>
+            <div style={{ flex: 1 }} />
+            <button
+              className={"screen-primary-btn" + (canSave ? "" : " disabled")}
+              disabled={!canSave}
+              onClick={saveDraft}
+            >
+              Save
+            </button>
+          </div>
+
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", marginBottom: 14 }}>
+            Create Routine
+          </div>
+
+          <div className="label">Title</div>
+          <input
+            type="text"
+            className="routine-title-input"
+            placeholder="e.g. Push Day, Leg Day"
+            value={draft.title}
+            maxLength={50}
+            onChange={function(e) { setDraftTitle(e.target.value); }}
+          />
+          {!titleValid && (
+            <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 6, marginBottom: 12 }}>
+              A title is required to save this routine.
+            </div>
+          )}
+
+          <div className="label" style={{ marginTop: 18 }}>Exercises</div>
+          {draft.exercises.length === 0 ? (
+            <div className="routines-empty">
+              <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No exercises yet</div>
+              <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 4 }}>Tap "Add Exercise" below</div>
+            </div>
+          ) : (
+            <div className="flex-col gap-10">
+              {draft.exercises.map(function(ex, exIdx) {
+                return (
+                  <div key={ex.id} className="draft-ex-card">
+                    <div className="draft-ex-header">
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-white)" }}>{ex.name}</div>
+                        <div style={{ fontSize: 11, color: "var(--purple-light)", marginTop: 2 }}>{ex.muscle}</div>
                       </div>
+                      <button className="draft-ex-remove" onClick={function() { removeExerciseFromDraft(exIdx); }} title="Remove exercise">
+                        {"\u2715"}
+                      </button>
                     </div>
-                    <div className="ex-control-group">
-                      <label className="ex-control-label">Reps</label>
-                      <div className="ex-stepper">
-                        <button className="ex-stepper-btn" onClick={function() { if (ex.reps > 1) updateExercise(selectedDay, ex.id, "reps", ex.reps - 1); }}>{"\u2212"}</button>
-                        <span className="ex-stepper-value mono">{ex.reps}</span>
-                        <button className="ex-stepper-btn" onClick={function() { updateExercise(selectedDay, ex.id, "reps", ex.reps + 1); }}>+</button>
-                      </div>
+
+                    <div className="draft-set-header">
+                      <span className="draft-set-col-num">Set</span>
+                      <span className="draft-set-col-reps">Reps</span>
+                      <span className="draft-set-col-weight">Weight</span>
+                      <span className="draft-set-col-del" />
                     </div>
-                    <div className="ex-control-group">
-                      <label className="ex-control-label">Weight (lbs)</label>
-                      <input
-                        type="number"
-                        className="ex-weight-input mono"
-                        value={ex.maxWeight || ""}
-                        min="0"
-                        placeholder="—"
-                        onChange={function(e) { var v = parseInt(e.target.value) || 0; updateExercise(selectedDay, ex.id, "maxWeight", v < 0 ? 0 : v); }}
-                      />
-                    </div>
+                    {ex.sets.map(function(s, si) {
+                      return (
+                        <div key={si} className="draft-set-row">
+                          <span className="draft-set-col-num mono">{si + 1}</span>
+                          <div className="draft-set-col-reps">
+                            <input
+                              type="number"
+                              className="draft-set-input mono"
+                              min="0"
+                              value={s.reps || ""}
+                              onChange={function(e) { updateSet(exIdx, si, "reps", parseInt(e.target.value) || 0); }}
+                            />
+                          </div>
+                          <div className="draft-set-col-weight">
+                            <input
+                              type="number"
+                              className="draft-set-input mono"
+                              min="0"
+                              placeholder="0"
+                              value={s.weight || ""}
+                              onChange={function(e) { updateSet(exIdx, si, "weight", parseInt(e.target.value) || 0); }}
+                            />
+                          </div>
+                          <div className="draft-set-col-del">
+                            {ex.sets.length > 1 && (
+                              <button
+                                className="draft-set-del"
+                                onClick={function() { removeSetFromDraft(exIdx, si); }}
+                                title="Remove set"
+                              >
+                                {"\u2212"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <button className="draft-add-set" onClick={function() { addSetToDraft(exIdx); }}>
+                      + Add Set
+                    </button>
                   </div>
-                  {ex.maxWeight > 0 && (
-                    <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 8, paddingTop: 8, borderTop: "1px solid var(--border)" }}>
-                      Volume: {ex.sets * ex.reps} total reps {"\u00B7"} {ex.sets * ex.reps * ex.maxWeight} lbs total
-                    </div>
-                  )}
-                </div>
+                );
+              })}
+            </div>
+          )}
+
+          <button className="add-exercise-btn" onClick={openPicker}>
+            + Add Exercise
+          </button>
+        </div>
+      );
+    }
+
+    // ── View: Exercise Picker ───────────────────────────────────────────
+    if (view === "pick") {
+      var cat = picker.category;
+      var list = EXERCISES[cat] || [];
+      var count = picker.selected.length;
+      return (
+        <div className="fade-in" style={{ paddingTop: 16, paddingBottom: 90 }}>
+          <div className="screen-header">
+            <button className="screen-back-btn" onClick={cancelPicker}>{"\u2039"} Back</button>
+            <div style={{ flex: 1 }} />
+            <span className="mono" style={{ fontSize: 12, color: "var(--text-muted)" }}>
+              {count} selected
+            </span>
+          </div>
+
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", marginBottom: 14 }}>
+            Add Exercises
+          </div>
+
+          <div className="picker-cat-row">
+            {CATEGORIES.map(function(c) {
+              return (
+                <button
+                  key={c.id}
+                  className={"picker-cat-pill" + (cat === c.id ? " active" : "")}
+                  onClick={function() { setPicker(function(p) { return Object.assign({}, p, { category: c.id }); }); }}
+                >
+                  {c.label}
+                </button>
               );
             })}
           </div>
-        ) : (
-          /* ── Workout / Logging Mode ── */
-          <div className="flex-col gap-10">
-            {dayExercises.map(function(ex) {
-              var setLogs = (workoutMode.setLogs[ex.id] || []);
-              var exDone = setLogs.length > 0 && setLogs.every(function(s) { return s.done; });
+
+          <div className="flex-col gap-6" style={{ marginTop: 14 }}>
+            {list.map(function(name) {
+              var selected = picker.selected.indexOf(name) >= 0;
               return (
-                <div key={ex.id} className={"ex-card ex-card-workout fade-in" + (exDone ? " ex-card-done" : "")}>
-                  <div className="ex-card-header">
-                    <div style={{ flex: 1 }}>
+                <button
+                  key={name}
+                  className={"picker-item" + (selected ? " selected" : "")}
+                  onClick={function() { togglePickerItem(name); }}
+                >
+                  <span className="picker-item-name">{name}</span>
+                  <span className={"picker-item-check" + (selected ? " checked" : "")}>
+                    {selected ? "\u2713" : ""}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {count > 0 && (
+            <div className="picker-action-bar">
+              <button className="picker-confirm-btn" onClick={confirmPicker}>
+                Add {count} exercise{count !== 1 ? "s" : ""}
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ── View: Active Workout ────────────────────────────────────────────
+    if (view === "active" && active) {
+      var compSets = 0, totSets = 0;
+      active.exercises.forEach(function(ex) {
+        ex.sets.forEach(function(s) { totSets++; if (s.done) compSets++; });
+      });
+      var pct = totSets > 0 ? Math.round(compSets / totSets * 100) : 0;
+      return (
+        <div className="fade-in" style={{ paddingTop: 16 }}>
+          <div className="screen-header">
+            <button className="screen-back-btn" onClick={cancelWorkout}>{"\u2039"} Exit</button>
+            <div style={{ flex: 1 }} />
+            <button className="screen-primary-btn" onClick={finishWorkout}>
+              Finish Workout
+            </button>
+          </div>
+
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", marginBottom: 4 }}>
+            {active.title}
+          </div>
+          <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 14 }}>
+            {compSets}/{totSets} sets {"\u00B7"} {pct}% complete
+          </div>
+
+          <div className="workout-active-banner fade-in" style={{ marginBottom: 14 }}>
+            <span style={{ fontSize: 14 }}>{"\uD83D\uDCAA"}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-white)" }}>Workout in progress</span>
+            <span style={{ flex: 1 }} />
+            <span className="mono" style={{ fontSize: 12, color: "var(--green)" }}>
+              {compSets === totSets && totSets > 0 ? "All sets done!" : pct + "% complete"}
+            </span>
+          </div>
+
+          <div className="flex-col gap-10">
+            {active.exercises.map(function(ex, exIdx) {
+              var exDone = ex.sets.length > 0 && ex.sets.every(function(s) { return s.done; });
+              return (
+                <div key={ex.id} className={"active-ex-card" + (exDone ? " active-ex-done" : "")}>
+                  <div className="draft-ex-header">
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-white)" }}>
                         {exDone && <span style={{ marginRight: 6 }}>{"\u2705"}</span>}
                         {ex.name}
@@ -375,75 +540,55 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                     </div>
                   </div>
 
-                  {/* Column labels */}
-                  <div className="set-log-header">
-                    <span className="set-log-col-set">Set</span>
-                    <span className="set-log-col-reps">Reps</span>
-                    <span className="set-log-col-weight">Weight</span>
-                    <span className="set-log-col-done">Done</span>
-                    <span className="set-log-col-del" />
+                  <div className="draft-set-header">
+                    <span className="draft-set-col-num">Set</span>
+                    <span className="draft-set-col-reps">Reps</span>
+                    <span className="draft-set-col-weight">Weight</span>
+                    <span className="draft-set-col-done">Done</span>
                   </div>
-
-                  {/* Set rows */}
-                  <div className="set-log-rows">
-                    {setLogs.map(function(s, si) {
-                      return (
-                        <div key={si} className={"set-log-row" + (s.done ? " set-log-row-done" : "")}>
-                          <span className="set-log-col-set mono">Set {si + 1}</span>
-                          <div className="set-log-col-reps">
-                            <input
-                              type="number"
-                              className="set-log-input mono"
-                              value={s.reps || ""}
-                              min="0"
-                              onChange={function(e) { updateSetLog(ex.id, si, "reps", parseInt(e.target.value) || 0); }}
-                            />
-                          </div>
-                          <div className="set-log-col-weight">
-                            <input
-                              type="number"
-                              className="set-log-input mono"
-                              value={s.weight || ""}
-                              min="0"
-                              placeholder="0"
-                              onChange={function(e) { updateSetLog(ex.id, si, "weight", parseInt(e.target.value) || 0); }}
-                            />
-                          </div>
-                          <div className="set-log-col-done">
-                            <button
-                              className={"set-done-checkbox" + (s.done ? " checked" : "")}
-                              onClick={function() { toggleSetDone(ex.id, si, ex.name, s.reps, s.weight); }}
-                            >
-                              {s.done ? "\u2713" : ""}
-                            </button>
-                          </div>
-                          <div className="set-log-col-del">
-                            {setLogs.length > 1 && (
-                              <button
-                                className="set-del-btn"
-                                onClick={function() { removeSetFromExercise(ex.id, si, ex.name); }}
-                                title="Remove set"
-                              >
-                                {"\uD83D\uDDD1"}
-                              </button>
-                            )}
-                          </div>
+                  {ex.sets.map(function(s, si) {
+                    return (
+                      <div key={si} className={"draft-set-row" + (s.done ? " set-done" : "")}>
+                        <span className="draft-set-col-num mono">{si + 1}</span>
+                        <div className="draft-set-col-reps">
+                          <input
+                            type="number"
+                            className="draft-set-input mono"
+                            min="0"
+                            value={s.reps || ""}
+                            onChange={function(e) { updateActiveSet(exIdx, si, "reps", parseInt(e.target.value) || 0); }}
+                          />
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Add set button */}
-                  <button className="add-set-btn" onClick={function() { addSetToExercise(ex.id); }}>
-                    + Add Set
-                  </button>
+                        <div className="draft-set-col-weight">
+                          <input
+                            type="number"
+                            className="draft-set-input mono"
+                            min="0"
+                            placeholder="0"
+                            value={s.weight || ""}
+                            onChange={function(e) { updateActiveSet(exIdx, si, "weight", parseInt(e.target.value) || 0); }}
+                          />
+                        </div>
+                        <div className="draft-set-col-done">
+                          <button
+                            className={"set-done-checkbox" + (s.done ? " checked" : "")}
+                            onClick={function() { toggleActiveSetDone(exIdx, si); }}
+                          >
+                            {s.done ? "\u2713" : ""}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
           </div>
-        )}
-      </div>
-    );
+        </div>
+      );
+    }
+
+    return null;
   }
 
   Screens.ExerciseTab = ExerciseTab;

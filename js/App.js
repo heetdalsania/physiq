@@ -56,6 +56,7 @@ window.PhysIQ = window.PhysIQ || {};
     var _history = useState([]);                 var history = _history[0], setHistory = _history[1];
 
     var _tab = useState("dashboard");            var tab = _tab[0], setTab = _tab[1];
+    var _addMenuOpen = useState(false);          var addMenuOpen = _addMenuOpen[0], setAddMenuOpen = _addMenuOpen[1];
     var _mealForm = useState({ name: "", calories: "", protein: "", carbs: "", fats: "", fiber: "", sugar: "", sodium: "", potassium: "" });
     var mealForm = _mealForm[0], setMealForm = _mealForm[1];
 
@@ -72,18 +73,23 @@ window.PhysIQ = window.PhysIQ || {};
     var _portionUnit = useState("grams");        var portionUnit = _portionUnit[0], setPortionUnit = _portionUnit[1];
     var _portionCount = useState(1);             var portionCount = _portionCount[0], setPortionCount = _portionCount[1];
 
-    // Weekly exercises: array of 7 days (0=Sun..6=Sat), each an array of exercise objects
-    var _weeklyExercises = useState(function() {
-      if (!email) return [[], [], [], [], [], [], []];
+    // Routines: array of routine objects { id, title, exercises: [{id, name, muscle, sets:[{reps,weight}]}] }
+    var _routines = useState(function() {
+      if (!email) return [];
       try {
-        return JSON.parse(localStorage.getItem(uKey(email, "weeklyEx"))) || [[], [], [], [], [], [], []];
-      } catch(e) { return [[], [], [], [], [], [], []]; }
+        return JSON.parse(localStorage.getItem(uKey(email, "routines"))) || [];
+      } catch(e) { return []; }
     });
-    var weeklyExercises = _weeklyExercises[0], setWeeklyExercises = _weeklyExercises[1];
+    var routines = _routines[0], setRoutines = _routines[1];
 
-    // Which day we're editing exercises for (null = today, 0-6 = specific day)
-    var _editingDay = useState(null);
-    var editingDay = _editingDay[0], setEditingDay = _editingDay[1];
+    // Completed workout log: array of session records
+    var _workoutLog = useState(function() {
+      if (!email) return [];
+      try {
+        return JSON.parse(localStorage.getItem(uKey(email, "workoutLog"))) || [];
+      } catch(e) { return []; }
+    });
+    var workoutLog = _workoutLog[0], setWorkoutLog = _workoutLog[1];
 
     // Active meal period for food logging
     var _activeMealPeriod = useState(getMealPeriod());
@@ -117,7 +123,8 @@ window.PhysIQ = window.PhysIQ || {};
           setIntake(d.intake);
           setMealLog(d.meals);
           setHistory(loadHistory(last));
-          try { setWeeklyExercises(JSON.parse(localStorage.getItem(uKey(last, "weeklyEx"))) || [[], [], [], [], [], [], []]); } catch(e) {}
+          try { setRoutines(JSON.parse(localStorage.getItem(uKey(last, "routines"))) || []); } catch(e) {}
+          try { setWorkoutLog(JSON.parse(localStorage.getItem(uKey(last, "workoutLog"))) || []); } catch(e) {}
           setScreen("app");
           return;
         }
@@ -158,10 +165,15 @@ window.PhysIQ = window.PhysIQ || {};
       }
     }, [intake, screen, email]);
 
-    // Persist weekly exercises
+    // Persist routines
     useEffect(function() {
-      if (screen === "app" && email) sv(email, "weeklyEx", weeklyExercises);
-    }, [weeklyExercises, screen, email]);
+      if (screen === "app" && email) sv(email, "routines", routines);
+    }, [routines, screen, email]);
+
+    // Persist workout log
+    useEffect(function() {
+      if (screen === "app" && email) sv(email, "workoutLog", workoutLog);
+    }, [workoutLog, screen, email]);
 
     // ── Handlers ──────────────────────────────────────────────────────
     var up = function(k, v) { setProfile(function(p) { return Object.assign({}, p, { [k]: v }); }); };
@@ -178,47 +190,33 @@ window.PhysIQ = window.PhysIQ || {};
 
     var DAYS_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    var addExercise = function(name, muscle) {
-      var dayIdx = editingDay !== null ? editingDay : new Date().getDay();
-      setWeeklyExercises(function(prev) {
-        var next = prev.map(function(d) { return d.slice(); });
-        if (next[dayIdx].some(function(e) { return e.name === name; })) return prev;
-        next[dayIdx] = next[dayIdx].concat([{ id: Date.now(), name: name, muscle: muscle, sets: 3, reps: 10, maxWeight: 0 }]);
-        return next;
-      });
-      var dayLabel = dayIdx === new Date().getDay() ? "today" : DAYS_FULL[dayIdx];
-      showToast(name + " added to " + dayLabel + "!");
-    };
-
-    var updateExercise = function(dayIdx, exId, field, value) {
-      setWeeklyExercises(function(prev) {
-        var next = prev.map(function(d) { return d.slice(); });
-        next[dayIdx] = next[dayIdx].map(function(e) {
-          if (e.id !== exId) return e;
-          var u = Object.assign({}, e);
-          u[field] = value;
-          return u;
-        });
-        return next;
+    // ─── Routine handlers ─────────────────────────────────────────────
+    var saveRoutine = function(routine) {
+      setRoutines(function(prev) {
+        var exists = prev.some(function(r) { return r.id === routine.id; });
+        if (exists) {
+          var updated = prev.map(function(r) { return r.id === routine.id ? routine : r; });
+          showToast("Routine updated!");
+          return updated;
+        }
+        showToast("Routine saved!");
+        return prev.concat([routine]);
       });
     };
 
-    var removeExercise = function(dayIdx, exId) {
-      setWeeklyExercises(function(prev) {
-        var next = prev.map(function(d) { return d.slice(); });
-        next[dayIdx] = next[dayIdx].filter(function(e) { return e.id !== exId; });
-        return next;
+    var deleteRoutine = function(routineId) {
+      setRoutines(function(prev) {
+        return prev.filter(function(r) { return r.id !== routineId; });
       });
+      showToast("Routine deleted");
     };
 
-    var startEditWorkout = function(dayIdx) {
-      setEditingDay(dayIdx);
-      setTab("health");
-    };
-
-    var stopEditWorkout = function() {
-      setEditingDay(null);
-      setTab("exercise");
+    var logCompletedWorkout = function(session) {
+      setWorkoutLog(function(prev) { return prev.concat([session]); });
+      var label = session.totalSets > 0 && session.completedSets === session.totalSets
+        ? "Workout complete!"
+        : "Workout saved (" + session.completedSets + "/" + session.totalSets + " sets)";
+      showToast(label);
     };
 
     var logNutrients = function(name, nums, period) {
@@ -376,7 +374,8 @@ window.PhysIQ = window.PhysIQ || {};
         setIntake(d.intake);
         setMealLog(d.meals);
         setHistory(loadHistory(e));
-        try { setWeeklyExercises(JSON.parse(localStorage.getItem(uKey(e, "weeklyEx"))) || [[], [], [], [], [], [], []]); } catch(err) {}
+        try { setRoutines(JSON.parse(localStorage.getItem(uKey(e, "routines"))) || []); } catch(err) {}
+        try { setWorkoutLog(JSON.parse(localStorage.getItem(uKey(e, "workoutLog"))) || []); } catch(err) {}
         setScreen("app");
       } else {
         setScreen("onboard");
@@ -491,18 +490,15 @@ window.PhysIQ = window.PhysIQ || {};
             <HealthTab
               profile={profile} targets={targets}
               up={up} toggleMuscle={toggleMuscle}
-              addExercise={addExercise}
-              editingDay={editingDay} stopEditWorkout={stopEditWorkout}
             />
           )}
 
           {tab === "exercise" && (
             <ExerciseTab
-              weeklyExercises={weeklyExercises}
-              updateExercise={updateExercise}
-              removeExercise={removeExercise}
-              startEditWorkout={startEditWorkout}
-              profile={profile}
+              routines={routines}
+              saveRoutine={saveRoutine}
+              deleteRoutine={deleteRoutine}
+              logCompletedWorkout={logCompletedWorkout}
             />
           )}
 
@@ -523,19 +519,57 @@ window.PhysIQ = window.PhysIQ || {};
         <div className="nav">
           {[
             { id: "dashboard", label: "Dashboard", icon: "\u25C9" },
-            { id: "eats",      label: "Eats",      icon: "\u25A3" },
-            { id: "health",    label: "Health",     icon: "\u2666" },
-            { id: "exercise",  label: "Exercise",   icon: "\uD83C\uDFCB" },
-            { id: "profile",   label: "Profile",    icon: "\u2699" }
+            { id: "health",    label: "Health",    icon: "\u2666" },
+            { id: "__add",     label: "",          icon: "+"      },
+            { id: "profile",   label: "Profile",   icon: "\u2699" }
           ].map(function(t) {
+            if (t.id === "__add") {
+              var addActive = tab === "eats" || tab === "exercise" || addMenuOpen;
+              return (
+                <button
+                  key="__add"
+                  className={"nav-btn nav-add-btn" + (addActive ? " active" : "")}
+                  onClick={function() { setAddMenuOpen(true); }}
+                  aria-label="Open quick menu"
+                >
+                  <span className="nav-add-circle">{t.icon}</span>
+                </button>
+              );
+            }
             return (
-              <button key={t.id} className={"nav-btn" + (tab === t.id ? " active" : "")} onClick={function() { setTab(t.id); }}>
+              <button key={t.id} className={"nav-btn" + (tab === t.id ? " active" : "")} onClick={function() { setTab(t.id); setAddMenuOpen(false); }}>
                 <span>{t.icon}</span>
                 <span>{t.label}</span>
               </button>
             );
           })}
         </div>
+
+        {/* Add Menu Bottom Sheet */}
+        {addMenuOpen && (
+          <div className="add-menu-backdrop" onClick={function() { setAddMenuOpen(false); }}>
+            <div className="add-menu-sheet" onClick={function(e) { e.stopPropagation(); }}>
+              <div className="add-menu-handle" />
+              <div className="add-menu-title">Quick Access</div>
+              <button
+                className="add-menu-item"
+                onClick={function() { setTab("eats"); setAddMenuOpen(false); }}
+              >
+                <span className="add-menu-item-icon">{"\u25A3"}</span>
+                <span className="add-menu-item-label">Eats</span>
+                <span className="add-menu-item-arrow">{"\u203A"}</span>
+              </button>
+              <button
+                className="add-menu-item"
+                onClick={function() { setTab("exercise"); setAddMenuOpen(false); }}
+              >
+                <span className="add-menu-item-icon">{"\uD83C\uDFCB"}</span>
+                <span className="add-menu-item-label">Exercise</span>
+                <span className="add-menu-item-arrow">{"\u203A"}</span>
+              </button>
+            </div>
+          </div>
+        )}
       </React.Fragment>
     );
   }

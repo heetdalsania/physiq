@@ -72,16 +72,61 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
     todayMuscles: [], bmrOverride: null, name: ""
   };
 
-  // ─── Recommended Exercises per Muscle Group ─────────────────────────────
-  Data.EXERCISES = {
-    chest:     ["Bench Press", "Incline Dumbbell Press", "Chest Fly", "Push-ups"],
-    back:      ["Pull-ups", "Lat Pulldown", "Seated Cable Row", "Deadlift"],
-    shoulders: ["Overhead Shoulder Press", "Lateral Raises", "Rear Delt Fly", "Arnold Press"],
-    biceps:    ["Barbell Curls", "Dumbbell Curls", "Hammer Curls", "Preacher Curls"],
-    triceps:   ["Tricep Pushdowns", "Overhead Tricep Extension", "Dips", "Close-Grip Bench Press"],
-    legs:      ["Squats", "Leg Press", "Lunges", "Leg Curl"],
-    core:      ["Plank", "Hanging Leg Raises"],
-    glutes:    ["Hip Thrusts", "Glute Bridges"]
+  // ─── Exercise Categories (for routine builder picker) ───────────────────
+  Data.EXERCISE_CATEGORIES = [
+    { id: "chest",     label: "Chest",     icon: "\uD83D\uDCAA" },
+    { id: "back",      label: "Back",      icon: "\uD83E\uDDCD" },
+    { id: "shoulders", label: "Shoulders", icon: "\uD83D\uDD3A" },
+    { id: "biceps",    label: "Biceps",    icon: "\uD83D\uDCAA" },
+    { id: "triceps",   label: "Triceps",   icon: "\uD83E\uDD1C" },
+    { id: "legs",      label: "Legs",      icon: "\uD83E\uDDB5" },
+    { id: "core",      label: "Core",      icon: "\uD83D\uDD25" },
+    { id: "cardio",    label: "Cardio",    icon: "\uD83C\uDFC3" }
+  ];
+
+  Data.EXERCISES_BY_CATEGORY = {
+    biceps: [
+      "Barbell Curl", "Dumbbell Curl", "Hammer Curl", "Incline Dumbbell Curl",
+      "Preacher Curl", "Concentration Curl", "Cable Curl", "EZ Bar Curl",
+      "Reverse Curl", "Spider Curl"
+    ],
+    back: [
+      "Pull-Up", "Lat Pulldown", "Barbell Row", "Dumbbell Row",
+      "Seated Cable Row", "Chest-Supported Row", "T-Bar Row",
+      "Straight-Arm Pulldown", "Deadlift", "Machine Row"
+    ],
+    chest: [
+      "Barbell Bench Press", "Incline Bench Press", "Dumbbell Bench Press",
+      "Incline Dumbbell Press", "Chest Fly", "Pec Deck", "Push-Up",
+      "Cable Fly", "Decline Bench Press", "Machine Chest Press"
+    ],
+    shoulders: [
+      "Overhead Press", "Dumbbell Shoulder Press", "Lateral Raise",
+      "Front Raise", "Rear Delt Fly", "Arnold Press", "Upright Row",
+      "Face Pull", "Machine Shoulder Press", "Cable Lateral Raise"
+    ],
+    triceps: [
+      "Tricep Pushdown", "Overhead Tricep Extension", "Skullcrusher",
+      "Close-Grip Bench Press", "Dips", "Rope Pushdown",
+      "Single-Arm Cable Extension", "Bench Dip", "EZ Bar Skullcrusher", "Kickback"
+    ],
+    core: [
+      "Crunch", "Cable Crunch", "Leg Raise", "Hanging Leg Raise",
+      "Plank", "Russian Twist", "Mountain Climber", "Bicycle Crunch",
+      "Ab Wheel Rollout", "Toe Touch"
+    ],
+    cardio: [
+      "Treadmill Walk", "Treadmill Run", "Stair Climber",
+      "Cycling", "Rowing", "Elliptical"
+    ],
+    legs: [
+      "Squat", "Leg Press", "Romanian Deadlift", "Leg Extension",
+      "Leg Curl", "Walking Lunge", "Bulgarian Split Squat",
+      "Calf Raise", "Hack Squat", "Hip Thrust"
+    ]
   };
+
+  // Legacy alias (kept for any lingering reference; superseded by EXERCISES_BY_CATEGORY)
+  Data.EXERCISES = Data.EXERCISES_BY_CATEGORY;
 
 })(window.PhysIQ.Data);

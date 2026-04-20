@@ -11,37 +11,23 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   var ACTIVITY_LEVELS = Data.ACTIVITY_LEVELS;
   var MUSCLE_GROUPS = Data.MUSCLE_GROUPS;
   var NUTRIENT_INFO = Data.NUTRIENT_INFO;
-  var EXERCISES = Data.EXERCISES;
+  var EXERCISES = Data.EXERCISES_BY_CATEGORY || Data.EXERCISES || {};
 
-  var DAYS_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-  function HealthTab({ profile, targets, up, toggleMuscle, addExercise, editingDay, stopEditWorkout }) {
+  function HealthTab({ profile, targets, up, toggleMuscle }) {
     var _expanded = useState(null);
     var expandedMuscle = _expanded[0], setExpandedMuscle = _expanded[1];
 
-    var _addedEx = useState(null);
-    var addedEx = _addedEx[0], setAddedEx = _addedEx[1];
-
-    var handleAddExercise = function(name, muscleLabel) {
-      addExercise(name, muscleLabel);
-      setAddedEx(name);
-      setTimeout(function() { setAddedEx(null); }, 600);
-    };
-
     var handleMuscleClick = function(id) {
       toggleMuscle(id);
-      // If the muscle is being activated (not currently in today's list), expand it
       if (!profile.todayMuscles.includes(id)) {
         setExpandedMuscle(id);
       } else {
-        // If deactivating and it was expanded, collapse it
         if (expandedMuscle === id) setExpandedMuscle(null);
       }
     };
 
     var toggleExpand = function(id) {
       if (expandedMuscle === id) {
-        // Collapsing — also deselect the muscle group
         setExpandedMuscle(null);
         toggleMuscle(id);
       } else {
@@ -82,23 +68,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           })}
         </div>
 
-        {/* Editing banner */}
-        {editingDay !== null && (
-          <div className="edit-workout-banner fade-in">
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-white)" }}>
-                Editing {DAYS_FULL[editingDay]}'s Workout
-              </div>
-              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
-                Select a muscle group and tap exercises to add them
-              </div>
-            </div>
-            <button className="edit-done-btn" onClick={stopEditWorkout}>Done</button>
-          </div>
-        )}
-
         {/* Today's Workout — Muscle Groups */}
-        <div className="label">{editingDay !== null ? DAYS_FULL[editingDay] + "'s Workout" : "Today's Workout"}</div>
+        <div className="label">Today's Workout</div>
         <div className="grid-2-10" style={{ marginBottom: 20 }}>
           {MUSCLE_GROUPS.map(function(mg) {
             var active = profile.todayMuscles.includes(mg.id);
@@ -123,12 +94,9 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   <div className="exercise-list fade-in">
                     {exercises.map(function(ex, i) {
                       return (
-                        <div key={ex} className={"exercise-item exercise-item-add" + (addedEx === ex ? " exercise-item-added" : "")} onClick={function() { handleAddExercise(ex, mg.label); }}>
+                        <div key={ex} className="exercise-item">
                           <span className="exercise-num">{i + 1}</span>
                           <span className="exercise-name">{ex}</span>
-                          <span className={"exercise-add-icon" + (addedEx === ex ? " added" : "")}>
-                            {addedEx === ex ? "\u2713" : "+"}
-                          </span>
                         </div>
                       );
                     })}
@@ -144,7 +112,6 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           <React.Fragment>
             <div className="label">Nutrient Focus</div>
             <div className="flex-col gap-8" style={{ marginBottom: 20 }}>
-              {/* Deduplicate nutrients across selected muscles */}
               {Array.from(new Set(
                 profile.todayMuscles.flatMap(function(id) {
                   var mg = MUSCLE_GROUPS.find(function(m) { return m.id === id; });
