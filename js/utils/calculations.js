@@ -102,9 +102,72 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
     return s;
   }
 
+  /**
+   * Goal-aware calorie completion check.
+   * Returns true only if `actual` satisfies the calorie rule for the user's goal.
+   *
+   *   cut / debloat → must be > 0 and ≤ target          (under-target wins)
+   *   build / lean  → must be ≥ target                  (over-target wins)
+   *   maintain      → must be within ±300 of target     (cushion both ways)
+   *
+   * Any missing input (no goal, no/0 target, null actual) returns false so a
+   * day never gets credit without real data.
+   */
+  function evaluateCalorieGoal(goal, actual, target) {
+    if (!goal) return false;
+    if (typeof target !== "number" || target <= 0) return false;
+    if (typeof actual !== "number" || isNaN(actual)) return false;
+
+    switch (goal) {
+      case "cut":
+      case "debloat":
+        return actual > 0 && actual <= target;
+      case "build":
+      case "lean":
+        return actual >= target;
+      case "maintain":
+        return Math.abs(actual - target) <= 300;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Macro floor: protein, carbs, and fats must each meet or exceed target.
+   * Any one below target → fail. Missing values are treated as 0 (fail).
+   */
+  function evaluateMacros(intake, targets) {
+    if (!intake || !targets) return false;
+    var keys = ["protein", "carbs", "fats"];
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      var tgt = targets[k];
+      if (typeof tgt !== "number" || tgt <= 0) return false;
+      var got = typeof intake[k] === "number" ? intake[k] : 0;
+      if (got < tgt) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Full nutrition-day completion check.
+   * A day passes only if BOTH:
+   *   - Goal-aware calorie rule (evaluateCalorieGoal) passes
+   *   - All three macros (protein, carbs, fats) are at or above target
+   */
+  function evaluateNutritionDay(goal, intake, targets) {
+    if (!intake || !targets) return false;
+    if (!evaluateCalorieGoal(goal, intake.calories, targets.calories)) return false;
+    if (!evaluateMacros(intake, targets)) return false;
+    return true;
+  }
+
   // ─── Exports ────────────────────────────────────────────────────────────
   Utils.calcBMR = calcBMR;
   Utils.calcTargets = calcTargets;
   Utils.getSuggestions = getSuggestions;
+  Utils.evaluateCalorieGoal = evaluateCalorieGoal;
+  Utils.evaluateMacros = evaluateMacros;
+  Utils.evaluateNutritionDay = evaluateNutritionDay;
 
 })(window.PhysIQ.Utils, window.PhysIQ.Data);

@@ -32,7 +32,55 @@ window.PhysIQ = window.PhysIQ || {};
   var getMealPeriod = Utils.getMealPeriod;
   var MEAL_PERIODS = Utils.MEAL_PERIODS;
 
+  var EXERCISE_MUSCLE = Data.EXERCISE_MUSCLE || {};
+
+  // ─── Weekly muscle-tracker helpers ──────────────────────────────────────
+  // Week boundary: Monday 00:00 local time.
+  function getMondayKey(date) {
+    var d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    var day = d.getDay();                    // 0=Sun..6=Sat
+    var offset = day === 0 ? 6 : day - 1;    // days since Monday
+    d.setDate(d.getDate() - offset);
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var dd = String(d.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + dd;
+  }
+  function getEmptyWeeklyMuscles() {
+    return { weekStart: getMondayKey(new Date()), dates: {}, sessions: {} };
+  }
+  // If the stored weekStart is older than the current week's Monday, reset.
+  // Schema: { weekStart, dates: { muscleId: [dateKey, ...] }, sessions: { muscleId: [...] } }
+  // A muscle "hit" = one unique calendar day it was trained. Multiple workouts
+  // on the same day for the same muscle still count as 1 hit.
+  function rolloverWeeklyMuscles(raw) {
+    var cur = getMondayKey(new Date());
+    if (!raw || !raw.weekStart || raw.weekStart !== cur) {
+      return { weekStart: cur, dates: {}, sessions: {} };
+    }
+    return {
+      weekStart: raw.weekStart,
+      dates: raw.dates || {},
+      sessions: raw.sessions || {}
+    };
+  }
+  // Given a completed session, return the set of muscle ids that were hit
+  // (at least one completed set targeting that muscle). No double-counting.
+  function musclesHitBySession(session) {
+    var hit = {};
+    if (!session || !session.exercises) return [];
+    session.exercises.forEach(function(ex) {
+      var anyDone = (ex.sets || []).some(function(s) { return s.done; });
+      if (!anyDone) return;
+      var m = EXERCISE_MUSCLE[ex.name];
+      if (m) hit[m] = true;
+    });
+    return Object.keys(hit);
+  }
+
   var PortionModal = Components.PortionModal;
+  var MuscleTracker = Components.MuscleTracker;
 
   var LoginScreen = Screens.LoginScreen;
   var OnboardScreen = Screens.OnboardScreen;
@@ -84,6 +132,16 @@ window.PhysIQ = window.PhysIQ || {};
     });
     var routines = _routines[0], setRoutines = _routines[1];
 
+    // Weekly muscle tracker: { weekStart: "YYYY-MM-DD", counts: {...}, sessions: {...} }
+    var _weeklyMuscles = useState(function() {
+      if (!email) return getEmptyWeeklyMuscles();
+      try {
+        var raw = JSON.parse(localStorage.getItem(uKey(email, "weeklyMuscles")));
+        return rolloverWeeklyMuscles(raw);
+      } catch(e) { return getEmptyWeeklyMuscles(); }
+    });
+    var weeklyMuscles = _weeklyMuscles[0], setWeeklyMuscles = _weeklyMuscles[1];
+
     // Completed workout log: array of session records
     var _workoutLog = useState(function() {
       if (!email) return [];
@@ -127,6 +185,7 @@ window.PhysIQ = window.PhysIQ || {};
           setHistory(loadHistory(last));
           try { setRoutines(JSON.parse(localStorage.getItem(uKey(last, "routines"))) || []); } catch(e) {}
           try { setWorkoutLog(JSON.parse(localStorage.getItem(uKey(last, "workoutLog"))) || []); } catch(e) {}
+          try { setWeeklyMuscles(rolloverWeeklyMuscles(JSON.parse(localStorage.getItem(uKey(last, "weeklyMuscles"))))); } catch(e) { setWeeklyMuscles(getEmptyWeeklyMuscles()); }
           setScreen("app");
           return;
         }
@@ -177,6 +236,20 @@ window.PhysIQ = window.PhysIQ || {};
       if (screen === "app" && email) sv(email, "workoutLog", workoutLog);
     }, [workoutLog, screen, email]);
 
+    // Persist weekly muscle tracker
+    useEffect(function() {
+      if (screen === "app" && email) sv(email, "weeklyMuscles", weeklyMuscles);
+    }, [weeklyMuscles, screen, email]);
+
+    // Rollover check — runs once per render cycle; cheap and guards against
+    // users returning after a week without reloading.
+    useEffect(function() {
+      var cur = getMondayKey(new Date());
+      if (weeklyMuscles && weeklyMuscles.weekStart !== cur) {
+        setWeeklyMuscles({ weekStart: cur, counts: {}, sessions: {} });
+      }
+    }, [weeklyMuscles && weeklyMuscles.weekStart]);
+
     // ── Handlers ──────────────────────────────────────────────────────
     var up = function(k, v) { setProfile(function(p) { return Object.assign({}, p, { [k]: v }); }); };
 
@@ -215,6 +288,34 @@ window.PhysIQ = window.PhysIQ || {};
 
     var logCompletedWorkout = function(session) {
       setWorkoutLog(function(prev) { return prev.concat([session]); });
+
+      // Update weekly muscle tracker — one hit per muscle per unique DAY.
+      // Same muscle trained twice in one day still counts as 1 hit toward the
+      // weekly 2-day target.
+      var hitMuscles = musclesHitBySession(session);
+      if (hitMuscles.length > 0) {
+        var dayKey = (function() {
+          var d = new Date(session.finishedAt || Date.now());
+          return d.getFullYear() + "-" +
+            String(d.getMonth() + 1).padStart(2, "0") + "-" +
+            String(d.getDate()).padStart(2, "0");
+        })();
+        setWeeklyMuscles(function(prev) {
+          var base = rolloverWeeklyMuscles(prev);
+          var dates = Object.assign({}, base.dates);
+          var sessions = Object.assign({}, base.sessions);
+          hitMuscles.forEach(function(m) {
+            var days = (dates[m] || []).slice();
+            if (days.indexOf(dayKey) < 0) days.push(dayKey);
+            dates[m] = days;
+            var sArr = (sessions[m] || []).slice();
+            sArr.push({ id: session.id, title: session.title, finishedAt: session.finishedAt });
+            sessions[m] = sArr;
+          });
+          return { weekStart: base.weekStart, dates: dates, sessions: sessions };
+        });
+      }
+
       var label = session.totalSets > 0 && session.completedSets === session.totalSets
         ? "Workout complete!"
         : "Workout saved (" + session.completedSets + "/" + session.totalSets + " sets)";
@@ -378,6 +479,7 @@ window.PhysIQ = window.PhysIQ || {};
         setHistory(loadHistory(e));
         try { setRoutines(JSON.parse(localStorage.getItem(uKey(e, "routines"))) || []); } catch(err) {}
         try { setWorkoutLog(JSON.parse(localStorage.getItem(uKey(e, "workoutLog"))) || []); } catch(err) {}
+        try { setWeeklyMuscles(rolloverWeeklyMuscles(JSON.parse(localStorage.getItem(uKey(e, "weeklyMuscles"))))); } catch(err) { setWeeklyMuscles(getEmptyWeeklyMuscles()); }
         setScreen("app");
       } else {
         setScreen("onboard");
@@ -512,6 +614,7 @@ window.PhysIQ = window.PhysIQ || {};
               saveRoutine={saveRoutine}
               deleteRoutine={deleteRoutine}
               logCompletedWorkout={logCompletedWorkout}
+              weeklyMuscles={weeklyMuscles}
             />
           )}
 
@@ -534,7 +637,7 @@ window.PhysIQ = window.PhysIQ || {};
             { id: "dashboard", label: "Dashboard", icon: "\u25C9" },
             { id: "health",    label: "Health",    icon: "\u2666" },
             { id: "__add",     label: "",          icon: "+"      },
-            { id: "calendar",  label: "Calendar",  icon: "\uD83D\uDCC5" },
+            { id: "calendar",  label: "Calendar",  icon: "\u25A6" },
             { id: "profile",   label: "Profile",   icon: "\u2699" }
           ].map(function(t) {
             if (t.id === "__add") {
@@ -634,6 +737,7 @@ window.PhysIQ = window.PhysIQ || {};
                 saveRoutine={saveRoutine}
                 deleteRoutine={deleteRoutine}
                 logCompletedWorkout={logCompletedWorkout}
+                weeklyMuscles={weeklyMuscles}
               />
             </div>
           </div>

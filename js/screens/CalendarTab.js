@@ -3,7 +3,10 @@
 window.PhysIQ = window.PhysIQ || {};
 window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
-(function(Screens, Data) {
+(function(Screens, Data, Utils) {
+
+  var evaluateCalorieGoal = Utils.evaluateCalorieGoal;
+  var evaluateNutritionDay = Utils.evaluateNutritionDay;
 
   var useState = React.useState;
   var useMemo = React.useMemo;
@@ -52,17 +55,23 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   // Returns: "green" | "yellow" | "red" | "future" | "none"
   // weekWorkoutCounts: Map of weekKey -> number of workouts that week
   // gymDays: user's target workout days per week
-  function getDayStatus(dateObj, today, nutritionMap, workoutDaySet, weekWorkoutCounts, targets, gymDays) {
+  function getDayStatus(dateObj, today, nutritionMap, workoutDaySet, weekWorkoutCounts, targets, gymDays, goal) {
     if (dateObj > today) return "future";
 
     var dStr = toDateString(dateObj);
     var dKey = dateKey(dateObj);
 
-    // Nutrition check: did calories hit >= 75% of target?
+    // Nutrition check: full day = goal-aware calorie rule AND macro floor.
+    //   Calories:
+    //     cut/debloat → ≤ target (and > 0)
+    //     build/lean  → ≥ target
+    //     maintain    → within ±300 of target
+    //   Macros (always required): protein, carbs, fats each ≥ target.
+    //   Fails the whole check if any macro is below target, regardless of calories.
     var histEntry = nutritionMap[dStr];
     var nutritionMet = false;
     if (histEntry) {
-      nutritionMet = histEntry.calories >= targets.calories * 0.75;
+      nutritionMet = evaluateNutritionDay(goal, histEntry, targets);
     }
 
     // Exercise check: did the user work out this day?
@@ -94,6 +103,17 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
     var _selectedDay = useState(null);
     var selectedDay = _selectedDay[0], setSelectedDay = _selectedDay[1];
+
+    // Which workout cards are expanded to show exercise recap
+    var _expandedWorkouts = useState({});
+    var expandedWorkouts = _expandedWorkouts[0], setExpandedWorkouts = _expandedWorkouts[1];
+    var toggleWorkout = function(id) {
+      setExpandedWorkouts(function(prev) {
+        var next = Object.assign({}, prev);
+        if (next[id]) delete next[id]; else next[id] = true;
+        return next;
+      });
+    };
 
     var viewYear = viewDate.getFullYear();
     var viewMonth = viewDate.getMonth();
@@ -141,6 +161,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
     }, [workoutDaySet]);
 
     var gymDays = profile.gymDays || 5;
+    var goal = profile.goal;
 
     // Month grid
     var grid = useMemo(function() {
@@ -167,7 +188,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
       var d = new Date(viewYear, viewMonth, selectedDay);
       var dStr = toDateString(d);
       var dKey = dateKey(d);
-      var status = getDayStatus(d, today, nutritionMap, workoutDaySet, weekWorkoutCounts, targets, gymDays);
+      var status = getDayStatus(d, today, nutritionMap, workoutDaySet, weekWorkoutCounts, targets, gymDays, goal);
       var hist = nutritionMap[dStr] || null;
 
       // Find workouts for that day
@@ -193,7 +214,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         var dateObj = new Date(viewYear, viewMonth, d);
         if (dateObj > today) break;
         total++;
-        var st = getDayStatus(dateObj, today, nutritionMap, workoutDaySet, weekWorkoutCounts, targets, gymDays);
+        var st = getDayStatus(dateObj, today, nutritionMap, workoutDaySet, weekWorkoutCounts, targets, gymDays, goal);
         if (st === "green") green++;
         else if (st === "yellow") yellow++;
         else if (st === "red") red++;
@@ -261,7 +282,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             var dateObj = new Date(viewYear, viewMonth, day);
             var isToday = isSameDay(dateObj, today);
             var isSelected = selectedDay === day;
-            var status = getDayStatus(dateObj, today, nutritionMap, workoutDaySet, weekWorkoutCounts, targets, gymDays);
+            var status = getDayStatus(dateObj, today, nutritionMap, workoutDaySet, weekWorkoutCounts, targets, gymDays, goal);
 
             return (
               <button
@@ -340,7 +361,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
               <div className="cal-detail-section-title">
                 <span>{"\uD83C\uDF4E"}</span>
                 <span>Nutrition</span>
-                {selectedDetails.nutrition && selectedDetails.nutrition.calories >= targets.calories * 0.75 && (
+                {selectedDetails.nutrition && evaluateNutritionDay(goal, selectedDetails.nutrition, targets) && (
                   <span className="cal-detail-check">{"\u2713"}</span>
                 )}
               </div>
@@ -382,15 +403,63 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   {selectedDetails.workouts.map(function(w) {
                     var dur = w.finishedAt && w.startedAt ? Math.round((w.finishedAt - w.startedAt) / 60000) : 0;
                     var completePct = w.totalSets > 0 ? Math.round((w.completedSets / w.totalSets) * 100) : 0;
+                    var isOpen = !!expandedWorkouts[w.id];
+                    var exs = w.exercises || [];
+                    // Unique muscles hit
+                    var muscles = Array.from(new Set(exs.map(function(e) { return e.muscle; }).filter(Boolean)));
                     return (
-                      <div key={w.id} className="cal-detail-workout-card">
-                        <div className="cal-detail-workout-top">
-                          <span className="cal-detail-workout-title">{w.title || "Workout"}</span>
-                          <span className={"cal-detail-workout-pct" + (completePct >= 100 ? " complete" : "")}>{completePct}%</span>
-                        </div>
-                        <div className="cal-detail-workout-meta">
-                          {w.completedSets}/{w.totalSets} sets {"\u00B7"} {dur > 0 ? dur + " min" : "—"}
-                        </div>
+                      <div key={w.id} className={"cal-detail-workout-card" + (isOpen ? " expanded" : "")}>
+                        <button
+                          className="cal-workout-card-btn"
+                          onClick={function() { toggleWorkout(w.id); }}
+                        >
+                          <div className="cal-detail-workout-top">
+                            <span className="cal-detail-workout-title">{w.title || "Workout"}</span>
+                            <span className={"cal-detail-workout-pct" + (completePct >= 100 ? " complete" : "")}>{completePct}%</span>
+                          </div>
+                          <div className="cal-detail-workout-meta">
+                            {w.completedSets}/{w.totalSets} sets {"\u00B7"} {dur > 0 ? dur + " min" : "—"} {"\u00B7"} {exs.length} exercise{exs.length !== 1 ? "s" : ""}
+                            <span className={"cal-workout-chevron" + (isOpen ? " open" : "")}>{"\u25BE"}</span>
+                          </div>
+                          {muscles.length > 0 && (
+                            <div className="cal-workout-muscles">
+                              {muscles.map(function(m) {
+                                return <span key={m} className="cal-workout-muscle-pill">{m}</span>;
+                              })}
+                            </div>
+                          )}
+                        </button>
+
+                        {isOpen && exs.length > 0 && (
+                          <div className="cal-workout-recap fade-in">
+                            {exs.map(function(ex) {
+                              var doneSets = (ex.sets || []).filter(function(s) { return s.done; });
+                              return (
+                                <div key={ex.id} className="cal-recap-ex">
+                                  <div className="cal-recap-ex-header">
+                                    <span className="cal-recap-ex-name">{ex.name}</span>
+                                    <span className="cal-recap-ex-count mono">
+                                      {doneSets.length}/{(ex.sets || []).length}
+                                    </span>
+                                  </div>
+                                  {doneSets.length > 0 ? (
+                                    <div className="cal-recap-sets">
+                                      {doneSets.map(function(s, i) {
+                                        return (
+                                          <span key={i} className="cal-recap-set mono">
+                                            {s.reps}{s.weight > 0 ? "\u00D7" + s.weight + "lb" : " reps"}
+                                          </span>
+                                        );
+                                      })}
+                                    </div>
+                                  ) : (
+                                    <div className="cal-recap-sets-empty">No completed sets</div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -410,4 +479,4 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
   Screens.CalendarTab = CalendarTab;
 
-})(window.PhysIQ.Screens, window.PhysIQ.Data);
+})(window.PhysIQ.Screens, window.PhysIQ.Data, window.PhysIQ.Utils);

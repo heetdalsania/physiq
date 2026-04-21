@@ -5460,6 +5460,157 @@ body {
     font-size: 10px;
     color: var(--text-faint)
 }
+/* ─── Weekly Muscle Tracker ───────────────────────────────────────────── */
+.muscle-tracker {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 16px;
+}
+.muscle-tracker-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.muscle-tracker-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-white);
+}
+.muscle-tracker-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.muscle-tracker-legend {
+  display: flex;
+  gap: 10px;
+  font-size: 10px;
+  color: var(--text-dim);
+  align-items: center;
+  font-family: "Space Mono", monospace;
+}
+.muscle-tracker-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.muscle-tracker-legend .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.muscle-side-toggle {
+  display: flex;
+  gap: 6px;
+  background: rgba(255,255,255,0.03);
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.muscle-side-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.muscle-side-btn.active {
+  background: rgba(139,92,246,0.18);
+  color: var(--text-white);
+}
+.muscle-body-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 10px;
+}
+.muscle-body-svg {
+  width: 220px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.muscle-region {
+  transition: opacity .15s, transform .15s;
+}
+.muscle-region:hover {
+  opacity: 0.85;
+}
+.muscle-region.selected path {
+  filter: drop-shadow(0 0 4px rgba(139,92,246,0.6));
+}
+.muscle-cardio-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  margin-top: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-white);
+  transition: background .15s;
+}
+.muscle-cardio-badge:hover { background: rgba(255,255,255,0.04); }
+.muscle-cardio-icon { font-size: 14px; }
+.muscle-detail {
+  margin-top: 12px;
+  background: rgba(139,92,246,0.06);
+  border: 1px solid rgba(139,92,246,0.22);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.muscle-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.muscle-detail-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-white);
+}
+.muscle-detail-count {
+  font-size: 11px;
+  font-weight: 700;
+}
+.muscle-detail-sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.muscle-detail-session {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  padding: 4px 0;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  font-family: "Space Mono", monospace;
+}
+.muscle-detail-session:first-child { border-top: none; }
+.muscle-detail-empty {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-style: italic;
+}
+.muscle-detail-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 8px;
+}
+
 /* ─── Calendar workout recap (expandable) ─────────────────────────────── */
 .cal-detail-workout-card {
   background: rgba(255,255,255,0.02);
@@ -5551,256 +5702,4 @@ body {
   font-size: 10px;
   color: var(--text-faint);
   font-style: italic;
-}
-
-/* ─── MuscleDiagram (Weekly Muscle Tracker) ───────────────────────────── */
-.md-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-  border: 1px solid var(--border-subtle);
-  border-radius: 18px;
-  padding: 18px 16px 16px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-/* Header ---------------------------------------------------------------- */
-.md-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.md-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-white);
-  letter-spacing: -0.2px;
-}
-.md-sub {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 3px;
-}
-.md-legend {
-  display: flex;
-  gap: 10px;
-  font-family: "Space Mono", monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  align-items: center;
-}
-.md-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.md-legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
-}
-
-/* Front / Back toggle --------------------------------------------------- */
-.md-toggle {
-  position: relative;
-  display: flex;
-  background: rgba(0,0,0,0.25);
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 12px;
-  border: 1px solid var(--border-subtle);
-}
-.md-toggle-indicator {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  height: calc(100% - 8px);
-  width: calc(50% - 4px);
-  background: linear-gradient(180deg, rgba(139,92,246,0.35), rgba(139,92,246,0.18));
-  border-radius: 9px;
-  border: 1px solid rgba(139,92,246,0.45);
-  transition: transform .28s cubic-bezier(.4,.0,.2,1);
-  pointer-events: none;
-  box-shadow: 0 2px 8px rgba(139,92,246,0.25);
-}
-.md-toggle-indicator.md-toggle-back {
-  transform: translateX(100%);
-}
-.md-toggle-btn {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 8px 0;
-  border-radius: 9px;
-  cursor: pointer;
-  transition: color .2s;
-  letter-spacing: 0.2px;
-}
-.md-toggle-btn.active {
-  color: var(--text-white);
-}
-
-/* SVG stage ------------------------------------------------------------- */
-.md-stage {
-  display: flex;
-  justify-content: center;
-  padding: 4px 0 8px;
-}
-.md-svg {
-  width: 240px;
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Silhouette fill is handled via gradient in <defs> */
-.md-silhouette path {
-  transition: fill .3s;
-}
-
-/* Regions --------------------------------------------------------------- */
-.md-region {
-  cursor: pointer;
-  transition: transform .2s cubic-bezier(.4,.0,.2,1), opacity .2s;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-.md-region path {
-  transition: fill .4s, stroke .2s, stroke-width .2s, filter .3s;
-}
-.md-region:hover {
-  opacity: 0.92;
-}
-.md-region.md-selected path {
-  filter: drop-shadow(0 0 6px rgba(139,92,246,0.55));
-}
-/* Gentle pulse on hit muscles so they feel alive */
-.md-region.md-state-hit path {
-  animation: mdPulseHit 3s ease-in-out infinite;
-}
-.md-region.md-state-partial path {
-  animation: mdPulsePartial 2.6s ease-in-out infinite;
-}
-@keyframes mdPulseHit {
-  0%, 100% { filter: drop-shadow(0 0 2px rgba(34,197,94,0.35)); }
-  50%      { filter: drop-shadow(0 0 6px rgba(34,197,94,0.75)); }
-}
-@keyframes mdPulsePartial {
-  0%, 100% { filter: drop-shadow(0 0 2px rgba(239,68,68,0.30)); }
-  50%      { filter: drop-shadow(0 0 6px rgba(239,68,68,0.65)); }
-}
-.md-region.md-selected.md-state-hit path,
-.md-region.md-selected.md-state-partial path {
-  animation: none;
-}
-
-/* Cardio badge ---------------------------------------------------------- */
-.md-cardio {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 14px;
-  margin-top: 6px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  color: var(--text-white);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .2s, border-color .3s, transform .15s;
-}
-.md-cardio:hover { background: rgba(255,255,255,0.04); transform: translateY(-1px); }
-.md-cardio:active { transform: translateY(0); }
-.md-cardio.md-state-partial {
-  border-color: rgba(239,68,68,0.45);
-  background: linear-gradient(180deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02));
-}
-.md-cardio.md-state-hit {
-  border-color: rgba(34,197,94,0.45);
-  background: linear-gradient(180deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02));
-}
-.md-cardio-icon {
-  font-size: 16px;
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.25);
-  border-radius: 8px;
-}
-.md-cardio-label { flex: 1; text-align: left; }
-.md-cardio-count { font-size: 11px; font-weight: 700; }
-
-/* Tooltip / detail ------------------------------------------------------ */
-.md-tooltip {
-  margin-top: 12px;
-  padding: 12px 14px;
-  background: linear-gradient(180deg, rgba(139,92,246,0.12), rgba(139,92,246,0.04));
-  border: 1px solid rgba(139,92,246,0.28);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(139,92,246,0.15);
-}
-.md-tooltip-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.md-tooltip-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  box-shadow: 0 0 6px currentColor;
-}
-.md-tooltip-name {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-white);
-  letter-spacing: -0.1px;
-}
-.md-tooltip-count { font-size: 11px; font-weight: 700; }
-.md-tooltip-sessions { display: flex; flex-direction: column; gap: 4px; }
-.md-tooltip-row {
-  display: flex;
-  gap: 10px;
-  font-size: 11px;
-  padding: 4px 0;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-.md-tooltip-row:first-child { border-top: none; padding-top: 0; }
-.md-tooltip-day {
-  font-family: "Space Mono", monospace;
-  color: var(--text-dim);
-  width: 88px;
-  flex-shrink: 0;
-}
-.md-tooltip-title {
-  color: var(--text-white);
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.md-tooltip-empty {
-  font-size: 11px;
-  color: var(--text-faint);
-  font-style: italic;
-}
-.md-hint {
-  text-align: center;
-  font-size: 11px;
-  color: var(--text-faint);
-  margin-top: 10px;
-  letter-spacing: 0.3px;
 }

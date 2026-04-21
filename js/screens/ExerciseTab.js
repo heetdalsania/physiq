@@ -23,7 +23,9 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   }
 
   // ─── Main Component ───────────────────────────────────────────────────
-  function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout }) {
+  var MuscleTracker = (window.PhysIQ.Components || {}).MuscleTracker;
+
+  function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout, weeklyMuscles }) {
     var _view = useState("main");
     var view = _view[0], setView = _view[1];
 
@@ -307,6 +309,13 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* ── Weekly Muscle Tracker ── */}
+          {MuscleTracker && (
+            <div style={{ marginTop: 28 }}>
+              <MuscleTracker weeklyMuscles={weeklyMuscles} />
             </div>
           )}
         </div>

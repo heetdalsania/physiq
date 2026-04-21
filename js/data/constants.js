@@ -120,13 +120,56 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
       "Cycling", "Rowing", "Elliptical"
     ],
     legs: [
-      "Squat", "Leg Press", "Romanian Deadlift", "Leg Extension",
-      "Leg Curl", "Walking Lunge", "Bulgarian Split Squat",
-      "Calf Raise", "Hack Squat", "Hip Thrust"
+      // Quads (4)
+      "Squat", "Leg Press", "Leg Extension", "Hack Squat",
+      // Hamstrings (3)
+      "Romanian Deadlift", "Seated Leg Curl", "Lying Leg Curl",
+      // Calves (3)
+      "Standing Calf Raise", "Seated Calf Raise", "Calf Press"
     ]
   };
 
   // Legacy alias (kept for any lingering reference; superseded by EXERCISES_BY_CATEGORY)
   Data.EXERCISES = Data.EXERCISES_BY_CATEGORY;
+
+  // ─── Tracked Muscle Groups (for weekly muscle tracker) ──────────────────
+  // Legs split into quads/hamstrings/calves for more granular tracking.
+  Data.TRACKED_MUSCLES = [
+    { id: "chest",      label: "Chest",      side: "front" },
+    { id: "shoulders",  label: "Shoulders",  side: "both"  },
+    { id: "biceps",     label: "Biceps",     side: "front" },
+    { id: "core",       label: "Core",       side: "front" },
+    { id: "quads",      label: "Quads",      side: "front" },
+    { id: "back",       label: "Back",       side: "back"  },
+    { id: "triceps",    label: "Triceps",    side: "back"  },
+    { id: "hamstrings", label: "Hamstrings", side: "back"  },
+    { id: "calves",     label: "Calves",     side: "back"  },
+    { id: "cardio",     label: "Cardio",     side: "badge" }
+  ];
+
+  // ─── Exercise → Primary Muscle mapping ──────────────────────────────────
+  // Each exercise maps to exactly one primary tracked muscle id.
+  Data.EXERCISE_MUSCLE = (function() {
+    var map = {};
+    Data.EXERCISES_BY_CATEGORY.chest.forEach(function(n)     { map[n] = "chest"; });
+    Data.EXERCISES_BY_CATEGORY.back.forEach(function(n)      { map[n] = "back"; });
+    Data.EXERCISES_BY_CATEGORY.shoulders.forEach(function(n) { map[n] = "shoulders"; });
+    Data.EXERCISES_BY_CATEGORY.biceps.forEach(function(n)    { map[n] = "biceps"; });
+    Data.EXERCISES_BY_CATEGORY.triceps.forEach(function(n)   { map[n] = "triceps"; });
+    Data.EXERCISES_BY_CATEGORY.core.forEach(function(n)      { map[n] = "core"; });
+    Data.EXERCISES_BY_CATEGORY.cardio.forEach(function(n)    { map[n] = "cardio"; });
+    // Legs — explicit per-exercise assignment to sub-groups
+    map["Squat"]               = "quads";
+    map["Leg Press"]           = "quads";
+    map["Leg Extension"]       = "quads";
+    map["Hack Squat"]          = "quads";
+    map["Romanian Deadlift"]   = "hamstrings";
+    map["Seated Leg Curl"]     = "hamstrings";
+    map["Lying Leg Curl"]      = "hamstrings";
+    map["Standing Calf Raise"] = "calves";
+    map["Seated Calf Raise"]   = "calves";
+    map["Calf Press"]          = "calves";
+    return map;
+  })();
 
 })(window.PhysIQ.Data);
