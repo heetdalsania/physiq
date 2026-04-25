@@ -6,17 +6,31 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 (function(Screens, Components) {
 
   var ProjectionChart = Components.ProjectionChart;
-  var MiniChart = Components.MiniChart;
-  var HistoryChart = Components.HistoryChart;
+  var WeightTrackingChart = Components.WeightTrackingChart;
+  var useState = React.useState;
 
   function ProfileTab(props) {
     var profile = props.profile, targets = props.targets, email = props.email, history = props.history;
     var up = props.up;
+    var logWeight = props.logWeight;
     var editingBMR = props.editingBMR, setEditingBMR = props.setEditingBMR;
     var bmrInput = props.bmrInput, setBmrInput = props.setBmrInput;
     var editing = props.editing, setEditing = props.setEditing;
     var theme = props.theme, setTheme = props.setTheme;
     var setScreen = props.setScreen, setEmail = props.setEmail, setLoginEmail = props.setLoginEmail;
+
+    // Local input state for the inline weight logger
+    var _wIn = useState("");
+    var weightInput = _wIn[0], setWeightInput = _wIn[1];
+
+    var weightLog = Array.isArray(profile.weightLog) ? profile.weightLog : [];
+
+    var submitWeight = function() {
+      var v = parseFloat(weightInput);
+      if (!v || v <= 0 || v > 1000) return;
+      if (typeof logWeight === "function") logWeight(v);
+      setWeightInput("");
+    };
 
     return (
       <div className="fade-in" style={{ paddingTop: 16 }}>
@@ -33,14 +47,39 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         {/* Projections */}
         <div className="label">Projections</div>
         <ProjectionChart profile={profile} targets={targets} />
-        <MiniChart
-          data={[targets.protein, targets.carbs, targets.fats]}
-          labels={["Protein", "Carbs", "Fats"]}
-          colors={["var(--blue)", "var(--yellow)", "var(--purple)"]}
-          title="Daily Macro Targets (g)"
-          height={90}
+
+        {/* Weight Tracking — single chart, two independently-computed lines */}
+        <div className="label">Weight Tracking</div>
+
+        <WeightTrackingChart
+          history={history}
+          maintenance={targets ? targets.tdee : null}
+          weightLog={weightLog}
+          profileWeight={profile.weight}
         />
-        <HistoryChart history={history} />
+
+        {/* Inline weight logger — never overwrites past entries */}
+        <div className="weight-log-row">
+          <input
+            className="input mono"
+            type="number"
+            inputMode="decimal"
+            placeholder="Enter today's weight (lb)"
+            value={weightInput}
+            onChange={function(e) { setWeightInput(e.target.value); }}
+            onKeyDown={function(e) { if (e.key === "Enter") submitWeight(); }}
+            style={{ flex: 1, padding: "10px 12px", fontSize: 14 }}
+          />
+          <button className="weight-log-btn" onClick={submitWeight}>Log Weight</button>
+        </div>
+        {weightLog.length > 0 && (
+          <div className="weight-log-recent">
+            Latest: {weightLog[weightLog.length - 1].weight} lb on {(function() {
+              var d = new Date(weightLog[weightLog.length - 1].date);
+              return d.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
+            })()}
+          </div>
+        )}
 
         {/* Computed Stats */}
         <div className="label">Computed Stats</div>
@@ -107,8 +146,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           <span style={{ fontSize: 13, color: "var(--blue)" }}>{editing ? "\u25B2" : "\u25BC"}</span>
         </div>
         {editing && (
-          <div className="fade-in" style={{ marginBottom: 20 }}>
-            <div className="grid-2-10" style={{ marginBottom: 14 }}>
+          <div className="fade-in card" style={{ padding: 16, marginBottom: 20 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 16 }}>
               {[
                 { k: "name", l: "Name", u: "", t: "text" },
                 { k: "age", l: "Age", u: "yrs" },
@@ -119,8 +158,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                 { k: "gymDays", l: "Gym Days", u: "/wk" }
               ].map(function(f) {
                 return (
-                  <div key={f.k}>
-                    <label style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  <div key={f.k} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <label style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.6 }}>
                       {f.l}{f.u && <span style={{ color: "var(--text-faint)" }}> ({f.u})</span>}
                     </label>
                     <input
@@ -128,33 +167,23 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                       type={f.t || "number"}
                       inputMode={f.t ? "text" : "decimal"}
                       value={profile[f.k]}
-                      style={{ marginTop: 4 }}
+                      style={{ padding: "10px 12px", fontSize: 14 }}
                       onChange={function(e) { up(f.k, f.t ? e.target.value : parseFloat(e.target.value) || 0); }}
                     />
                   </div>
                 );
               })}
             </div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              {[{ id: "male", label: "Male" }, { id: "female", label: "Female" }].map(function(s) {
-                return <button key={s.id} className={"sex-btn" + (profile.sex === s.id ? " active" : "")} onClick={function() { up("sex", s.id); }}>{s.label}</button>;
-              })}
+            <div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 8 }}>Sex</div>
+              <div style={{ display: "flex", gap: 10 }}>
+                {[{ id: "male", label: "Male" }, { id: "female", label: "Female" }].map(function(s) {
+                  return <button key={s.id} className={"sex-btn" + (profile.sex === s.id ? " active" : "")} style={{ flex: 1, padding: "10px 12px" }} onClick={function() { up("sex", s.id); }}>{s.label}</button>;
+                })}
+              </div>
             </div>
           </div>
         )}
-
-        {/* BMR Formula info */}
-        <div className="card" style={{ padding: 14, marginBottom: 16, background: "var(--surface-alt)" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>BMR Formula</div>
-          <div style={{ fontSize: 11, lineHeight: 1.7, color: "var(--text-dim)" }}>
-            <strong>Mifflin-St Jeor</strong><br />
-            Male: (10{"\u00D7"}kg)+(6.25{"\u00D7"}cm)-(5{"\u00D7"}age)+5<br />
-            Female: same -161<br />
-            <span style={{ fontSize: 10, color: "var(--text-faint)" }}>
-              {(profile.weight * 0.453592).toFixed(1)}kg {"\u00B7"} {(profile.height * 2.54).toFixed(1)}cm {"\u00B7"} {profile.age}yrs = <strong>{targets.calculatedBMR} kcal</strong>
-            </span>
-          </div>
-        </div>
 
         {/* Appearance */}
         <div className="label">Appearance</div>

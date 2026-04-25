@@ -7,6 +7,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
   var evaluateCalorieGoal = Utils.evaluateCalorieGoal;
   var evaluateNutritionDay = Utils.evaluateNutritionDay;
+  var AppTime = Utils.AppTime;
 
   var useState = React.useState;
   var useMemo = React.useMemo;
@@ -96,8 +97,10 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   // ══════════════════════════════════════════════════════════════════════
   // CalendarTab Component
   // ══════════════════════════════════════════════════════════════════════
-  function CalendarTab({ history, workoutLog, intake, targets, profile }) {
-    var today = new Date();
+  function CalendarTab({ history, workoutLog, intake, targets, profile, devTick }) {
+    // devTick is an unused prop intentionally bumped by App when Dev Mode
+    // date changes, so this component re-renders and `today` re-resolves.
+    var today = AppTime ? AppTime.now() : new Date();
     var _viewDate = useState(new Date(today.getFullYear(), today.getMonth(), 1));
     var viewDate = _viewDate[0], setViewDate = _viewDate[1];
 
@@ -367,22 +370,54 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
               </div>
               {selectedDetails.nutrition ? (
                 <div className="cal-detail-macros">
-                  <div className="cal-detail-macro">
-                    <span className="cal-detail-macro-val mono">{selectedDetails.nutrition.calories}</span>
-                    <span className="cal-detail-macro-label">cal</span>
-                  </div>
-                  <div className="cal-detail-macro">
-                    <span className="cal-detail-macro-val mono" style={{ color: "var(--blue)" }}>{selectedDetails.nutrition.protein || 0}g</span>
-                    <span className="cal-detail-macro-label">protein</span>
-                  </div>
-                  <div className="cal-detail-macro">
-                    <span className="cal-detail-macro-val mono" style={{ color: "var(--yellow)" }}>{selectedDetails.nutrition.carbs || 0}g</span>
-                    <span className="cal-detail-macro-label">carbs</span>
-                  </div>
-                  <div className="cal-detail-macro">
-                    <span className="cal-detail-macro-val mono" style={{ color: "var(--purple)" }}>{selectedDetails.nutrition.fats || 0}g</span>
-                    <span className="cal-detail-macro-label">fats</span>
-                  </div>
+                  {[
+                    { key: "calories", label: "Calories", color: "#F97316",
+                      cur: selectedDetails.nutrition.calories || 0,
+                      tgt: targets.calories || 0,
+                      hit: evaluateCalorieGoal(goal, selectedDetails.nutrition.calories, targets.calories),
+                      unit: "" },
+                    { key: "protein", label: "Protein", color: "#3B82F6",
+                      cur: selectedDetails.nutrition.protein || 0,
+                      tgt: targets.protein || 0,
+                      hit: (selectedDetails.nutrition.protein || 0) >= (targets.protein || Infinity),
+                      unit: "g" },
+                    { key: "carbs", label: "Carbs", color: "#EAB308",
+                      cur: selectedDetails.nutrition.carbs || 0,
+                      tgt: targets.carbs || 0,
+                      hit: (selectedDetails.nutrition.carbs || 0) >= (targets.carbs || Infinity),
+                      unit: "g" },
+                    { key: "fats", label: "Fats", color: "#A855F7",
+                      cur: selectedDetails.nutrition.fats || 0,
+                      tgt: targets.fats || 0,
+                      hit: (selectedDetails.nutrition.fats || 0) >= (targets.fats || Infinity),
+                      unit: "g" }
+                  ].map(function(m) {
+                    var pct = m.tgt > 0 ? Math.min(100, Math.round((m.cur / m.tgt) * 100)) : 0;
+                    var R = 18, C = 2 * Math.PI * R;
+                    var dash = (pct / 100) * C;
+                    return (
+                      <div key={m.key} className={"cal-macro-ring" + (m.hit ? " cal-macro-hit" : "")}>
+                        <div className="cal-macro-ring-svg-wrap">
+                          <svg viewBox="0 0 44 44" className="cal-macro-ring-svg">
+                            <circle cx="22" cy="22" r={R} fill="none" stroke="var(--stat-border)" strokeWidth="4" />
+                            <circle cx="22" cy="22" r={R} fill="none"
+                              stroke={m.hit ? "var(--green)" : m.color}
+                              strokeWidth="4" strokeLinecap="round"
+                              strokeDasharray={C}
+                              strokeDashoffset={C - dash}
+                              transform="rotate(-90 22 22)"
+                              style={{ transition: "stroke-dashoffset 280ms ease" }}
+                            />
+                          </svg>
+                          {m.hit && <span className="cal-macro-ring-check">{"\u2713"}</span>}
+                        </div>
+                        <div className="cal-macro-ring-val mono">
+                          {m.cur}<span className="cal-macro-ring-tgt">/{m.tgt}{m.unit}</span>
+                        </div>
+                        <div className="cal-macro-ring-label">{m.label}</div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="cal-detail-empty">No nutrition data</div>

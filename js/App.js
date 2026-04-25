@@ -7,6 +7,7 @@ window.PhysIQ = window.PhysIQ || {};
   var useState = React.useState;
   var useEffect = React.useEffect;
   var useMemo = React.useMemo;
+  var useRef = React.useRef;
 
   // ─── Pull in all dependencies from namespace ───────────────────────────
   var Data = PhysIQ.Data;
@@ -31,6 +32,7 @@ window.PhysIQ = window.PhysIQ || {};
   var getSuggestions = Utils.getSuggestions;
   var getMealPeriod = Utils.getMealPeriod;
   var MEAL_PERIODS = Utils.MEAL_PERIODS;
+  var AppTime = Utils.AppTime;
 
   var EXERCISE_MUSCLE = Data.EXERCISE_MUSCLE || {};
 
@@ -48,14 +50,14 @@ window.PhysIQ = window.PhysIQ || {};
     return y + "-" + m + "-" + dd;
   }
   function getEmptyWeeklyMuscles() {
-    return { weekStart: getMondayKey(new Date()), dates: {}, sessions: {} };
+    return { weekStart: getMondayKey(AppTime.now()), dates: {}, sessions: {} };
   }
   // If the stored weekStart is older than the current week's Monday, reset.
   // Schema: { weekStart, dates: { muscleId: [dateKey, ...] }, sessions: { muscleId: [...] } }
   // A muscle "hit" = one unique calendar day it was trained. Multiple workouts
   // on the same day for the same muscle still count as 1 hit.
   function rolloverWeeklyMuscles(raw) {
-    var cur = getMondayKey(new Date());
+    var cur = getMondayKey(AppTime.now());
     if (!raw || !raw.weekStart || raw.weekStart !== cur) {
       return { weekStart: cur, dates: {}, sessions: {} };
     }
@@ -116,6 +118,29 @@ window.PhysIQ = window.PhysIQ || {};
     var _toast = useState(null);                 var toast = _toast[0], setToast = _toast[1];
     var _loginEmail = useState(getLastEmail());  var loginEmail = _loginEmail[0], setLoginEmail = _loginEmail[1];
     var _editing = useState(false);              var editing = _editing[0], setEditing = _editing[1];
+
+    // ── Dev Mode (date override for testing time-based features) ──────
+    // Source of truth lives in Utils.AppTime (persisted in localStorage).
+    // We mirror it into React state so toggling re-renders the UI.
+    var _devMode = useState(function() { return AppTime.getDevMode(); });
+    var devMode = _devMode[0], setDevModeState = _devMode[1];
+    var _devDate = useState(function() { return AppTime.getDevDate(); });
+    var devDate = _devDate[0], setDevDateState = _devDate[1];
+
+    var toggleDevMode = function() {
+      var next = !AppTime.getDevMode();
+      AppTime.setDevMode(next);
+      setDevModeState(next);
+      setDevDateState(AppTime.getDevDate());
+    };
+    var changeDevDate = function(key) {
+      AppTime.setDevDate(key);
+      setDevDateState(AppTime.getDevDate());
+    };
+    var shiftDevDate = function(days) {
+      AppTime.shiftDevDate(days);
+      setDevDateState(AppTime.getDevDate());
+    };
 
     // Portion modal state
     var _portionItem = useState(null);           var portionItem = _portionItem[0], setPortionItem = _portionItem[1];
@@ -198,60 +223,171 @@ window.PhysIQ = window.PhysIQ || {};
       try { localStorage.setItem("pq_theme", theme); } catch(err) {}
     }, [theme]);
 
+    // Persistence effects — all skip writing to localStorage while Dev
+    // Mode is on, so dev-session changes are sandboxed in memory and
+    // discarded when Dev Mode is turned off.
     useEffect(function() {
-      if (screen === "app" && email) sv(email, "profile", profile);
+      if (screen === "app" && email && !AppTime.getDevMode()) sv(email, "profile", profile);
     }, [profile, screen, email]);
 
     useEffect(function() {
-      if (screen === "app" && email) sv(email, "intake", intake);
+      if (screen === "app" && email && !AppTime.getDevMode()) sv(email, "intake", intake);
     }, [intake, screen, email]);
 
     useEffect(function() {
-      if (screen === "app" && email) {
+      if (screen === "app" && email && !AppTime.getDevMode()) {
         sv(email, "meals", mealLog);
-        try { localStorage.setItem(uKey(email, "date"), new Date().toDateString()); } catch(err) {}
+        try { localStorage.setItem(uKey(email, "date"), AppTime.now().toDateString()); } catch(err) {}
       }
     }, [mealLog, screen, email]);
 
     useEffect(function() {
       if (screen !== "app" || !email || intake.calories === 0) return;
-      var t = new Date().toDateString();
+      // History React state always updates so the calendar/charts reflect
+      // dev-day macros immediately. localStorage write is skipped in Dev
+      // Mode so real history isn't tainted.
+      var t = AppTime.now().toDateString();
       var h = history.slice();
       var ei = h.findIndex(function(d) { return d.date === t; });
       var sn = { date: t, calories: intake.calories, protein: intake.protein, carbs: intake.carbs, fats: intake.fats, sodium: intake.sodium };
       if (ei >= 0) h[ei] = sn; else h.push(sn);
       if (JSON.stringify(h) !== JSON.stringify(history)) {
         setHistory(h);
-        saveHistory(email, h);
+        if (!AppTime.getDevMode()) saveHistory(email, h);
       }
     }, [intake, screen, email]);
 
     // Persist routines
     useEffect(function() {
-      if (screen === "app" && email) sv(email, "routines", routines);
+      if (screen === "app" && email && !AppTime.getDevMode()) sv(email, "routines", routines);
     }, [routines, screen, email]);
 
     // Persist workout log
     useEffect(function() {
-      if (screen === "app" && email) sv(email, "workoutLog", workoutLog);
+      if (screen === "app" && email && !AppTime.getDevMode()) sv(email, "workoutLog", workoutLog);
     }, [workoutLog, screen, email]);
 
     // Persist weekly muscle tracker
     useEffect(function() {
-      if (screen === "app" && email) sv(email, "weeklyMuscles", weeklyMuscles);
+      if (screen === "app" && email && !AppTime.getDevMode()) sv(email, "weeklyMuscles", weeklyMuscles);
     }, [weeklyMuscles, screen, email]);
 
     // Rollover check — runs once per render cycle; cheap and guards against
     // users returning after a week without reloading.
     useEffect(function() {
-      var cur = getMondayKey(new Date());
+      var cur = getMondayKey(AppTime.now());
       if (weeklyMuscles && weeklyMuscles.weekStart !== cur) {
         setWeeklyMuscles({ weekStart: cur, counts: {}, sessions: {} });
       }
     }, [weeklyMuscles && weeklyMuscles.weekStart]);
 
+    // ── Dev Mode session sandbox ─────────────────────────────────────
+    //
+    // Goal: while Dev Mode is on, intake/meals are scoped to the current
+    // app date. Skipping to a new day starts fresh. Skipping back to a
+    // day already visited in this session restores what was logged then.
+    // Toggling Dev Mode OFF discards everything logged during the session
+    // and restores the user's real data exactly as it was.
+    //
+    // We keep:
+    //   realSnapshotRef  → whole-state snapshot taken when Dev Mode turns
+    //                      on. Used to restore on turn-off.
+    //   devBufferRef     → { "YYYY-MM-DD": { intake, mealLog } } per dev
+    //                      day visited in this session. Lives in memory
+    //                      only; never persisted.
+    //   prevDevModeRef   → tracks the previous render's devMode so we can
+    //                      detect transitions.
+    //   prevDevDateRef   → tracks previous render's devDate to detect
+    //                      day rollover within an active session.
+    //
+    // We initialize prevDevModeRef to false so a page-load that hydrates
+    // with Dev Mode already on is treated as a fresh OFF→ON transition,
+    // snapshotting the just-loaded real data as the baseline.
+    var realSnapshotRef = useRef(null);
+    var devBufferRef = useRef({});
+    var prevDevModeRef = useRef(false);
+    var prevDevDateRef = useRef(devDate);
+
+    useEffect(function() {
+      if (screen !== "app" || !email) return;
+      var prevMode = prevDevModeRef.current;
+      var prevDate = prevDevDateRef.current;
+
+      if (!prevMode && devMode) {
+        // OFF → ON: snapshot the entire real state so we can restore it.
+        realSnapshotRef.current = {
+          intake: intake,
+          mealLog: mealLog,
+          workoutLog: workoutLog,
+          weeklyMuscles: weeklyMuscles,
+          history: history,
+          weightLog: profile.weightLog ? profile.weightLog.slice() : null,
+          weight: profile.weight
+        };
+        // Seed the buffer for the initial dev day with the real data so
+        // the screen doesn't visually wipe at the moment of toggle.
+        devBufferRef.current = {};
+        devBufferRef.current[devDate] = { intake: intake, mealLog: mealLog };
+      } else if (prevMode && !devMode) {
+        // ON → OFF: restore real state. Drop the buffer.
+        var snap = realSnapshotRef.current;
+        if (snap) {
+          setIntake(snap.intake);
+          setMealLog(snap.mealLog);
+          setWorkoutLog(snap.workoutLog);
+          setWeeklyMuscles(snap.weeklyMuscles);
+          setHistory(snap.history);
+          // Restore weight log + weight number on profile (other profile
+          // fields kept as-is since they aren't time-bound logs).
+          setProfile(function(p) {
+            return Object.assign({}, p, { weightLog: snap.weightLog, weight: snap.weight });
+          });
+        }
+        realSnapshotRef.current = null;
+        devBufferRef.current = {};
+      } else if (prevMode && devMode && prevDate !== devDate) {
+        // Day change within an active dev session.
+        // Save what's currently on screen under the OLD dev date.
+        devBufferRef.current[prevDate] = { intake: intake, mealLog: mealLog };
+        // Load the buffered values for the NEW dev date if we've been
+        // there before in this session; otherwise start fresh.
+        var next = devBufferRef.current[devDate];
+        if (next) {
+          setIntake(next.intake);
+          setMealLog(next.mealLog);
+        } else {
+          setIntake(Object.assign({}, EMPTY_INTAKE));
+          setMealLog([]);
+        }
+      }
+
+      prevDevModeRef.current = devMode;
+      prevDevDateRef.current = devDate;
+    }, [devMode, devDate, screen, email]);
+
     // ── Handlers ──────────────────────────────────────────────────────
     var up = function(k, v) { setProfile(function(p) { return Object.assign({}, p, { [k]: v }); }); };
+
+    // Append-or-replace today's actual weight log entry. We replace the
+    // entry for the current app date if one already exists (so users can
+    // correct a same-day mistake) but never touch past entries — that
+    // would corrupt actual weight history. The current `profile.weight`
+    // (used by BMR/TDEE) is also synced so calculations stay consistent.
+    var logWeight = function(lbs) {
+      if (typeof lbs !== "number" || lbs <= 0) return;
+      var now = AppTime.now();
+      var pad = function(n) { return n < 10 ? "0" + n : "" + n; };
+      var key = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate());
+      setProfile(function(p) {
+        var prev = Array.isArray(p.weightLog) ? p.weightLog.slice() : [];
+        var idx = -1;
+        for (var i = 0; i < prev.length; i++) { if (prev[i] && prev[i].date === key) { idx = i; break; } }
+        var entry = { date: key, weight: lbs };
+        if (idx >= 0) prev[idx] = entry; else prev.push(entry);
+        return Object.assign({}, p, { weightLog: prev, weight: lbs });
+      });
+      showToast("Weight logged");
+    };
 
     var toggleMuscle = function(id) {
       setProfile(function(p) {
@@ -295,7 +431,7 @@ window.PhysIQ = window.PhysIQ || {};
       var hitMuscles = musclesHitBySession(session);
       if (hitMuscles.length > 0) {
         var dayKey = (function() {
-          var d = new Date(session.finishedAt || Date.now());
+          var d = new Date(session.finishedAt || AppTime.nowMs());
           return d.getFullYear() + "-" +
             String(d.getMonth() + 1).padStart(2, "0") + "-" +
             String(d.getDate()).padStart(2, "0");
@@ -533,8 +669,25 @@ window.PhysIQ = window.PhysIQ || {};
     }
 
     // ── Main App UI ───────────────────────────────────────────────────
+    // Pretty-format dev date for the banner
+    var devDateLabel = (function() {
+      try {
+        var p = devDate.split("-");
+        var d = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+        return d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+      } catch(e) { return devDate; }
+    })();
+
     return (
       <React.Fragment>
+        {/* Dev Mode banner — visible everywhere when active */}
+        {devMode && (
+          <div className="dev-banner" onClick={function() { setTab("dashboard"); }}>
+            <span className="dev-banner-dot" />
+            <span className="dev-banner-text">DEV MODE ACTIVE — {devDateLabel}</span>
+          </div>
+        )}
+
         {/* Toast */}
         {toast && <div className="added-toast">{"\u2705"} {toast}</div>}
 
@@ -573,6 +726,8 @@ window.PhysIQ = window.PhysIQ || {};
               suggestions={suggestions} mealLog={mealLog}
               addWater={addWater} removeMeal={removeMeal} resetDay={resetDay}
               onQuickNav={function(tabId, mode) { setTab(tabId); setAddMenuOpen(false); setPopupType(null); }}
+              devMode={devMode} devDate={devDate}
+              toggleDevMode={toggleDevMode} changeDevDate={changeDevDate} shiftDevDate={shiftDevDate}
             />
           )}
 
@@ -605,6 +760,7 @@ window.PhysIQ = window.PhysIQ || {};
               intake={intake}
               targets={targets}
               profile={profile}
+              devTick={devMode + "|" + devDate}
             />
           )}
 
@@ -621,7 +777,7 @@ window.PhysIQ = window.PhysIQ || {};
           {tab === "profile" && (
             <ProfileTab
               profile={profile} targets={targets} email={email} history={history}
-              up={up}
+              up={up} logWeight={logWeight}
               editingBMR={editingBMR} setEditingBMR={setEditingBMR}
               bmrInput={bmrInput} setBmrInput={setBmrInput}
               editing={editing} setEditing={setEditing}

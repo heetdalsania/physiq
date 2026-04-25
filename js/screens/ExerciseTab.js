@@ -3,13 +3,14 @@
 window.PhysIQ = window.PhysIQ || {};
 window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
-(function(Screens, Data) {
+(function(Screens, Data, Utils) {
 
   var useState = React.useState;
   var useMemo = React.useMemo;
 
   var CATEGORIES = Data.EXERCISE_CATEGORIES;
   var EXERCISES = Data.EXERCISES_BY_CATEGORY;
+  var AppTime = (Utils && Utils.AppTime) || { nowMs: function() { return Date.now(); } };
 
   // Build reverse map: exercise name → category id
   var NAME_TO_CAT = {};
@@ -188,7 +189,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           })
         };
       });
-      setActive({ routineId: r.id, title: r.title, startedAt: Date.now(), exercises: logs });
+      setActive({ routineId: r.id, title: r.title, startedAt: AppTime.nowMs(), exercises: logs });
       setView("active");
     };
 
@@ -231,7 +232,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           routineId: active.routineId,
           title: active.title,
           startedAt: active.startedAt,
-          finishedAt: Date.now(),
+          finishedAt: AppTime.nowMs(),
           completedSets: completedSets,
           totalSets: totalSets,
           exercises: active.exercises
@@ -602,4 +603,4 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
   Screens.ExerciseTab = ExerciseTab;
 
-})(window.PhysIQ.Screens, window.PhysIQ.Data);
+})(window.PhysIQ.Screens, window.PhysIQ.Data, window.PhysIQ.Utils);

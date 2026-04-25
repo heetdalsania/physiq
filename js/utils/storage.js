@@ -24,7 +24,8 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
   /** Load today's daily intake & meal log (auto-resets on new day) */
   function loadDaily(e) {
     try {
-      var t = new Date().toDateString();
+      // Use AppTime so Dev Mode's overridden date drives daily rollover.
+      var t = (Utils.AppTime ? Utils.AppTime.now() : new Date()).toDateString();
       var sd = localStorage.getItem(uKey(e, "date"));
       if (sd !== t) {
         localStorage.setItem(uKey(e, "date"), t);

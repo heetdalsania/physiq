@@ -12,9 +12,11 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
     { id: "shoulders", label: "Shoulders", icon: "\u25B2", nutrients: ["protein", "vitaminD", "calcium"],  recovery: 48 },
     { id: "biceps",    label: "Biceps",    icon: "\u25CF", nutrients: ["protein", "potassium", "b12"],     recovery: 36 },
     { id: "triceps",   label: "Triceps",   icon: "\u25CF", nutrients: ["protein", "potassium", "b12"],     recovery: 36 },
-    { id: "legs",      label: "Legs",      icon: "\u25BC", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
-    { id: "core",      label: "Core",      icon: "\u25C7", nutrients: ["protein", "fiber", "omega3"],      recovery: 24 },
-    { id: "glutes",    label: "Glutes",    icon: "\u25A0", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 }
+    { id: "quads",      label: "Quads",      icon: "\u25BC", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
+    { id: "hamstrings", label: "Hamstrings", icon: "\u25BD", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
+    { id: "calves",     label: "Calves",     icon: "\u25BE", nutrients: ["protein", "magnesium", "potassium"], recovery: 48 },
+    { id: "core",       label: "Core",       icon: "\u25C7", nutrients: ["protein", "fiber", "omega3"],      recovery: 24 },
+    { id: "glutes",     label: "Glutes",     icon: "\u25A0", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 }
   ];
 
   // ─── Goals (ordered: build → lean → maintain → debloat+cut → cut) ─────
@@ -79,9 +81,12 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
     { id: "shoulders", label: "Shoulders", icon: "\uD83D\uDD3A" },
     { id: "biceps",    label: "Biceps",    icon: "\uD83D\uDCAA" },
     { id: "triceps",   label: "Triceps",   icon: "\uD83E\uDD1C" },
-    { id: "legs",      label: "Legs",      icon: "\uD83E\uDDB5" },
-    { id: "core",      label: "Core",      icon: "\uD83D\uDD25" },
-    { id: "cardio",    label: "Cardio",    icon: "\uD83C\uDFC3" }
+    { id: "quads",      label: "Quads",      icon: "\uD83E\uDDB5" },
+    { id: "hamstrings", label: "Hamstrings", icon: "\uD83E\uDDB5" },
+    { id: "calves",     label: "Calves",     icon: "\uD83E\uDDB6" },
+    { id: "glutes",     label: "Glutes",     icon: "\uD83C\uDF51" },
+    { id: "core",       label: "Core",       icon: "\uD83D\uDD25" },
+    { id: "cardio",     label: "Cardio",     icon: "\uD83C\uDFC3" }
   ];
 
   Data.EXERCISES_BY_CATEGORY = {
@@ -119,13 +124,24 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
       "Treadmill Walk", "Treadmill Run", "Stair Climber",
       "Cycling", "Rowing", "Elliptical"
     ],
-    legs: [
-      // Quads (4)
+    quads: [
       "Squat", "Leg Press", "Leg Extension", "Hack Squat",
-      // Hamstrings (3)
+      "Front Squat", "Goblet Squat", "Bulgarian Split Squat (Quad)",
+      "Sissy Squat", "Lunge", "Box Squat"
+    ],
+    hamstrings: [
       "Romanian Deadlift", "Seated Leg Curl", "Lying Leg Curl",
-      // Calves (3)
-      "Standing Calf Raise", "Seated Calf Raise", "Calf Press"
+      "Stiff-Leg Deadlift", "Nordic Curl", "Good Morning",
+      "Single-Leg Romanian Deadlift", "Cable Pull-Through (Hams)"
+    ],
+    calves: [
+      "Standing Calf Raise", "Seated Calf Raise", "Calf Press",
+      "Single-Leg Calf Raise", "Donkey Calf Raise", "Smith Machine Calf Raise"
+    ],
+    glutes: [
+      "Hip Thrust", "Glute Bridge", "Bulgarian Split Squat",
+      "Cable Kickback", "Sumo Deadlift", "Glute Ham Raise",
+      "Step-Up", "Cable Pull-Through", "Reverse Lunge", "Frog Pump"
     ]
   };
 
@@ -142,6 +158,7 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
     { id: "quads",      label: "Quads",      side: "front" },
     { id: "back",       label: "Back",       side: "back"  },
     { id: "triceps",    label: "Triceps",    side: "back"  },
+    { id: "glutes",     label: "Glutes",     side: "back"  },
     { id: "hamstrings", label: "Hamstrings", side: "back"  },
     { id: "calves",     label: "Calves",     side: "back"  },
     { id: "cardio",     label: "Cardio",     side: "badge" }
@@ -158,17 +175,10 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
     Data.EXERCISES_BY_CATEGORY.triceps.forEach(function(n)   { map[n] = "triceps"; });
     Data.EXERCISES_BY_CATEGORY.core.forEach(function(n)      { map[n] = "core"; });
     Data.EXERCISES_BY_CATEGORY.cardio.forEach(function(n)    { map[n] = "cardio"; });
-    // Legs — explicit per-exercise assignment to sub-groups
-    map["Squat"]               = "quads";
-    map["Leg Press"]           = "quads";
-    map["Leg Extension"]       = "quads";
-    map["Hack Squat"]          = "quads";
-    map["Romanian Deadlift"]   = "hamstrings";
-    map["Seated Leg Curl"]     = "hamstrings";
-    map["Lying Leg Curl"]      = "hamstrings";
-    map["Standing Calf Raise"] = "calves";
-    map["Seated Calf Raise"]   = "calves";
-    map["Calf Press"]          = "calves";
+    Data.EXERCISES_BY_CATEGORY.glutes.forEach(function(n)    { map[n] = "glutes"; });
+    Data.EXERCISES_BY_CATEGORY.quads.forEach(function(n)     { map[n] = "quads"; });
+    Data.EXERCISES_BY_CATEGORY.hamstrings.forEach(function(n){ map[n] = "hamstrings"; });
+    Data.EXERCISES_BY_CATEGORY.calves.forEach(function(n)    { map[n] = "calves"; });
     return map;
   })();
 

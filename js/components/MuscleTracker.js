@@ -119,8 +119,8 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
       paths: [
         // Upper back — wide V shape (traps + upper lats)
         "M68 74 C62 86 62 102 66 118 C84 128 116 128 134 118 C138 102 138 86 132 74 C118 70 82 70 68 74 Z",
-        // Lower back — narrower lat sweep + lumbar
-        "M74 124 C70 140 70 160 76 176 C88 184 112 184 124 176 C130 160 130 140 126 124 C110 128 90 128 74 124 Z"
+        // Lower back — narrower lat sweep + lumbar (ends above glutes)
+        "M74 124 C70 138 70 156 76 170 C88 176 112 176 124 170 C130 156 130 138 126 124 C110 128 90 128 74 124 Z"
       ]
     },
     {
@@ -137,6 +137,15 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
         "M36 100 C32 118 30 144 34 162 C42 164 50 158 52 142 C52 124 48 106 44 98 C40 96 38 96 36 100 Z",
         // Right tricep
         "M164 100 C168 118 170 144 166 162 C158 164 150 158 148 142 C148 124 152 106 156 98 C160 96 162 96 164 100 Z"
+      ]
+    },
+    {
+      id: "glutes",
+      paths: [
+        // Left glute — rounded cheek, sits above hamstring at the hip/seat
+        "M80 184 C72 192 70 204 76 212 C86 216 98 212 100 200 C100 190 94 182 86 182 Z",
+        // Right glute — mirror
+        "M120 184 C128 192 130 204 124 212 C114 216 102 212 100 200 C100 190 106 182 114 182 Z"
       ]
     },
     {

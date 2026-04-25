@@ -36,7 +36,7 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
     var wB = Math.round(p.weight / 2);
     var wE = p.todayMuscles.length > 0 ? 24 : 0;
     var wS = p.steps > 10000 ? 16 : p.steps > 7000 ? 8 : 0;
-    var hB = p.todayMuscles.some(function(m) { return ["legs", "back", "glutes"].includes(m); });
+    var hB = p.todayMuscles.some(function(m) { return ["quads", "hamstrings", "back", "glutes"].includes(m); });
     var lm = p.weight * (1 - p.bodyfat / 100);
 
     return {
@@ -84,7 +84,7 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
       s.push({ type: "critical", text: "Dehydrated. Target " + t.water + "oz today." });
     if (i.fiber < t.fiber * 0.7)
       s.push({ type: "info", text: "Add fiber (oats, lentils, broccoli) for digestion." });
-    if (m.includes("legs") || m.includes("glutes"))
+    if (m.includes("quads") || m.includes("hamstrings") || m.includes("calves") || m.includes("glutes"))
       s.push({ type: "muscle", text: "Leg day: 40g+ protein post-workout + fast carbs." });
     if (m.includes("chest") || m.includes("shoulders") || m.includes("triceps"))
       s.push({ type: "muscle", text: "Push day: 5g creatine + carbs pre-workout." });

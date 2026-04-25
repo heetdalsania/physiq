@@ -14,7 +14,16 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   var SUGGESTION_COLORS = { critical: "#EF4444", warning: "#FBBF24", info: "#3B82F6", muscle: "#A855F7" };
   var SUGGESTION_ICONS = { critical: "\u26A0", warning: "\u26A1", info: "\uD83D\uDCA1", muscle: "\uD83D\uDCAA" };
 
-  function DashboardTab({ intake, targets, profile, suggestions, mealLog, addWater, removeMeal, resetDay, onQuickNav }) {
+  function DashboardTab({ intake, targets, profile, suggestions, mealLog, addWater, removeMeal, resetDay, onQuickNav, devMode, devDate, toggleDevMode, changeDevDate, shiftDevDate }) {
+    // Pretty label for the override date
+    var devDateLabel = "";
+    try {
+      var p = (devDate || "").split("-");
+      if (p.length === 3) {
+        var dd = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+        devDateLabel = dd.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric", year: "numeric" });
+      }
+    } catch(e) {}
     // Compute macro data locally
     var macroData = [
       { label: "Protein", val: intake.protein, target: targets.protein, cal: intake.protein * 4, color: "var(--blue)" },
@@ -136,6 +145,52 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         {/* Reset button */}
         <div style={{ display: "flex", justifyContent: "center", paddingBottom: 20 }}>
           <button className="reset-btn" onClick={resetDay}>Reset Today</button>
+        </div>
+
+        {/* ── Dev Mode (internal testing) ───────────────────────────── */}
+        <div className="label">Developer</div>
+        <div className="dev-panel">
+          <div className="dev-panel-row">
+            <div style={{ flex: 1 }}>
+              <div className="dev-panel-title">Dev Mode</div>
+              <div className="dev-panel-sub">
+                Override the app's "today" for testing time-based features.
+              </div>
+            </div>
+            <button
+              className={"dev-toggle-btn" + (devMode ? " on" : "")}
+              onClick={toggleDevMode}
+            >
+              {devMode ? "ON" : "OFF"}
+            </button>
+          </div>
+
+          {devMode && (
+            <div className="dev-panel-controls fade-in">
+              <div className="dev-current">
+                <span className="dev-current-label">Current App Date</span>
+                <span className="dev-current-date mono">{devDateLabel || devDate}</span>
+              </div>
+              <div className="dev-shift-row">
+                <button className="dev-shift-btn" onClick={function() { shiftDevDate(-7); }}>-7d</button>
+                <button className="dev-shift-btn" onClick={function() { shiftDevDate(-1); }}>-1d</button>
+                <button className="dev-shift-btn" onClick={function() { shiftDevDate(1); }}>+1d</button>
+                <button className="dev-shift-btn" onClick={function() { shiftDevDate(7); }}>+7d</button>
+              </div>
+              <div className="dev-pick-row">
+                <label className="dev-pick-label">Pick date</label>
+                <input
+                  type="date"
+                  className="dev-pick-input mono"
+                  value={devDate || ""}
+                  onChange={function(e) { if (e.target.value) changeDevDate(e.target.value); }}
+                />
+              </div>
+              <div className="dev-panel-note">
+                Logged workouts and meals will use this date until Dev Mode is turned off.
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
