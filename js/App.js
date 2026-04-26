@@ -180,6 +180,13 @@ window.PhysIQ = window.PhysIQ || {};
     var _activeMealPeriod = useState(getMealPeriod());
     var activeMealPeriod = _activeMealPeriod[0], setActiveMealPeriod = _activeMealPeriod[1];
 
+    // Global recent foods (last 5 added)
+    var _recentFoods = useState(function() {
+      if (!email) return [];
+      try { return JSON.parse(localStorage.getItem(uKey(email, "recentFoods"))) || []; } catch(e) { return []; }
+    });
+    var recentFoods = _recentFoods[0], setRecentFoods = _recentFoods[1];
+
     // Onboarding form state
     var _obName = useState("");                  var obName = _obName[0], setObName = _obName[1];
     var _obAge = useState("28");                 var obAge = _obAge[0], setObAge = _obAge[1];
@@ -193,7 +200,7 @@ window.PhysIQ = window.PhysIQ || {};
     var _obGymDays = useState("5");              var obGymDays = _obGymDays[0], setObGymDays = _obGymDays[1];
 
     // ── Derived values ────────────────────────────────────────────────
-    var targets = useMemo(function() { return calcTargets(profile); }, [profile]);
+    var targets = useMemo(function() { return calcTargets(profile, intake); }, [profile, intake.creatine]);
     var suggestions = useMemo(function() { return getSuggestions(profile, targets, intake); }, [profile, targets, intake]);
 
     // ── Effects ───────────────────────────────────────────────────────
@@ -473,6 +480,12 @@ window.PhysIQ = window.PhysIQ || {};
         Object.keys(nums).forEach(function(k) { if (k in n) n[k] = (n[k] || 0) + nums[k]; });
         return n;
       });
+      setRecentFoods(function(prev) {
+        var filtered = prev.filter(function(m) { return m.name !== name; });
+        var updated = [Object.assign({ name: name }, nums)].concat(filtered).slice(0, 5);
+        if (email) sv(email, "recentFoods", updated);
+        return updated;
+      });
     };
 
     var addMeal = function() {
@@ -496,33 +509,43 @@ window.PhysIQ = window.PhysIQ || {};
     // Open Food Facts food → portion modal
     var addSearchFood = function(item) {
       setPortionItem(item);
-      setPortionGrams(parseFloat(item.serving) || 100);
-      setPortionUnit("grams");
+      // Default to 1 serving in servings mode
+      setPortionUnit("servings");
       setPortionCount(1);
+      // Pre-compute the grams for custom mode fallback
+      var servGrams = item._servingGrams || 0;
+      if (!servGrams && item.serving) {
+        var m = item.serving.match(/(\d+\.?\d*)\s*g/i);
+        if (m) servGrams = parseFloat(m[1]);
+      }
+      setPortionGrams(servGrams || 100);
     };
 
     var confirmPortion = function() {
       if (!portionItem) return;
 
+      // Parse serving grams
+      var servingGrams = portionItem._servingGrams || 0;
+      if (!servingGrams && portionItem.serving) {
+        var match = portionItem.serving.match(/(\d+\.?\d*)\s*g/i);
+        if (match) servingGrams = parseFloat(match[1]);
+      }
+      if (!servingGrams) servingGrams = 100;
+
       var s;
-      if (portionItem._perServing) {
-        var baseGrams = portionItem._servingGrams || 100;
-        if (portionUnit === "count") {
-          s = portionCount; // Exactly 1x multiplier for 1 count
-        } else {
-          s = baseGrams > 0 ? (portionGrams / baseGrams) : 1;
-        }
-      } else {
-        if (portionUnit === "count") {
-          // Parse serving grams from the serving string (e.g. "30g", "1 cookie (28g)")
-          var servingGrams = 100;
-          if (portionItem.serving) {
-            var match = portionItem.serving.match(/(\d+\.?\d*)\s*g/i);
-            if (match) servingGrams = parseFloat(match[1]);
-          }
-          s = (portionCount * servingGrams) / 100;
+      if (portionUnit === "custom") {
+        // Custom grams mode
+        if (portionItem._perServing) {
+          s = servingGrams > 0 ? (portionGrams / servingGrams) : 1;
         } else {
           s = portionGrams / 100;
+        }
+      } else {
+        // Serving multiplier mode
+        if (portionItem._perServing) {
+          s = portionCount; // Base values are already 1 serving
+        } else {
+          s = (portionCount * servingGrams) / 100;
         }
       }
 
@@ -537,7 +560,7 @@ window.PhysIQ = window.PhysIQ || {};
         potassium: Math.round(portionItem.potassium * s)
       };
 
-      var suffix = portionUnit === "count"
+      var suffix = portionUnit === "servings" && portionCount !== 1
         ? " ×" + portionCount
         : "";
 
@@ -588,6 +611,7 @@ window.PhysIQ = window.PhysIQ || {};
     };
 
     var addWater = function(oz) { setIntake(function(prev) { return Object.assign({}, prev, { water: Math.max(0, prev.water + oz) }); }); };
+    var addCreatine = function(g) { setIntake(function(prev) { return Object.assign({}, prev, { creatine: Math.max(0, (prev.creatine || 0) + g) }); }); };
 
     var showToast = function(msg) {
       setToast(msg);
@@ -724,7 +748,7 @@ window.PhysIQ = window.PhysIQ || {};
             <DashboardTab
               intake={intake} targets={targets} profile={profile}
               suggestions={suggestions} mealLog={mealLog}
-              addWater={addWater} removeMeal={removeMeal} resetDay={resetDay}
+              addWater={addWater} addCreatine={addCreatine} removeMeal={removeMeal} resetDay={resetDay}
               onQuickNav={function(tabId, mode) { setTab(tabId); setAddMenuOpen(false); setPopupType(null); }}
               devMode={devMode} devDate={devDate}
               toggleDevMode={toggleDevMode} changeDevDate={changeDevDate} shiftDevDate={shiftDevDate}
@@ -743,6 +767,7 @@ window.PhysIQ = window.PhysIQ || {};
               activeMealPeriod={activeMealPeriod}
               setActiveMealPeriod={setActiveMealPeriod}
               reAddFood={reAddFood}
+              recentFoods={recentFoods}
             />
           )}
 
@@ -802,7 +827,14 @@ window.PhysIQ = window.PhysIQ || {};
                 <button
                   key="__add"
                   className={"nav-btn nav-add-btn" + (addActive ? " active" : "")}
-                  onClick={function() { setAddMenuOpen(true); }}
+                  onClick={function() {
+                    if (addMenuOpen && !popupType) {
+                      setAddMenuOpen(false);
+                    } else {
+                      setPopupType(null);
+                      setAddMenuOpen(true);
+                    }
+                  }}
                   aria-label="Open quick menu"
                 >
                   <span className="nav-add-circle">{t.icon}</span>
@@ -866,6 +898,7 @@ window.PhysIQ = window.PhysIQ || {};
                 activeMealPeriod={activeMealPeriod}
                 setActiveMealPeriod={setActiveMealPeriod}
                 reAddFood={reAddFood}
+                recentFoods={recentFoods}
               />
             </div>
             {/* Portion modal inside popup so it renders above the overlay */}

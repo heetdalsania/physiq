@@ -14,7 +14,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   var SUGGESTION_COLORS = { critical: "#EF4444", warning: "#FBBF24", info: "#3B82F6", muscle: "#A855F7" };
   var SUGGESTION_ICONS = { critical: "\u26A0", warning: "\u26A1", info: "\uD83D\uDCA1", muscle: "\uD83D\uDCAA" };
 
-  function DashboardTab({ intake, targets, profile, suggestions, mealLog, addWater, removeMeal, resetDay, onQuickNav, devMode, devDate, toggleDevMode, changeDevDate, shiftDevDate }) {
+  function DashboardTab({ intake, targets, profile, suggestions, mealLog, addWater, addCreatine, removeMeal, resetDay, onQuickNav, devMode, devDate, toggleDevMode, changeDevDate, shiftDevDate }) {
     // Pretty label for the override date
     var devDateLabel = "";
     try {
@@ -71,8 +71,27 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             <button className="water-btn subtract" onClick={function() { addWater(-8); }}>-8oz</button>
-            {[8, 16, 24].map(function(oz) {
+            {[1, 8, 16].map(function(oz) {
               return <button key={oz} className="water-btn" onClick={function() { addWater(oz); }}>+{oz}oz</button>;
+            })}
+          </div>
+        </div>
+
+        {/* Creatine tracker */}
+        <div style={{ background: "var(--muscle-tag-bg)", borderRadius: 12, padding: 14, border: "1px solid var(--muscle-tag-border)", marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--purple-light)" }}>Creatine</span>
+            <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: "var(--text-bright)" }}>
+              {intake.creatine || 0}g <span style={{ color: "var(--text-faint)", fontWeight: 400 }}>/ {targets.creatine || 5}g</span>
+            </span>
+          </div>
+          <div style={{ height: 6, borderRadius: 3, background: "var(--track)", overflow: "hidden", marginBottom: 10 }}>
+            <div style={{ height: "100%", borderRadius: 3, width: Math.min((intake.creatine || 0) / (targets.creatine || 5) * 100, 100) + "%", background: "linear-gradient(90deg, #A855F7, #C084FC)", transition: "width .4s" }} />
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button className="creatine-btn subtract" onClick={function() { addCreatine(-5); }}>-5g</button>
+            {[2.5, 5].map(function(g) {
+              return <button key={g} className="creatine-btn" onClick={function() { addCreatine(g); }}>+{g}g</button>;
             })}
           </div>
         </div>

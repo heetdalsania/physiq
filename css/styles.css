@@ -392,6 +392,35 @@ body {
     background: rgba(239, 68, 68, 0.15)
 }
 
+/* ─── Creatine Tracker ───────────────────────────────────────────────────── */
+.creatine-btn {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 8px;
+    background: var(--muscle-active-bg);
+    border: 1px solid var(--muscle-tag-border);
+    color: var(--purple-light);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s
+}
+
+.creatine-btn:hover {
+    background: rgba(168, 85, 247, 0.18)
+}
+
+.creatine-btn.subtract {
+    color: var(--red);
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2)
+}
+
+.creatine-btn.subtract:hover {
+    background: rgba(239, 68, 68, 0.15)
+}
+
 /* ─── Muscle & Option Buttons ────────────────────────────────────────────── */
 .muscle-btn {
     padding: 16px 14px;
@@ -1420,13 +1449,13 @@ body {
     vertical-align: middle
 }
 
-/* ─── Portion Modal (enhanced) ──────────────────────────────────────────── */
+/* ─── Portion Modal (redesigned) ────────────────────────────────────────── */
 .portion-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     z-index: 150;
     display: flex;
     align-items: flex-end;
@@ -1439,9 +1468,11 @@ body {
     max-width: 480px;
     background: var(--bg);
     border-top: 1px solid var(--border);
-    border-radius: 20px 20px 0 0;
-    padding: 24px 20px max(20px, env(safe-area-inset-bottom));
-    animation: slideUp 0.3s ease
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px max(24px, env(safe-area-inset-bottom));
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 90vh;
+    overflow-y: auto
 }
 
 .portion-modal-header {
@@ -1451,12 +1482,13 @@ body {
 }
 
 .portion-modal-thumb {
-    width: 52px;
-    height: 52px;
-    border-radius: 10px;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
     overflow: hidden;
     flex-shrink: 0;
-    background: var(--surface)
+    background: var(--surface);
+    border: 1px solid var(--border)
 }
 
 .portion-modal-thumb img {
@@ -1470,6 +1502,147 @@ body {
     min-width: 0
 }
 
+.portion-item-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 2px;
+    text-transform: capitalize;
+    line-height: 1.3
+}
+
+.portion-item-brand {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 2px
+}
+
+.portion-item-source {
+    font-size: 10px;
+    color: var(--text-faint)
+}
+
+/* ─── Serving Badge ─────────────────────────────────────────────────────── */
+.portion-serving-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    font-size: 12px;
+    color: var(--text-dim)
+}
+
+.portion-serving-badge-icon {
+    font-size: 15px;
+    flex-shrink: 0
+}
+
+.portion-serving-badge-text {
+    font-weight: 500
+}
+
+/* ─── Serving Multiplier ────────────────────────────────────────────────── */
+.portion-multiplier-section {
+    margin-bottom: 16px
+}
+
+.portion-multiplier-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 8px
+}
+
+.portion-multiplier-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px
+}
+
+.portion-mult-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 10px 4px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s ease
+}
+
+.portion-mult-btn:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(34, 197, 94, 0.04)
+}
+
+.portion-mult-btn.active {
+    border-color: var(--green);
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--green);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15)
+}
+
+.portion-mult-value {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.1
+}
+
+.portion-mult-unit {
+    font-size: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.7
+}
+
+.portion-mult-btn.custom-btn .portion-mult-value {
+    font-size: 14px
+}
+
+/* ─── Custom Grams Section ──────────────────────────────────────────────── */
+.portion-custom-section {
+    margin-bottom: 16px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border)
+}
+
+.portion-custom-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px
+}
+
+.portion-custom-input {
+    width: 100px;
+    padding: 8px 12px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 10px
+}
+
+.portion-custom-unit {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500
+}
+
 .portion-slider {
     width: 100%;
     height: 6px;
@@ -1478,7 +1651,7 @@ body {
     appearance: none;
     background: var(--track);
     outline: none;
-    margin: 12px 0
+    margin: 10px 0 4px
 }
 
 .portion-slider::-webkit-slider-thumb {
@@ -1488,7 +1661,8 @@ body {
     border-radius: 50%;
     background: var(--green);
     cursor: pointer;
-    border: 2px solid var(--bg)
+    border: 2px solid var(--bg);
+    box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3)
 }
 
 .portion-slider::-moz-range-thumb {
@@ -1497,99 +1671,182 @@ body {
     border-radius: 50%;
     background: var(--green);
     cursor: pointer;
-    border: 2px solid var(--bg)
+    border: 2px solid var(--bg);
+    box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3)
 }
 
-.portion-presets {
+.portion-slider-labels {
     display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 12px
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-faint)
 }
 
-.portion-preset {
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
+/* ─── Nutrition Preview Card ────────────────────────────────────────────── */
+.portion-nutrition-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 16px;
     border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-dim);
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s
+    margin-bottom: 16px
 }
 
-.portion-preset:hover {
-    border-color: var(--green);
-    color: var(--green)
-}
-
-.portion-preset.active {
-    border-color: var(--green);
-    color: var(--green);
-    background: rgba(34, 197, 94, 0.1)
-}
-
-/* ─── Portion Unit Toggle ───────────────────────────────────────────────── */
-.portion-unit-toggle {
+.portion-nutrition-header {
     display: flex;
-    gap: 4px;
-    margin-bottom: 14px;
-    padding: 3px;
-    background: var(--surface);
-    border-radius: 12px;
-    border: 1px solid var(--border)
-}
-
-.portion-unit-btn {
-    flex: 1;
-    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 9px 12px;
-    border-radius: 9px;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 12px;
-    font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    transition: all 0.25s ease
+    margin-bottom: 10px
 }
 
-.portion-unit-btn:hover {
-    color: var(--text-dim)
-}
-
-.portion-unit-btn.active {
-    background: linear-gradient(135deg, var(--green), var(--teal));
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25)
-}
-
-.portion-unit-icon {
-    font-size: 14px
-}
-
-.portion-serving-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    background: rgba(59, 130, 246, 0.06);
-    border: 1px solid rgba(59, 130, 246, 0.12);
-    font-size: 11px;
+.portion-nutrition-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     color: var(--text-muted)
 }
 
-.portion-serving-icon {
-    font-size: 14px;
+.portion-nutrition-amount {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-faint);
+    background: var(--surface-hover);
+    padding: 2px 8px;
+    border-radius: 6px
+}
+
+.portion-cal-display {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 14px
+}
+
+.portion-cal-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--orange);
+    line-height: 1
+}
+
+.portion-cal-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500
+}
+
+/* Macro rows */
+.portion-macro-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px
+}
+
+.portion-macro-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.portion-macro-info {
+    display: flex;
+    align-items: center;
+    gap: 8px
+}
+
+.portion-macro-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     flex-shrink: 0
+}
+
+.portion-macro-name {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500
+}
+
+.portion-macro-value {
+    font-size: 13px;
+    font-weight: 700
+}
+
+/* Macro distribution bar */
+.portion-macro-dist {
+    margin-bottom: 10px
+}
+
+.portion-macro-dist-bar {
+    display: flex;
+    height: 6px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--track)
+}
+
+.portion-macro-dist-bar > div {
+    min-width: 2px;
+    transition: width 0.3s ease
+}
+
+/* Micro nutrients row */
+.portion-micro-row {
+    display: flex;
+    gap: 12px;
+    font-size: 10px;
+    color: var(--text-faint);
+    padding-top: 8px;
+    border-top: 1px solid var(--border)
+}
+
+/* ─── Action Buttons ────────────────────────────────────────────────────── */
+.portion-actions {
+    display: flex;
+    gap: 8px
+}
+
+.portion-cancel-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s
+}
+
+.portion-cancel-btn:hover {
+    background: var(--surface-hover)
+}
+
+.portion-log-btn {
+    flex: 2;
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--green), var(--teal));
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.25)
+}
+
+.portion-log-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35)
+}
+
+.portion-log-btn:active {
+    transform: scale(0.98)
 }
 
 /* ─── Recent & Popular Sections ─────────────────────────────────────────── */
@@ -3568,7 +3825,7 @@ body {
 .add-menu-sheet {
     width: 100%;
     max-width: 480px;
-    background: var(--card-bg, #1a1a1f);
+    background: var(--bg);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     border: 1px solid var(--border);
@@ -3661,7 +3918,7 @@ body {
 .screen-back-btn {
     padding: 6px 12px 6px 8px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text-dim);
     font-size: 13px;
@@ -3756,7 +4013,7 @@ body {
 .routine-card {
     padding: 14px;
     border-radius: 12px;
-    background: var(--card-bg, #1a1a1f);
+    background: var(--bg);
     border: 1px solid var(--border);
     transition: all .2s
 }
@@ -3868,7 +4125,7 @@ body {
 .draft-ex-card {
     padding: 12px;
     border-radius: 12px;
-    background: var(--card-bg, #1a1a1f);
+    background: var(--bg);
     border: 1px solid var(--border)
 }
 
@@ -4183,7 +4440,7 @@ body {
 .active-ex-card {
     padding: 12px;
     border-radius: 12px;
-    background: var(--card-bg, #1a1a1f);
+    background: var(--bg);
     border: 1px solid rgba(168, 85, 247, 0.2);
     transition: all .3s
 }

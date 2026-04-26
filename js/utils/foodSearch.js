@@ -61,7 +61,7 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
       "search_terms=" + encodeURIComponent(query.trim()) +
       "&json=1" +
       "&page_size=" + fetchSize +
-      "&fields=product_name,nutriments,brands,image_small_url,serving_size,nutrition_grades,categories_tags,countries_tags,languages_tags,completeness,unique_scans_n" +
+      "&fields=product_name,nutriments,brands,image_small_url,serving_size,serving_quantity,nutrition_grades,categories_tags,countries_tags,languages_tags,completeness,unique_scans_n" +
       "&search_simple=1" +
       "&action=process" +
       "&sort_by=unique_scans_n" +       // Sort by most-scanned (popularity)
@@ -69,11 +69,28 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
       "&tag_contains_0=contains" +
       "&tag_0=en";
 
-    return fetch(url)
-    .then(function(res) {
-      if (!res.ok) throw new Error("OFF API error: " + res.status);
-      return res.json();
-    })
+    var attemptFetch = function(retries) {
+      return fetch(url)
+      .then(function(res) {
+        if (!res.ok) {
+          if (retries > 0) {
+            return new Promise(function(resolve) { setTimeout(resolve, 500); })
+              .then(function() { return attemptFetch(retries - 1); });
+          }
+          throw new Error("OFF API error: " + res.status);
+        }
+        return res.json();
+      })
+      .catch(function(err) {
+        if (retries > 0) {
+          return new Promise(function(resolve) { setTimeout(resolve, 500); })
+            .then(function() { return attemptFetch(retries - 1); });
+        }
+        throw err;
+      });
+    };
+
+    return attemptFetch(3)
     .then(function(data) {
       var products = (data.products || []);
       var q = query.trim();
@@ -86,12 +103,12 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
           // Must be English text
           if (!isEnglishText(p.product_name)) return false;
 
-          // Must have at least calories
+          // Must have at least calories (check both per-serving and per-100g)
           var n = p.nutriments;
-          var kcal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
+          var kcal = n["energy-kcal_serving"] || n["energy-kcal_100g"] || n["energy-kcal"] || 0;
           if (kcal <= 0) {
             // Try converting from kJ
-            var kj = n["energy_100g"] || n["energy"] || 0;
+            var kj = n["energy_serving"] || n["energy_100g"] || n["energy"] || 0;
             if (kj > 0) kcal = kj / 4.184;
           }
           if (kcal <= 0) return false;
@@ -105,10 +122,46 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
         // ─── Map to clean objects ──────────────────────────────
         .map(function(p) {
           var n = p.nutriments || {};
-          var kcal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
-          if (kcal <= 0) {
-            var kj = n["energy_100g"] || n["energy"] || 0;
-            if (kj > 0) kcal = kj / 4.184;
+
+          // Detect if per-serving data is available (same logic as barcode lookup)
+          var servQty = p.serving_quantity;  // grams or ml per serving
+          var hasServing = servQty > 0 && (
+            n["energy-kcal_serving"] != null ||
+            n["proteins_serving"] != null ||
+            n["carbohydrates_serving"] != null ||
+            n["fat_serving"] != null
+          );
+
+          var kcal, protein, carbs, fats, fiber, sugar, sodium, potassium;
+
+          if (hasServing) {
+            // Use exact per-serving values from the product's nutrition label
+            kcal = n["energy-kcal_serving"] || 0;
+            if (kcal <= 0) {
+              var kjServ = n["energy_serving"] || 0;
+              if (kjServ > 0) kcal = kjServ / 4.184;
+            }
+            protein   = n["proteins_serving"] || 0;
+            carbs     = n["carbohydrates_serving"] || 0;
+            fats      = n["fat_serving"] || 0;
+            fiber     = n["fiber_serving"] || 0;
+            sugar     = n["sugars_serving"] || 0;
+            sodium    = n["sodium_serving"] || 0;
+            potassium = n["potassium_serving"] || 0;
+          } else {
+            // Fallback: use _100g values
+            kcal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
+            if (kcal <= 0) {
+              var kj100 = n["energy_100g"] || n["energy"] || 0;
+              if (kj100 > 0) kcal = kj100 / 4.184;
+            }
+            protein   = n["proteins_100g"] || n["proteins"] || 0;
+            carbs     = n["carbohydrates_100g"] || n["carbohydrates"] || 0;
+            fats      = n["fat_100g"] || n["fat"] || 0;
+            fiber     = n["fiber_100g"] || n["fiber"] || 0;
+            sugar     = n["sugars_100g"] || n["sugars"] || 0;
+            sodium    = n["sodium_100g"] || n["sodium"] || 0;
+            potassium = n["potassium_100g"] || n["potassium"] || 0;
           }
 
           return {
@@ -116,17 +169,19 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
             brand: p.brands || "",
             image: p.image_small_url || "",
             nutriScore: (p.nutrition_grades || "").toUpperCase(),
-            serving: p.serving_size || "100g",
+            serving: p.serving_size || (hasServing ? "1 serving" : "100g"),
             cal:       Math.round(kcal),
-            protein:   Math.round((n["proteins_100g"] || n["proteins"] || 0) * 10) / 10,
-            carbs:     Math.round((n["carbohydrates_100g"] || n["carbohydrates"] || 0) * 10) / 10,
-            fats:      Math.round((n["fat_100g"] || n["fat"] || 0) * 10) / 10,
-            fiber:     Math.round((n["fiber_100g"] || n["fiber"] || 0) * 10) / 10,
-            sugar:     Math.round((n["sugars_100g"] || n["sugars"] || 0) * 10) / 10,
-            sodium:    Math.round((n["sodium_100g"] || n["sodium"] || 0) * 1000),
-            potassium: Math.round((n["potassium_100g"] || n["potassium"] || 0) * 1000),
+            protein:   Math.round(protein * 10) / 10,
+            carbs:     Math.round(carbs * 10) / 10,
+            fats:      Math.round(fats * 10) / 10,
+            fiber:     Math.round(fiber * 10) / 10,
+            sugar:     Math.round(sugar * 10) / 10,
+            sodium:    hasServing ? Math.round(sodium) : Math.round(sodium * 1000),
+            potassium: hasServing ? Math.round(potassium) : Math.round(potassium * 1000),
             _relevance: relevanceScore(p.product_name, q),
             _scans: p.unique_scans_n || 0,
+            _perServing: hasServing,
+            _servingGrams: servQty || 0,
             source: "off"
           };
         })
@@ -200,11 +255,28 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
       encodeURIComponent(barcode.trim()) +
       ".json?fields=product_name,nutriments,brands,image_small_url,image_url,serving_size,serving_quantity,nutrition_grades,categories_tags";
 
-    return fetch(url)
-      .then(function(res) {
-        if (!res.ok) throw new Error("OFF API error: " + res.status);
-        return res.json();
-      })
+    var attemptFetch = function(retries) {
+      return fetch(url)
+        .then(function(res) {
+          if (!res.ok) {
+            if (retries > 0) {
+              return new Promise(function(resolve) { setTimeout(resolve, 500); })
+                .then(function() { return attemptFetch(retries - 1); });
+            }
+            throw new Error("OFF API error: " + res.status);
+          }
+          return res.json();
+        })
+        .catch(function(err) {
+          if (retries > 0) {
+            return new Promise(function(resolve) { setTimeout(resolve, 500); })
+              .then(function() { return attemptFetch(retries - 1); });
+          }
+          throw err;
+        });
+    };
+
+    return attemptFetch(3)
       .then(function(data) {
         if (!data || data.status !== 1 || !data.product) return null;
 

@@ -189,12 +189,19 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
     var mealForm = props.mealForm, setMealForm = props.setMealForm, addMeal = props.addMeal;
     var removeMeal = props.removeMeal;
     var moveMealToPeriod = props.moveMealToPeriod;
+    var activeMealPeriod = props.activeMealPeriod;
     var setActiveMealPeriod = props.setActiveMealPeriod;
     var reAddFood = props.reAddFood;
 
     // ── Local State ────────────────────────────────────────────────────
     var _em = useState("recent");  var eatsMode = _em[0], setEatsMode = _em[1];
-    var _ep = useState(getMealPeriod()); var expandedPeriod = _ep[0], setExpandedPeriod = _ep[1];
+    var _ep = useState(activeMealPeriod || getMealPeriod()); var expandedPeriod = _ep[0], setExpandedPeriod = _ep[1];
+
+    // Keep global active meal period in sync when user expands an accordion
+    var handleSetExpandedPeriod = function(p) {
+      setExpandedPeriod(p);
+      if (p) setActiveMealPeriod(p);
+    };
 
     // Search state
     var _sq = useState("");       var searchQuery = _sq[0], setSearchQuery = _sq[1];
@@ -224,15 +231,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
     var scannerRef = useRef(null);
     var scannerDivId = "barcode-scanner-reader";
 
-    // Recent foods from mealLog — unique foods user has logged, for quick re-add
-    var recentFoods = useMemo(function() {
-      var seen = {};
-      return mealLog.slice().reverse().filter(function(m) {
-        if (seen[m.name]) return false;
-        seen[m.name] = true;
-        return true;
-      }).slice(0, 20);
-    }, [mealLog]);
+    var recentFoods = props.recentFoods || [];
 
     // ── Search handler ─────────────────────────────────────────────────
     var doSearch = useCallback(function() {
@@ -456,7 +455,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         <MealPeriodHeader
           mealLog={mealLog}
           expandedPeriod={expandedPeriod}
-          setExpandedPeriod={setExpandedPeriod}
+          setExpandedPeriod={handleSetExpandedPeriod}
           removeMeal={removeMeal}
           moveMealToPeriod={moveMealToPeriod}
           onAddFood={handleAddFoodFromPeriod}

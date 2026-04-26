@@ -18,7 +18,7 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
   }
 
   /** Calculate all daily nutrient targets based on profile */
-  function calcTargets(p) {
+  function calcTargets(p, intake) {
     var c = calcBMR(p);
     var bmr = p.bmrOverride != null ? p.bmrOverride : c;
     var isMale = p.sex === "male";
@@ -36,6 +36,7 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
     var wB = Math.round(p.weight / 2);
     var wE = p.todayMuscles.length > 0 ? 24 : 0;
     var wS = p.steps > 10000 ? 16 : p.steps > 7000 ? 8 : 0;
+    var wC = (intake && intake.creatine > 0) ? Math.round(intake.creatine * 3.2) : 0; // ~16oz per 5g
     var hB = p.todayMuscles.some(function(m) { return ["quads", "hamstrings", "back", "glutes"].includes(m); });
     var lm = p.weight * (1 - p.bodyfat / 100);
 
@@ -55,8 +56,8 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
       vitaminD: 2000,
       b12: 2.4,
       omega3: 1.6,
-      creatine: hB ? 5 : 3,
-      water: wB + wE + wS,
+      creatine: 5,
+      water: wB + wE + wS + wC,
       tdee: Math.round(tdee),
       bmr: Math.round(bmr),
       calculatedBMR: Math.round(c),
