@@ -358,7 +358,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
           className={"md-cardio md-state-" + cardioState}
           onClick={function() { select("cardio"); }}
         >
-          <span className="md-cardio-icon">{"\uD83C\uDFC3"}</span>
+          <span className="md-cardio-icon pq-icon pq-icon-cardio" aria-hidden="true"></span>
           <span className="md-cardio-label">Cardio</span>
           <span className="mono md-cardio-count" style={{ color: STATE_COLOR[cardioState] }}>
             {cardioCount}/{target} days

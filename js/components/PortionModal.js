@@ -136,7 +136,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
 
           {/* ── Serving Size Info ────────────────────────────────────── */}
           <div className="portion-serving-badge">
-            <span className="portion-serving-badge-icon">📦</span>
+            <span className="portion-serving-badge-icon pq-icon pq-icon-package" aria-hidden="true"></span>
             <span className="portion-serving-badge-text">
               1 serving = {servingLabel}
               {servingGrams > 0 && !servingLabel.match(/^\d+g$/) && " (" + servingGrams + "g)"}

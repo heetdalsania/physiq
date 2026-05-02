@@ -713,7 +713,7 @@ window.PhysIQ = window.PhysIQ || {};
         )}
 
         {/* Toast */}
-        {toast && <div className="added-toast">{"\u2705"} {toast}</div>}
+        {toast && <div className="added-toast"><span className="toast-mark pq-icon pq-icon-check" aria-hidden="true"></span> {toast}</div>}
 
         {/* Portion Modal */}
         <PortionModal
@@ -725,16 +725,17 @@ window.PhysIQ = window.PhysIQ || {};
         />
 
         {/* Header */}
-        <div style={{ padding: "20px 20px 16px", background: "linear-gradient(180deg,var(--bg-header) 0%,transparent 100%)" }}>
+        <div className="app-header" style={{ padding: "20px 20px 16px", background: "linear-gradient(180deg,var(--bg-header) 0%,transparent 100%)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
             <div className="mono" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: "var(--blue)" }}>PHYSIQ ENGINE</div>
             <div className="flex-row" style={{ gap: 8 }}>
-              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{theme === "dark" ? "\uD83C\uDF19" : "\u2600\uFE0F"}</span>
+              <span className={"theme-indicator pq-icon " + (theme === "dark" ? "pq-icon-moon" : "pq-icon-sun")} aria-hidden="true"></span>
               <button className="theme-toggle" onClick={function() { setTheme(function(t) { return t === "dark" ? "light" : "dark"; }); }} />
             </div>
           </div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", lineHeight: 1.2 }}>
-            {(GOALS.find(function(g) { return g.id === profile.goal; }) || {}).icon} {(GOALS.find(function(g) { return g.id === profile.goal; }) || {}).label} Mode
+          <div className="app-mode-title" style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", lineHeight: 1.2 }}>
+            <span className={"app-mode-icon pq-icon " + ((GOALS.find(function(g) { return g.id === profile.goal; }) || {}).iconClass || "pq-icon-goal-flat")} aria-hidden="true"></span>
+            {(GOALS.find(function(g) { return g.id === profile.goal; }) || {}).label} Mode
           </div>
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
             {targets.tdee} TDEE {"\u00B7"} {targets.leanMass}lb lean {"\u00B7"} {profile.steps.toLocaleString()} steps
@@ -743,7 +744,7 @@ window.PhysIQ = window.PhysIQ || {};
         </div>
 
         {/* Tab Content */}
-        <div style={{ padding: "0 16px" }}>
+        <div className="app-content" style={{ padding: "0 16px" }}>
           {tab === "dashboard" && (
             <DashboardTab
               intake={intake} targets={targets} profile={profile}
@@ -815,11 +816,11 @@ window.PhysIQ = window.PhysIQ || {};
         {/* Bottom Navigation */}
         <div className="nav">
           {[
-            { id: "dashboard", label: "Dashboard", icon: "\u25C9" },
-            { id: "health",    label: "Health",    icon: "\u2666" },
-            { id: "__add",     label: "",          icon: "+"      },
-            { id: "calendar",  label: "Calendar",  icon: "\u25A6" },
-            { id: "profile",   label: "Profile",   icon: "\u2699" }
+            { id: "dashboard", label: "Dashboard", iconClass: "pq-icon-home" },
+            { id: "health",    label: "Health",    iconClass: "pq-icon-health" },
+            { id: "__add",     label: "",          iconClass: "pq-icon-plus" },
+            { id: "calendar",  label: "Calendar",  iconClass: "pq-icon-calendar" },
+            { id: "profile",   label: "Profile",   iconClass: "pq-icon-user" }
           ].map(function(t) {
             if (t.id === "__add") {
               var addActive = tab === "eats" || tab === "exercise" || addMenuOpen;
@@ -837,13 +838,13 @@ window.PhysIQ = window.PhysIQ || {};
                   }}
                   aria-label="Open quick menu"
                 >
-                  <span className="nav-add-circle">{t.icon}</span>
+                  <span className="nav-add-circle"><span className={"pq-icon " + t.iconClass} aria-hidden="true"></span></span>
                 </button>
               );
             }
             return (
               <button key={t.id} className={"nav-btn" + (tab === t.id ? " active" : "")} onClick={function() { setTab(t.id); setAddMenuOpen(false); setPopupType(null); }}>
-                <span>{t.icon}</span>
+                <span className={"nav-icon pq-icon " + t.iconClass} aria-hidden="true"></span>
                 <span>{t.label}</span>
               </button>
             );
@@ -861,7 +862,7 @@ window.PhysIQ = window.PhysIQ || {};
                   className="add-menu-card eats-card"
                   onClick={function() { setPopupType("eats"); }}
                 >
-                  <div className="add-menu-card-icon">{"\uD83C\uDF4E"}</div>
+                  <div className="add-menu-card-icon"><span className="pq-icon pq-icon-food" aria-hidden="true"></span></div>
                   <div className="add-menu-card-label">Eats</div>
                   <div className="add-menu-card-sub">Log food & nutrition</div>
                 </button>
@@ -869,7 +870,7 @@ window.PhysIQ = window.PhysIQ || {};
                   className="add-menu-card exercise-card"
                   onClick={function() { setPopupType("exercise"); }}
                 >
-                  <div className="add-menu-card-icon">{"\uD83C\uDFCB\uFE0F"}</div>
+                  <div className="add-menu-card-icon"><span className="pq-icon pq-icon-dumbbell" aria-hidden="true"></span></div>
                   <div className="add-menu-card-label">Exercise</div>
                   <div className="add-menu-card-sub">Routines & workouts</div>
                 </button>
@@ -884,7 +885,7 @@ window.PhysIQ = window.PhysIQ || {};
             <div className="popup-header">
               <button className="popup-close-btn" onClick={function() { setPopupType(null); setAddMenuOpen(false); }} aria-label="Close">{"\u00D7"}</button>
               <div className="popup-header-title">Log Food</div>
-              <span className="popup-header-icon">{"\uD83C\uDF4E"}</span>
+              <span className="popup-header-icon"><span className="pq-icon pq-icon-food" aria-hidden="true"></span></span>
             </div>
             <div className="popup-content">
               <EatsTab
@@ -918,7 +919,7 @@ window.PhysIQ = window.PhysIQ || {};
             <div className="popup-header">
               <button className="popup-close-btn" onClick={function() { setPopupType(null); setAddMenuOpen(false); }} aria-label="Close">{"\u00D7"}</button>
               <div className="popup-header-title">Exercise</div>
-              <span className="popup-header-icon">{"\uD83C\uDFCB\uFE0F"}</span>
+              <span className="popup-header-icon"><span className="pq-icon pq-icon-dumbbell" aria-hidden="true"></span></span>
             </div>
             <div className="popup-content">
               <ExerciseTab

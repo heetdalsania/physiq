@@ -236,10 +236,10 @@ window.PhysIQ.Utils = window.PhysIQ.Utils || {};
    * Meal period labels & icons
    */
   Utils.MEAL_PERIODS = [
-    { id: "breakfast", label: "Breakfast", icon: "☀️", hours: "Before 11am" },
-    { id: "lunch",     label: "Lunch",     icon: "🌤️", hours: "11am – 3pm" },
-    { id: "dinner",    label: "Dinner",    icon: "🌙", hours: "3pm – 8pm" },
-    { id: "snacks",    label: "Snacks",    icon: "🍿", hours: "Anytime" }
+    { id: "breakfast", label: "Breakfast", iconClass: "pq-icon-cup", hours: "Before 11am" },
+    { id: "lunch",     label: "Lunch",     iconClass: "pq-icon-burger", hours: "11am – 3pm" },
+    { id: "dinner",    label: "Dinner",    iconClass: "pq-icon-bowl", hours: "3pm – 8pm" },
+    { id: "snacks",    label: "Snacks",    iconClass: "pq-icon-cookie", hours: "Anytime" }
   ];
 
   /**

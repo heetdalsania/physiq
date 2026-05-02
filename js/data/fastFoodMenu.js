@@ -7,19 +7,19 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
 
   // ─── Restaurant List (with aliases for OSM matching) ───────────────────
   Data.FF_RESTAURANTS = [
-    { id: "mcdonalds",   name: "McDonald's",    color: "#FFC72C", icon: "🍔", aliases: ["mcdonalds", "mcdonald's", "mc donald", "mcd"] },
-    { id: "chipotle",    name: "Chipotle",      color: "#A81612", icon: "🌯", aliases: ["chipotle", "chipotle mexican grill"] },
-    { id: "chickfila",   name: "Chick-fil-A",   color: "#E51636", icon: "🐔", aliases: ["chick-fil-a", "chickfila", "chick fil a"] },
-    { id: "tacobell",    name: "Taco Bell",     color: "#702082", icon: "🌮", aliases: ["taco bell", "tacobell"] },
-    { id: "subway",      name: "Subway",        color: "#008C15", icon: "🥖", aliases: ["subway"] },
-    { id: "wendys",      name: "Wendy's",       color: "#E2203D", icon: "🍟", aliases: ["wendy's", "wendys"] },
-    { id: "pandaexpress",name: "Panda Express", color: "#D02B2B", icon: "🥡", aliases: ["panda express", "pandaexpress"] },
-    { id: "fiveguys",    name: "Five Guys",     color: "#B7191C", icon: "🍔", aliases: ["five guys", "fiveguys", "five guys burgers"] },
-    { id: "popeyes",     name: "Popeyes",       color: "#F15A22", icon: "🍗", aliases: ["popeyes", "popeye's", "popeyes louisiana kitchen"] },
-    { id: "innout",      name: "In-N-Out",      color: "#FFD700", icon: "🎯", aliases: ["in-n-out", "in n out", "innout", "in-n-out burger"] },
-    { id: "panera",      name: "Panera Bread",  color: "#4A7C2E", icon: "🥐", aliases: ["panera", "panera bread"] },
-    { id: "starbucks",   name: "Starbucks",     color: "#00704A", icon: "☕", aliases: ["starbucks", "starbucks coffee"] },
-    { id: "dunkin",      name: "Dunkin'",       color: "#FF671F", icon: "🍩", aliases: ["dunkin", "dunkin'", "dunkin donuts", "dunkin' donuts"] }
+    { id: "mcdonalds",   name: "McDonald's",    color: "#FFC72C", iconClass: "pq-icon-store", aliases: ["mcdonalds", "mcdonald's", "mc donald", "mcd"] },
+    { id: "chipotle",    name: "Chipotle",      color: "#A81612", iconClass: "pq-icon-store", aliases: ["chipotle", "chipotle mexican grill"] },
+    { id: "chickfila",   name: "Chick-fil-A",   color: "#E51636", iconClass: "pq-icon-store", aliases: ["chick-fil-a", "chickfila", "chick fil a"] },
+    { id: "tacobell",    name: "Taco Bell",     color: "#702082", iconClass: "pq-icon-store", aliases: ["taco bell", "tacobell"] },
+    { id: "subway",      name: "Subway",        color: "#008C15", iconClass: "pq-icon-store", aliases: ["subway"] },
+    { id: "wendys",      name: "Wendy's",       color: "#E2203D", iconClass: "pq-icon-store", aliases: ["wendy's", "wendys"] },
+    { id: "pandaexpress",name: "Panda Express", color: "#D02B2B", iconClass: "pq-icon-store", aliases: ["panda express", "pandaexpress"] },
+    { id: "fiveguys",    name: "Five Guys",     color: "#B7191C", iconClass: "pq-icon-store", aliases: ["five guys", "fiveguys", "five guys burgers"] },
+    { id: "popeyes",     name: "Popeyes",       color: "#F15A22", iconClass: "pq-icon-store", aliases: ["popeyes", "popeye's", "popeyes louisiana kitchen"] },
+    { id: "innout",      name: "In-N-Out",      color: "#FFD700", iconClass: "pq-icon-store", aliases: ["in-n-out", "in n out", "innout", "in-n-out burger"] },
+    { id: "panera",      name: "Panera Bread",  color: "#4A7C2E", iconClass: "pq-icon-store", aliases: ["panera", "panera bread"] },
+    { id: "starbucks",   name: "Starbucks",     color: "#00704A", iconClass: "pq-icon-store", aliases: ["starbucks", "starbucks coffee"] },
+    { id: "dunkin",      name: "Dunkin'",       color: "#FF671F", iconClass: "pq-icon-store", aliases: ["dunkin", "dunkin'", "dunkin donuts", "dunkin' donuts"] }
   ];
 
   // ─── Full Menu Data ────────────────────────────────────────────────────
