@@ -23,9 +23,11 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
               <button key={g.id} className={"option-btn" + (profile.goal === g.id ? " active" : "")} onClick={function() { up("goal", g.id); }} style={{ padding: 12 }}>
                 <span className={"option-icon pq-icon " + g.iconClass} aria-hidden="true"></span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{g.label}</div>
-                  <div style={{ fontSize: 10, color: "var(--text-faint)" }}>
-                    {g.pct > 0 ? "+" : ""}{Math.round(g.pct * 100)}% cal {"\u00B7"} {g.proteinGKg}g/kg protein
+                  <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: 0.15 }}>{g.label}</div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, lineHeight: 1.3 }}>
+                    <span className="mono" style={{ fontWeight: 600 }}>{g.pct > 0 ? "+" : ""}{Math.round(g.pct * 100)}%</span> calories
+                    <span style={{ margin: "0 6px", opacity: 0.35 }}>{"\u00B7"}</span>
+                    <span className="mono" style={{ fontWeight: 600 }}>{g.proteinGKg}g</span><span style={{ opacity: 0.6 }}>/kg</span> protein
                   </div>
                 </div>
               </button>
@@ -39,8 +41,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           {ACTIVITY_LEVELS.map(function(a) {
             return (
               <button key={a.id} className={"option-btn" + (profile.activity === a.id ? " active" : "")} onClick={function() { up("activity", a.id); }}>
-                <span style={{ fontSize: 12, flex: 1 }}>{a.label}</span>
-                <span className="mono" style={{ fontSize: 10, color: "var(--text-faint)" }}>{a.steps} steps</span>
+                <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{a.label}</span>
+                <span className="mono" style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)" }}>{a.steps} steps</span>
               </button>
             );
           })}
@@ -67,20 +69,20 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                 return (
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     <div className="option-btn" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
-                      <span style={{ fontSize: 10, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: 0.5 }}>Workouts</span>
-                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--blue)" }}>{totalW}</span>
+                      <span style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>Workouts</span>
+                      <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--blue)" }}>{totalW}</span>
                     </div>
                     <div className="option-btn" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
-                      <span style={{ fontSize: 10, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: 0.5 }}>Sets Completed</span>
-                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--orange)" }}>{totalS}</span>
+                      <span style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>Sets Completed</span>
+                      <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--orange)" }}>{totalS}</span>
                     </div>
                     <div className="option-btn" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
-                      <span style={{ fontSize: 10, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: 0.5 }}>Total Minutes</span>
-                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--purple)" }}>{totalMin}</span>
+                      <span style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>Total Minutes</span>
+                      <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--purple)" }}>{totalMin}</span>
                     </div>
                     <div className="option-btn" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
-                      <span style={{ fontSize: 10, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: 0.5 }}>Cals Burned (Est.)</span>
-                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--green)" }}>{calsBurned.toLocaleString()}</span>
+                      <span style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>Cals Burned (Est.)</span>
+                      <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--green)" }}>{calsBurned.toLocaleString()}</span>
                     </div>
                   </div>
                 );

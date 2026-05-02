@@ -86,9 +86,11 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                     <button key={g.id} className={"option-btn" + (obGoal === g.id ? " active" : "")} onClick={function() { setObGoal(g.id); }} style={{ padding: 14 }}>
                       <span className={"option-icon pq-icon " + g.iconClass} aria-hidden="true"></span>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{g.label}</div>
-                        <div style={{ fontSize: 10, color: "var(--text-faint)" }}>
-                          {g.pct > 0 ? "+" : ""}{Math.round(g.pct * 100)}% cal {"\u00B7"} {g.proteinGKg}g/kg protein
+                        <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: 0.15 }}>{g.label}</div>
+                        <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, lineHeight: 1.3 }}>
+                          <span className="mono" style={{ fontWeight: 600 }}>{g.pct > 0 ? "+" : ""}{Math.round(g.pct * 100)}%</span> calories
+                          <span style={{ margin: "0 6px", opacity: 0.35 }}>{"\u00B7"}</span>
+                          <span className="mono" style={{ fontWeight: 600 }}>{g.proteinGKg}g</span><span style={{ opacity: 0.6 }}>/kg</span> protein
                         </div>
                       </div>
                     </button>
@@ -115,8 +117,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   {ACTIVITY_LEVELS.map(function(a) {
                     return (
                       <button key={a.id} className={"option-btn" + (obActivity === a.id ? " active" : "")} onClick={function() { setObActivity(a.id); }} style={{ padding: 10 }}>
-                        <span style={{ fontSize: 12, flex: 1 }}>{a.label}</span>
-                        <span className="mono" style={{ fontSize: 10, color: "var(--text-faint)" }}>{a.steps}</span>
+                        <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{a.label}</span>
+                        <span className="mono" style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)" }}>{a.steps}</span>
                       </button>
                     );
                   })}

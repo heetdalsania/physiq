@@ -727,17 +727,17 @@ window.PhysIQ = window.PhysIQ || {};
         {/* Header */}
         <div className="app-header" style={{ padding: "20px 20px 16px", background: "linear-gradient(180deg,var(--bg-header) 0%,transparent 100%)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-            <div className="mono" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: "var(--blue)" }}>PHYSIQ ENGINE</div>
+            <div className="mono" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2.5, color: "var(--blue)" }}>PHYSIQ ENGINE</div>
             <div className="flex-row" style={{ gap: 8 }}>
               <span className={"theme-indicator pq-icon " + (theme === "dark" ? "pq-icon-moon" : "pq-icon-sun")} aria-hidden="true"></span>
               <button className="theme-toggle" onClick={function() { setTheme(function(t) { return t === "dark" ? "light" : "dark"; }); }} />
             </div>
           </div>
-          <div className="app-mode-title" style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", lineHeight: 1.2 }}>
+          <div className="app-mode-title" style={{ fontSize: 24, fontWeight: 700, color: "var(--text-white)", lineHeight: 1.2, letterSpacing: -0.3 }}>
             <span className={"app-mode-icon pq-icon " + ((GOALS.find(function(g) { return g.id === profile.goal; }) || {}).iconClass || "pq-icon-goal-flat")} aria-hidden="true"></span>
             {(GOALS.find(function(g) { return g.id === profile.goal; }) || {}).label} Mode
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 4, fontWeight: 500, letterSpacing: 0.2 }}>
             {targets.tdee} TDEE {"\u00B7"} {targets.leanMass}lb lean {"\u00B7"} {profile.steps.toLocaleString()} steps
             {targets.isOverridden && <span className="bmr-override-badge">{"\u00B7"} BMR Override</span>}
           </div>

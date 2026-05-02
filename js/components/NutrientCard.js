@@ -37,12 +37,12 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
         onMouseLeave={function(e) { e.currentTarget.style.borderColor = "transparent"; }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: info.color }}>{info.label}</span>
-          <span className="mono" style={{ fontSize: 10, color: over ? "var(--red)" : "var(--text-muted)" }}>{pct}%</span>
+          <span style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.2, color: info.color }}>{info.label}</span>
+          <span className="mono" style={{ fontSize: 11, color: over ? "var(--red)" : "var(--text-muted)" }}>{pct}%</span>
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 8 }}>
           <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--text-bright)" }}>{value}</span>
-          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>/ {target} {info.unit}</span>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>/ {target} {info.unit}</span>
         </div>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: Math.min(pct, 130) + "%", background: over ? "var(--red)" : "linear-gradient(90deg," + info.color + "88," + info.color + ")" }} />

@@ -9,7 +9,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
     return (
       <div className="onboard-screen slide-up">
         <div style={{ marginBottom: 24 }}>
-          <div className="mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 3, color: "var(--blue)", marginBottom: 8 }}>
+          <div className="mono" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3.5, color: "var(--blue)", marginBottom: 8 }}>
             PHYSIQ ENGINE
           </div>
           <div className="onboard-title">

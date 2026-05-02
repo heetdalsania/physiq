@@ -37,11 +37,11 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         {/* Calorie ring + macro split */}
         <div className="flex-row" style={{ gap: 20, padding: "16px 0 20px" }}>
           <ProgressRing value={intake.calories} max={targets.calories} color="var(--orange)">
-            <span className="mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--text-white)" }}>{intake.calories}</span>
-            <span style={{ fontSize: 9, color: "var(--text-muted)" }}>/ {targets.calories}</span>
+            <span className="mono" style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)" }}>{intake.calories}</span>
+            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>/ {targets.calories}</span>
           </ProgressRing>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 8 }}>MACRO SPLIT</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 8, letterSpacing: 1.2, fontWeight: 600 }}>MACRO SPLIT</div>
             <div style={{ display: "flex", gap: 2, height: 8, borderRadius: 4, overflow: "hidden", marginBottom: 10 }}>
               {macroData.map(function(m) { return <div key={m.label} style={{ flex: m.cal / totalMC, background: m.color, transition: "flex .4s" }} />; })}
             </div>
@@ -49,9 +49,9 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
               return (
                 <div key={m.label} className="flex-row" style={{ gap: 6, marginBottom: 4 }}>
                   <div style={{ width: 6, height: 6, borderRadius: "50%", background: m.color }} />
-                  <span style={{ fontSize: 11, color: "var(--text-dim)", flex: 1 }}>{m.label}</span>
-                  <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: m.val >= m.target ? "var(--green)" : "var(--text)" }}>{m.val}g</span>
-                  <span style={{ fontSize: 10, color: "var(--text-faint)" }}>/{m.target}g</span>
+                  <span style={{ fontSize: 12, color: "var(--text-dim)", flex: 1 }}>{m.label}</span>
+                  <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: m.val >= m.target ? "var(--green)" : "var(--text)" }}>{m.val}g</span>
+                  <span style={{ fontSize: 11, color: "var(--text-faint)" }}>/{m.target}g</span>
                 </div>
               );
             })}
@@ -61,7 +61,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         {/* Water tracker */}
         <div style={{ background: "var(--water-bg)", borderRadius: 12, padding: 14, border: "1px solid var(--water-border)", marginBottom: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sky)" }}>Water</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--sky)" }}>Water</span>
             <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: "var(--text-bright)" }}>
               {intake.water}oz <span style={{ color: "var(--text-faint)", fontWeight: 400 }}>/ {targets.water}oz</span>
             </span>
@@ -80,7 +80,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         {/* Creatine tracker */}
         <div style={{ background: "var(--muscle-tag-bg)", borderRadius: 12, padding: 14, border: "1px solid var(--muscle-tag-border)", marginBottom: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--purple-light)" }}>Creatine</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--purple-light)" }}>Creatine</span>
             <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: "var(--text-bright)" }}>
               {intake.creatine || 0}g <span style={{ color: "var(--text-faint)", fontWeight: 400 }}>/ {targets.creatine || 5}g</span>
             </span>
@@ -154,8 +154,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
               {mealLog.map(function(m) {
                 return (
                   <div key={m.id} className="meal-row">
-                    <span className="mono" style={{ fontSize: 10, color: "var(--text-faint)" }}>{m.time}</span>
-                    <span style={{ flex: 1, fontSize: 12, fontWeight: 500 }}>{m.name}</span>
+                    <span className="mono" style={{ fontSize: 11, color: "var(--text-muted)" }}>{m.time}</span>
+                    <span style={{ flex: 1, fontSize: 13, fontWeight: 500 }}>{m.name}</span>
                     <span className="mono" style={{ fontSize: 11, color: "var(--orange)" }}>{m.calories}</span>
                     <span className="mono" style={{ fontSize: 11, color: "var(--blue)" }}>{m.protein}P</span>
                     <button className="meal-remove" onClick={function() { removeMeal(m.id); }}>{"\u00D7"}</button>

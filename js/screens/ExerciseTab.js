@@ -255,16 +255,16 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
     if (view === "main") {
       return (
         <div className="fade-in" style={{ paddingTop: 16 }}>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", marginBottom: 4 }}>Workouts</div>
-          <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 18 }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text-white)", marginBottom: 4, letterSpacing: -0.3 }}>Workouts</div>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 18 }}>
             Build routines and track sessions
           </div>
 
           <button className="new-routine-btn" onClick={startNewRoutine}>
             <span className="new-routine-plus"><span className="pq-icon pq-icon-plus" aria-hidden="true"></span></span>
             <div style={{ flex: 1, textAlign: "left" }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-white)" }}>New Routine</div>
-              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Build a custom workout</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-white)" }}>New Routine</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Build a custom workout</div>
             </div>
             <span className="new-routine-arrow">{"\u203A"}</span>
           </button>
@@ -273,8 +273,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           {routines.length === 0 ? (
             <div className="routines-empty">
               <div className="routines-empty-icon"><span className="pq-icon pq-icon-list" aria-hidden="true"></span></div>
-              <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No routines yet</div>
-              <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 4 }}>Tap "New Routine" to create your first one</div>
+              <div style={{ fontSize: 14, color: "var(--text-muted)" }}>No routines yet</div>
+              <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 4 }}>Tap "New Routine" to create your first one</div>
             </div>
           ) : (
             <div className="flex-col gap-10">
@@ -284,10 +284,10 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   <div key={r.id} className="routine-card fade-in">
                     <div className="routine-card-header">
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-white)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text-white)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {r.title}
                         </div>
-                        <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3 }}>
+                        <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 3, fontWeight: 500 }}>
                           {r.exercises.length} exercise{r.exercises.length !== 1 ? "s" : ""} {"\u00B7"} {setCount} set{setCount !== 1 ? "s" : ""}
                         </div>
                       </div>
@@ -341,7 +341,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             </button>
           </div>
 
-          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", marginBottom: 14 }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text-white)", marginBottom: 14, letterSpacing: -0.3 }}>
             Create Routine
           </div>
 
@@ -363,8 +363,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           <div className="label" style={{ marginTop: 18 }}>Exercises</div>
           {draft.exercises.length === 0 ? (
             <div className="routines-empty">
-              <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No exercises yet</div>
-              <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 4 }}>Tap "Add Exercise" below</div>
+              <div style={{ fontSize: 14, color: "var(--text-muted)" }}>No exercises yet</div>
+              <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 4 }}>Tap "Add Exercise" below</div>
             </div>
           ) : (
             <div className="flex-col gap-10">
@@ -373,8 +373,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   <div key={ex.id} className="draft-ex-card">
                     <div className="draft-ex-header">
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-white)" }}>{ex.name}</div>
-                        <div style={{ fontSize: 11, color: "var(--purple-light)", marginTop: 2 }}>{ex.muscle}</div>
+                        <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-white)" }}>{ex.name}</div>
+                        <div style={{ fontSize: 12, color: "var(--purple-light)", marginTop: 2, fontWeight: 500 }}>{ex.muscle}</div>
                       </div>
                       <button className="draft-ex-remove" onClick={function() { removeExerciseFromDraft(exIdx); }} title="Remove exercise">
                         {"\u2715"}
@@ -455,7 +455,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             </span>
           </div>
 
-          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", marginBottom: 14 }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text-white)", marginBottom: 14, letterSpacing: -0.3 }}>
             Add Exercises
           </div>
 
@@ -520,16 +520,16 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             </button>
           </div>
 
-          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-white)", marginBottom: 4 }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text-white)", marginBottom: 4, letterSpacing: -0.3 }}>
             {active.title}
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 14 }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 14, fontWeight: 500 }}>
             {compSets}/{totSets} sets {"\u00B7"} {pct}% complete
           </div>
 
           <div className="workout-active-banner fade-in" style={{ marginBottom: 14 }}>
             <span className="pq-icon pq-icon-dumbbell" aria-hidden="true"></span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-white)" }}>Workout in progress</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-white)" }}>Workout in progress</span>
             <span style={{ flex: 1 }} />
             <span className="mono" style={{ fontSize: 12, color: "var(--green)" }}>
               {compSets === totSets && totSets > 0 ? "All sets done!" : pct + "% complete"}
@@ -543,11 +543,11 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                 <div key={ex.id} className={"active-ex-card" + (exDone ? " active-ex-done" : "")}>
                   <div className="draft-ex-header">
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-white)" }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-white)" }}>
                         {exDone && <span className="ex-done-icon pq-icon pq-icon-check" aria-hidden="true"></span>}
                         {ex.name}
                       </div>
-                      <div style={{ fontSize: 11, color: "var(--purple-light)", marginTop: 2 }}>{ex.muscle}</div>
+                      <div style={{ fontSize: 12, color: "var(--purple-light)", marginTop: 2, fontWeight: 500 }}>{ex.muscle}</div>
                     </div>
                   </div>
 

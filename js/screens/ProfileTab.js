@@ -38,8 +38,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         <div className="account-bar">
           <div className="account-avatar">{(profile.name || email || "U")[0].toUpperCase()}</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-bright)" }}>{profile.name || "User"}</div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{email}</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-bright)" }}>{profile.name || "User"}</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{email}</div>
           </div>
           <button className="logout-btn" onClick={function() { setScreen("login"); setEmail(""); setLoginEmail(""); }}>Log out</button>
         </div>
@@ -119,7 +119,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           </div>
 
           {targets.isOverridden && (
-            <div style={{ fontSize: 10, color: "var(--text-faint)", padding: "4px 0", borderBottom: "1px solid var(--stat-border)" }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", padding: "4px 0", borderBottom: "1px solid var(--stat-border)" }}>
               Calculated: {targets.calculatedBMR} kcal (Mifflin-St Jeor)
             </div>
           )}
@@ -133,8 +133,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           ].map(function(s) {
             return (
               <div key={s.l} className="stat-row">
-                <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{s.l}</span>
-                <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{s.v}</span>
+                <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500 }}>{s.l}</span>
+                <span className="mono" style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{s.v}</span>
               </div>
             );
           })}
@@ -188,7 +188,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         {/* Appearance */}
         <div className="label">Appearance</div>
         <div className="flex-row" style={{ gap: 12, marginBottom: 30 }}>
-          <span style={{ fontSize: 13, color: "var(--text-dim)", flex: 1 }}>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
+          <span style={{ fontSize: 14, color: "var(--text-dim)", flex: 1, fontWeight: 500 }}>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
           <button className="theme-toggle" onClick={function() { setTheme(function(t) { return t === "dark" ? "light" : "dark"; }); }} />
         </div>
       </div>
