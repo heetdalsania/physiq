@@ -84,7 +84,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                 {GOALS.map(function(g) {
                   return (
                     <button key={g.id} className={"option-btn" + (obGoal === g.id ? " active" : "")} onClick={function() { setObGoal(g.id); }} style={{ padding: 14 }}>
-                      <span style={{ fontSize: 18, flexShrink: 0 }}>{g.icon}</span>
+                      <span className={"option-icon pq-icon " + g.iconClass} aria-hidden="true"></span>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 13, fontWeight: 600 }}>{g.label}</div>
                         <div style={{ fontSize: 10, color: "var(--text-faint)" }}>

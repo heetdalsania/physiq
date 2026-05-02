@@ -142,7 +142,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
             >
               <div className="meal-period-header" onClick={function() { setExpandedPeriod(isExpanded ? null : period.id); }}>
                 <div className="meal-period-left">
-                  <span className="meal-period-icon">{period.icon}</span>
+                  <span className={"meal-period-icon pq-icon " + period.iconClass} aria-hidden="true"></span>
                   <div>
                     <div className="meal-period-label">{period.label}</div>
                     <div className="meal-period-count">

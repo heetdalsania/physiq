@@ -11,8 +11,8 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
   var MUSCLE_GROUPS = Data.MUSCLE_GROUPS;
 
   // Suggestion styling
-  var SUGGESTION_COLORS = { critical: "#EF4444", warning: "#FBBF24", info: "#3B82F6", muscle: "#A855F7" };
-  var SUGGESTION_ICONS = { critical: "\u26A0", warning: "\u26A1", info: "\uD83D\uDCA1", muscle: "\uD83D\uDCAA" };
+  var SUGGESTION_COLORS = { critical: "#EF4444", warning: "#FBBF24", info: "#14B8A6", muscle: "#D946EF" };
+  var SUGGESTION_ICONS = { critical: "pq-icon-alert", warning: "pq-icon-alert", info: "pq-icon-health", muscle: "pq-icon-muscle" };
 
   function DashboardTab({ intake, targets, profile, suggestions, mealLog, addWater, addCreatine, removeMeal, resetDay, onQuickNav, devMode, devDate, toggleDevMode, changeDevDate, shiftDevDate }) {
     // Pretty label for the override date
@@ -120,7 +120,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
               {suggestions.map(function(s, i) {
                 return (
                   <div key={i} className="suggestion" style={{ background: SUGGESTION_COLORS[s.type] + "08", border: "1px solid " + SUGGESTION_COLORS[s.type] + "22" }}>
-                    <span style={{ marginRight: 8 }}>{SUGGESTION_ICONS[s.type]}</span>{s.text}
+                    <span className={"suggestion-icon pq-icon " + SUGGESTION_ICONS[s.type]} aria-hidden="true"></span>{s.text}
                   </div>
                 );
               })}
@@ -135,7 +135,12 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
               {profile.todayMuscles.map(function(id) {
                 var mg = MUSCLE_GROUPS.find(function(m) { return m.id === id; });
-                return <div key={id} className="muscle-tag">{mg ? mg.icon : ""} {mg ? mg.label : ""}</div>;
+                return (
+                  <div key={id} className="muscle-tag">
+                    <span className={"pq-icon " + (mg && mg.iconClass ? mg.iconClass : "pq-icon-muscle")} aria-hidden="true"></span>
+                    {mg ? mg.label : ""}
+                  </div>
+                );
               })}
             </div>
           </React.Fragment>

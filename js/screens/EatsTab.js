@@ -137,12 +137,12 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
     return (
       <div className={"nearby-restaurant-card fade-in" + (chain ? " is-chain" : "")} style={{ animationDelay: (index * 50) + "ms" }} onClick={function() { if (chain) onSelect(chain); }}>
         <div className="nearby-restaurant-icon" style={chainData ? { background: chainData.color + "22", borderColor: chainData.color + "44" } : {}}>
-          {chainData ? chainData.icon : (rest.amenity === "fast_food" ? "🍔" : "🍽️")}
+          <span className="pq-icon pq-icon-store" aria-hidden="true"></span>
         </div>
         <div className="nearby-restaurant-info">
           <div className="nearby-restaurant-name">{rest.name}</div>
           <div className="nearby-restaurant-meta">
-            <span className="nearby-restaurant-distance">📍 {rest.distanceLabel}</span>
+            <span className="nearby-restaurant-distance"><span className="pq-icon pq-icon-pin" aria-hidden="true"></span>{rest.distanceLabel}</span>
             {rest.cuisine && <span className="nearby-restaurant-cuisine">{rest.cuisine.split(";")[0]}</span>}
           </div>
         </div>
@@ -464,18 +464,18 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
         {/* ─── Segmented Tab Control ─────────────────────────────────── */}
         <div className="eats-segmented-control">
           {[
-            { id: "recent",  label: "Recent",  icon: "🕐" },
-            { id: "search",  label: "Search",  icon: "🔍" },
-            { id: "scan",    label: "Scan",    icon: "📷" },
-            { id: "nearby",  label: "Nearby",  icon: "📍" },
-            { id: "manual",  label: "Manual",  icon: "✏️" }
+            { id: "recent",  label: "Recent",  iconClass: "pq-icon-clock" },
+            { id: "search",  label: "Search",  iconClass: "pq-icon-search" },
+            { id: "scan",    label: "Scan",    iconClass: "pq-icon-barcode" },
+            { id: "nearby",  label: "Nearby",  iconClass: "pq-icon-pin" },
+            { id: "manual",  label: "Manual",  iconClass: "pq-icon-pencil" }
           ].map(function(t) {
             return (
               <button key={t.id}
                 className={"eats-seg-btn" + (eatsMode === t.id ? " active" : "")}
                 onClick={function() { setEatsMode(t.id); if (t.id !== "nearby") { setChainDetail(null); } }}
               >
-                <span className="eats-seg-icon">{t.icon}</span>
+                <span className={"eats-seg-icon pq-icon " + t.iconClass} aria-hidden="true"></span>
                 <span className="eats-seg-label">{t.label}</span>
               </button>
             );
@@ -487,7 +487,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           <div className="eats-recent-section fade-in">
             {recentFoods.length === 0 ? (
               <div className="eats-empty-state">
-                <div className="eats-empty-icon">🕐</div>
+                <div className="eats-empty-icon"><span className="pq-icon pq-icon-clock" aria-hidden="true"></span></div>
                 <div className="eats-empty-title">No recent eats yet</div>
                 <div className="eats-empty-sub">Foods you log will appear here for quick re-adding. Search for a food to get started!</div>
                 <button className="btn btn-primary" style={{ maxWidth: 240, margin: "16px auto 0" }} onClick={function() { setEatsMode("search"); }}>
@@ -530,7 +530,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             {/* Search Bar */}
             <div className="eats-search-bar">
               <div className="eats-search-input-wrap">
-                <span className="eats-search-icon">🔍</span>
+                <span className="eats-search-icon pq-icon pq-icon-search" aria-hidden="true"></span>
                 <input
                   className="eats-search-input"
                   placeholder='Search 2.5M+ foods...'
@@ -612,7 +612,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             {scanResult && (
               <div className="scan-result-card fade-in">
                 <div className="scan-result-header">
-                  <div className="scan-result-badge">✅ Product Found</div>
+                  <div className="scan-result-badge">Product Found</div>
                   <button className="scan-result-close" onClick={function() { setScanResult(null); }}>×</button>
                 </div>
                 <div className="scan-result-body">
@@ -653,7 +653,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   </div>
                 ) : (
                   <div className="scan-start-section">
-                    <div className="scan-start-icon">📷</div>
+                    <div className="scan-start-icon"><span className="pq-icon pq-icon-barcode" aria-hidden="true"></span></div>
                     <div className="scan-start-title">Barcode Scanner</div>
                     <div className="scan-start-sub">Point your camera at any food barcode to instantly look up nutrition info from Open Food Facts</div>
                     <button className="btn btn-primary scan-start-btn" onClick={startScanner} disabled={scanLoading}>
@@ -675,7 +675,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             {/* Error */}
             {scanError && (
               <div className="scan-error fade-in">
-                <div className="scan-error-icon">⚠️</div>
+                <div className="scan-error-icon"><span className="pq-icon pq-icon-alert" aria-hidden="true"></span></div>
                 <div className="scan-error-msg">{scanError}</div>
                 <button className="btn btn-primary" style={{ maxWidth: 200, margin: "12px auto 0" }} onClick={function() { setScanError(""); startScanner(); }}>
                   Try Again
@@ -765,7 +765,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
             {nearbyError && !nearbyLoading && (
               <div className="eats-nearby-error">
-                <div className="eats-nearby-error-icon">📍</div>
+                <div className="eats-nearby-error-icon"><span className="pq-icon pq-icon-pin" aria-hidden="true"></span></div>
                 <div className="eats-nearby-error-msg">{nearbyError}</div>
                 <button className="btn btn-primary" style={{ maxWidth: 200, margin: "12px auto 0" }} onClick={function() { setNearbyFetched(false); fetchNearby(); }}>
                   Try Again
@@ -797,7 +797,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                       return <NearbyRestaurantCard key={i} restaurant={r} onSelect={function() {}} index={i} />;
                     })}
                     <div className="eats-nearby-tip">
-                      💡 Tip: Search for dishes from local restaurants in the Search tab for nutrition info.
+                      Tip: Search for dishes from local restaurants in the Search tab for nutrition info.
                     </div>
                   </div>
                 )}
@@ -815,7 +815,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                           onClick={function() { setChainDetail(r.id); setChainCat("All"); setChainSearch(""); }}
                           style={{ borderColor: isNearby ? r.color : undefined }}
                         >
-                          <span>{r.icon}</span>
+                          <span className="pq-icon pq-icon-store" aria-hidden="true"></span>
                           <span>{r.name}</span>
                           {isNearby && <span className="eats-chain-nearby-dot" style={{ background: r.color }} />}
                         </button>
@@ -836,7 +836,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                       <button key={r.id} className="eats-chain-pill"
                         onClick={function() { setChainDetail(r.id); setChainCat("All"); setChainSearch(""); }}
                       >
-                        <span>{r.icon}</span>
+                        <span className="pq-icon pq-icon-store" aria-hidden="true"></span>
                         <span>{r.name}</span>
                       </button>
                     );
@@ -857,7 +857,9 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
             {/* Chain header */}
             <div className="eats-chain-header" style={{ borderColor: chainData.color + "44" }}>
-              <span className="eats-chain-header-icon" style={{ background: chainData.color + "22" }}>{chainData.icon}</span>
+              <span className="eats-chain-header-icon" style={{ background: chainData.color + "22" }}>
+                <span className="pq-icon pq-icon-store" aria-hidden="true"></span>
+              </span>
               <div>
                 <div className="eats-chain-header-name">{chainData.name}</div>
                 <div className="eats-chain-header-count">{chainMenu ? chainMenu.items.length : 0} items</div>
@@ -866,7 +868,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
             {/* Search within chain */}
             <div className="eats-chain-search-wrap">
-              <span className="eats-search-icon">🔍</span>
+              <span className="eats-search-icon pq-icon pq-icon-search" aria-hidden="true"></span>
               <input
                 className="eats-chain-search"
                 placeholder={"Search " + chainData.name + "..."}

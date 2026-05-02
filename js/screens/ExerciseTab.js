@@ -261,7 +261,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           </div>
 
           <button className="new-routine-btn" onClick={startNewRoutine}>
-            <span className="new-routine-plus">+</span>
+            <span className="new-routine-plus"><span className="pq-icon pq-icon-plus" aria-hidden="true"></span></span>
             <div style={{ flex: 1, textAlign: "left" }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-white)" }}>New Routine</div>
               <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Build a custom workout</div>
@@ -272,7 +272,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           <div className="label" style={{ marginTop: 24 }}>My Routines</div>
           {routines.length === 0 ? (
             <div className="routines-empty">
-              <div style={{ fontSize: 28, opacity: 0.35, marginBottom: 8 }}>{"\uD83D\uDCCB"}</div>
+              <div className="routines-empty-icon"><span className="pq-icon pq-icon-list" aria-hidden="true"></span></div>
               <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No routines yet</div>
               <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 4 }}>Tap "New Routine" to create your first one</div>
             </div>
@@ -292,10 +292,10 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                         </div>
                       </div>
                       <button className="routine-edit-btn" onClick={function() { editRoutine(r); }} title="Edit">
-                        {"\u270E"}
+                        <span className="pq-icon pq-icon-pencil" aria-hidden="true"></span>
                       </button>
                       <button className="routine-delete-btn" onClick={function() { deleteRoutine(r.id); }} title="Delete">
-                        {"\u2715"}
+                        <span className="pq-icon pq-icon-plus" aria-hidden="true"></span>
                       </button>
                     </div>
                     <div className="routine-muscles">
@@ -467,6 +467,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   className={"picker-cat-pill" + (cat === c.id ? " active" : "")}
                   onClick={function() { setPicker(function(p) { return Object.assign({}, p, { category: c.id }); }); }}
                 >
+                  <span className={"picker-cat-icon pq-icon " + c.iconClass} aria-hidden="true"></span>
                   {c.label}
                 </button>
               );
@@ -527,7 +528,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           </div>
 
           <div className="workout-active-banner fade-in" style={{ marginBottom: 14 }}>
-            <span style={{ fontSize: 14 }}>{"\uD83D\uDCAA"}</span>
+            <span className="pq-icon pq-icon-dumbbell" aria-hidden="true"></span>
             <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-white)" }}>Workout in progress</span>
             <span style={{ flex: 1 }} />
             <span className="mono" style={{ fontSize: 12, color: "var(--green)" }}>
@@ -543,7 +544,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
                   <div className="draft-ex-header">
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-white)" }}>
-                        {exDone && <span style={{ marginRight: 6 }}>{"\u2705"}</span>}
+                        {exDone && <span className="ex-done-icon pq-icon pq-icon-check" aria-hidden="true"></span>}
                         {ex.name}
                       </div>
                       <div style={{ fontSize: 11, color: "var(--purple-light)", marginTop: 2 }}>{ex.muscle}</div>

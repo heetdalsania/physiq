@@ -362,7 +362,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             {/* Nutrition */}
             <div className="cal-detail-section">
               <div className="cal-detail-section-title">
-                <span>{"\uD83C\uDF4E"}</span>
+                <span className="cal-detail-title-icon pq-icon pq-icon-food" aria-hidden="true"></span>
                 <span>Nutrition</span>
                 {selectedDetails.nutrition && evaluateNutritionDay(goal, selectedDetails.nutrition, targets) && (
                   <span className="cal-detail-check">{"\u2713"}</span>
@@ -427,7 +427,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
             {/* Workouts */}
             <div className="cal-detail-section">
               <div className="cal-detail-section-title">
-                <span>{"\uD83C\uDFCB\uFE0F"}</span>
+                <span className="cal-detail-title-icon pq-icon pq-icon-dumbbell" aria-hidden="true"></span>
                 <span>Exercise</span>
                 {selectedDetails.workouts.length > 0 && (
                   <span className="cal-detail-check">{"\u2713"}</span>

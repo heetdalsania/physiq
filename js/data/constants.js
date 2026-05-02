@@ -7,25 +7,25 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
 
   // ─── Muscle Groups ──────────────────────────────────────────────────────
   Data.MUSCLE_GROUPS = [
-    { id: "chest",     label: "Chest",     icon: "\u25FC", nutrients: ["protein", "creatine", "leucine"],  recovery: 48 },
-    { id: "back",      label: "Back",      icon: "\u25C6", nutrients: ["protein", "magnesium", "zinc"],    recovery: 48 },
-    { id: "shoulders", label: "Shoulders", icon: "\u25B2", nutrients: ["protein", "vitaminD", "calcium"],  recovery: 48 },
-    { id: "biceps",    label: "Biceps",    icon: "\u25CF", nutrients: ["protein", "potassium", "b12"],     recovery: 36 },
-    { id: "triceps",   label: "Triceps",   icon: "\u25CF", nutrients: ["protein", "potassium", "b12"],     recovery: 36 },
-    { id: "quads",      label: "Quads",      icon: "\u25BC", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
-    { id: "hamstrings", label: "Hamstrings", icon: "\u25BD", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
-    { id: "calves",     label: "Calves",     icon: "\u25BE", nutrients: ["protein", "magnesium", "potassium"], recovery: 48 },
-    { id: "core",       label: "Core",       icon: "\u25C7", nutrients: ["protein", "fiber", "omega3"],      recovery: 24 },
-    { id: "glutes",     label: "Glutes",     icon: "\u25A0", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 }
+    { id: "chest",     label: "Chest",     iconClass: "pq-icon-muscle", nutrients: ["protein", "creatine", "leucine"],  recovery: 48 },
+    { id: "back",      label: "Back",      iconClass: "pq-icon-muscle", nutrients: ["protein", "magnesium", "zinc"],    recovery: 48 },
+    { id: "shoulders", label: "Shoulders", iconClass: "pq-icon-muscle", nutrients: ["protein", "vitaminD", "calcium"],  recovery: 48 },
+    { id: "biceps",    label: "Biceps",    iconClass: "pq-icon-muscle", nutrients: ["protein", "potassium", "b12"],     recovery: 36 },
+    { id: "triceps",   label: "Triceps",   iconClass: "pq-icon-muscle", nutrients: ["protein", "potassium", "b12"],     recovery: 36 },
+    { id: "quads",      label: "Quads",      iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
+    { id: "hamstrings", label: "Hamstrings", iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
+    { id: "calves",     label: "Calves",     iconClass: "pq-icon-muscle", nutrients: ["protein", "magnesium", "potassium"], recovery: 48 },
+    { id: "core",       label: "Core",       iconClass: "pq-icon-muscle", nutrients: ["protein", "fiber", "omega3"],      recovery: 24 },
+    { id: "glutes",     label: "Glutes",     iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 }
   ];
 
   // ─── Goals (ordered: build → lean → maintain → debloat+cut → cut) ─────
   Data.GOALS = [
-    { id: "build",    label: "Build Muscle",  pct:  0.10, proteinGKg: 1.8, icon: "\u2191" },
-    { id: "lean",     label: "Lean Bulk",     pct:  0.05, proteinGKg: 1.8, icon: "\u2B08" },
-    { id: "maintain", label: "Maintain",      pct:  0,    proteinGKg: 1.6, icon: "\u2192" },
-    { id: "debloat",  label: "Debloat + Cut", pct: -0.15, proteinGKg: 2.0, icon: "\u2B0A" },
-    { id: "cut",      label: "Cut Fat",       pct: -0.20, proteinGKg: 2.2, icon: "\u2193" }
+    { id: "build",    label: "Build Muscle",  pct:  0.10, proteinGKg: 1.8, iconClass: "pq-icon-goal-up" },
+    { id: "lean",     label: "Lean Bulk",     pct:  0.05, proteinGKg: 1.8, iconClass: "pq-icon-goal-up" },
+    { id: "maintain", label: "Maintain",      pct:  0,    proteinGKg: 1.6, iconClass: "pq-icon-goal-flat" },
+    { id: "debloat",  label: "Debloat + Cut", pct: -0.15, proteinGKg: 2.0, iconClass: "pq-icon-goal-down" },
+    { id: "cut",      label: "Cut Fat",       pct: -0.20, proteinGKg: 2.2, iconClass: "pq-icon-goal-down" }
   ];
 
   // ─── Activity Levels ───────────────────────────────────────────────────
@@ -76,17 +76,17 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
 
   // ─── Exercise Categories (for routine builder picker) ───────────────────
   Data.EXERCISE_CATEGORIES = [
-    { id: "chest",     label: "Chest",     icon: "\uD83D\uDCAA" },
-    { id: "back",      label: "Back",      icon: "\uD83E\uDDCD" },
-    { id: "shoulders", label: "Shoulders", icon: "\uD83D\uDD3A" },
-    { id: "biceps",    label: "Biceps",    icon: "\uD83D\uDCAA" },
-    { id: "triceps",   label: "Triceps",   icon: "\uD83E\uDD1C" },
-    { id: "quads",      label: "Quads",      icon: "\uD83E\uDDB5" },
-    { id: "hamstrings", label: "Hamstrings", icon: "\uD83E\uDDB5" },
-    { id: "calves",     label: "Calves",     icon: "\uD83E\uDDB6" },
-    { id: "glutes",     label: "Glutes",     icon: "\uD83C\uDF51" },
-    { id: "core",       label: "Core",       icon: "\uD83D\uDD25" },
-    { id: "cardio",     label: "Cardio",     icon: "\uD83C\uDFC3" }
+    { id: "chest",     label: "Chest",     iconClass: "pq-icon-muscle" },
+    { id: "back",      label: "Back",      iconClass: "pq-icon-muscle" },
+    { id: "shoulders", label: "Shoulders", iconClass: "pq-icon-muscle" },
+    { id: "biceps",    label: "Biceps",    iconClass: "pq-icon-muscle" },
+    { id: "triceps",   label: "Triceps",   iconClass: "pq-icon-muscle" },
+    { id: "quads",      label: "Quads",      iconClass: "pq-icon-muscle" },
+    { id: "hamstrings", label: "Hamstrings", iconClass: "pq-icon-muscle" },
+    { id: "calves",     label: "Calves",     iconClass: "pq-icon-muscle" },
+    { id: "glutes",     label: "Glutes",     iconClass: "pq-icon-muscle" },
+    { id: "core",       label: "Core",       iconClass: "pq-icon-muscle" },
+    { id: "cardio",     label: "Cardio",     iconClass: "pq-icon-cardio" }
   ];
 
   Data.EXERCISES_BY_CATEGORY = {
