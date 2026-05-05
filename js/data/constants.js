@@ -148,6 +148,29 @@ window.PhysIQ.Data = window.PhysIQ.Data || {};
   // Legacy alias (kept for any lingering reference; superseded by EXERCISES_BY_CATEGORY)
   Data.EXERCISES = Data.EXERCISES_BY_CATEGORY;
 
+  // ─── Weekly Volume Targets (sets per muscle group per week) ────────────
+  // Evidence-backed range for hypertrophy is ~10–20 sets/week per muscle.
+  // We default to the lower end (10) so most lifters can realistically hit
+  // it; structured as a per-muscle map so this becomes user-customizable
+  // later without a schema change.
+  Data.DEFAULT_WEEKLY_SET_TARGET = 10;
+  Data.WEEKLY_SET_TARGETS = {
+    chest:      10,
+    back:       10,
+    shoulders:  10,
+    biceps:     10,
+    triceps:    10,
+    core:       10,
+    quads:      10,
+    hamstrings: 10,
+    glutes:     10,
+    calves:     10
+    // cardio intentionally omitted — tracked by sessions/days, not sets.
+  };
+
+  // Cardio still uses a days-per-week target (it's a frequency, not volume).
+  Data.CARDIO_WEEKLY_DAYS_TARGET = 2;
+
   // ─── Tracked Muscle Groups (for weekly muscle tracker) ──────────────────
   // Legs split into quads/hamstrings/calves for more granular tracking.
   Data.TRACKED_MUSCLES = [

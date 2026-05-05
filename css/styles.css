@@ -7382,3 +7382,249 @@ body[data-theme="light"]::before {
 .routine-delete-btn .pq-icon {
     transform: rotate(45deg)
 }
+
+/* ─── Muscle Tracker — inline target editor ──────────────────────────── */
+.md-target-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text-bright);
+}
+.md-target-edit-prefix,
+.md-target-edit-suffix {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+.md-target-edit-input {
+    width: 38px;
+    padding: 4px 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border-active, rgba(168,85,247,0.45));
+    border-radius: 6px;
+    color: var(--text-white);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    transition: border-color 200ms ease, background 200ms ease;
+    /* hide native number spinners for a cleaner look */
+    -moz-appearance: textfield;
+}
+.md-target-edit-input::-webkit-inner-spin-button,
+.md-target-edit-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.md-target-edit-input:focus {
+    border-color: #A855F7;
+    background: rgba(168,85,247,0.10);
+}
+.md-target-actions {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 6px;
+}
+.md-target-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-faint);
+    color: var(--text-dim);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease, border-color 200ms ease, transform 150ms ease;
+}
+.md-target-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-bright);
+    transform: translateY(-1px);
+}
+.md-target-edit-trigger {
+    margin-left: 8px;
+}
+.md-target-save {
+    color: #4ADE80;
+    border-color: rgba(34,197,94,0.30);
+}
+.md-target-save:hover { background: rgba(34,197,94,0.12); color: #22C55E; }
+.md-target-reset { color: #FBBF24; border-color: rgba(245,158,11,0.30); }
+.md-target-reset:hover { background: rgba(245,158,11,0.12); color: #F59E0B; }
+.md-target-cancel { color: #F87171; border-color: rgba(239,68,68,0.30); }
+.md-target-cancel:hover { background: rgba(239,68,68,0.12); color: #EF4444; }
+
+.md-target-hint {
+    margin-top: 6px;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.2px;
+}
+
+/* ─── Muscle Tracker — volume progress bar ────────────────────────────── */
+.md-tooltip-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+.md-tooltip-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 360ms ease, background 280ms ease;
+}
+.md-tooltip-bar-fill.md-bar-empty {
+    background: #3A4254;
+}
+.md-tooltip-bar-fill.md-bar-partial {
+    background: linear-gradient(90deg, #FBBF24, #F59E0B);
+}
+.md-tooltip-bar-fill.md-bar-hit {
+    background: linear-gradient(90deg, #4ADE80, #22C55E);
+}
+
+/* ─── Recovery Tracker ────────────────────────────────────────────────────
+   Matches the muscle-tracker card aesthetic: same gradient, radius, padding,
+   shadow. Pills mirror the routine-muscle-pill / md-cardio language so the
+   section feels native rather than bolted on. */
+.rec-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border: 1px solid var(--border-subtle);
+    border-radius: 18px;
+    padding: 18px 16px 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.rec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.rec-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-white);
+    letter-spacing: -0.2px;
+}
+.rec-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+.rec-counts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    font-family: "Space Mono", monospace;
+    font-size: 10px;
+}
+.rec-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-dim);
+    letter-spacing: 0.2px;
+}
+.rec-count-dot,
+.rec-zone-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+}
+.rec-dot-ready {
+    background: #22C55E;
+    box-shadow: 0 0 0 1px rgba(34,197,94,0.25), 0 0 8px rgba(34,197,94,0.35);
+}
+.rec-dot-recover {
+    background: #F59E0B;
+    box-shadow: 0 0 0 1px rgba(245,158,11,0.25), 0 0 8px rgba(245,158,11,0.30);
+}
+
+/* Zones */
+.rec-zone {
+    margin-top: 10px;
+}
+.rec-zone-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+}
+.rec-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.rec-empty {
+    font-size: 12px;
+    color: var(--text-faint);
+    padding: 4px 2px 2px;
+    line-height: 1.45;
+}
+
+/* Pills — share the muscle-pill geometry for visual consistency */
+.rec-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+    border: 1px solid transparent;
+    transition: background 280ms ease, border-color 280ms ease, color 280ms ease, transform 200ms ease, opacity 280ms ease;
+}
+.rec-pill-ready {
+    background: rgba(34,197,94,0.10);
+    border-color: rgba(34,197,94,0.28);
+    color: #4ADE80;
+}
+.rec-pill-recover {
+    background: rgba(245,158,11,0.08);
+    border-color: rgba(245,158,11,0.22);
+    color: #FBBF24;
+    opacity: 0.78;
+}
+.rec-pill-recover .rec-pill-name {
+    color: var(--text-bright);
+}
+.rec-pill-recover .rec-pill-timer {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #FBBF24;
+    opacity: 0.85;
+    letter-spacing: 0.2px;
+    padding-left: 6px;
+    border-left: 1px solid rgba(245,158,11,0.22);
+}
+/* Near-ready muscles brighten as they approach the end of recovery */
+.rec-pill-recover.rec-near-ready {
+    opacity: 1;
+    background: rgba(245,158,11,0.14);
+    border-color: rgba(245,158,11,0.38);
+}
+.rec-pill-recover.rec-near-ready .rec-pill-timer {
+    opacity: 1;
+}
+
+.rec-foot {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-faint);
+    font-size: 10.5px;
+    color: var(--text-faint);
+    text-align: center;
+    letter-spacing: 0.2px;
+}
