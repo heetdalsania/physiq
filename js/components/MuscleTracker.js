@@ -3,12 +3,16 @@
  * Modern Apple-Fitness-style silhouette with anatomically-inspired muscle
  * regions. SVG-first, zero external dependencies.
  *
- *   0 days hit  →  muted gray         (default)
- *   1 day  hit  →  soft red gradient  (partial)
- *   2+ days hit →  green gradient     (target met)
+ *   0 sets             →  muted gray   (not trained)
+ *   1..target-1 sets   →  amber/orange (in progress)
+ *   target+ sets       →  green        (volume goal met)
  *
- * A "day hit" = at least one completed set for an exercise targeting the
- * muscle on that calendar date. Max 1 hit per muscle per day.
+ * "Sets" = total completed sets across the week for any exercise that
+ * targets the muscle. Accumulates across multiple sessions; resets every
+ * Monday with the rest of the weekly tracker.
+ *
+ * Cardio is the exception — it uses a days-per-week target (frequency,
+ * not volume) and continues to count distinct training days.
  * ───────────────────────────────────────────────────────────────────────── */
 
 window.PhysIQ = window.PhysIQ || {};
@@ -18,17 +22,36 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
 
   var useState = React.useState;
   var TRACKED = Data.TRACKED_MUSCLES;
+  var SET_TARGETS = Data.WEEKLY_SET_TARGETS || {};
+  var DEFAULT_SET_TARGET = Data.DEFAULT_WEEKLY_SET_TARGET || 10;
+  var CARDIO_DAYS_TARGET = Data.CARDIO_WEEKLY_DAYS_TARGET || 2;
 
-  // ── Fill state keys ─────────────────────────────────────────────────────
-  function stateFor(count) {
-    if (!count || count === 0) return "empty";
-    if (count === 1) return "partial";
-    return "hit";
+  // overrides: optional user-customized per-muscle targets (from app state)
+  function makeTargetFor(overrides) {
+    return function(muscleId) {
+      if (muscleId === "cardio") return CARDIO_DAYS_TARGET;
+      if (overrides && typeof overrides[muscleId] === "number") return overrides[muscleId];
+      return SET_TARGETS[muscleId] || DEFAULT_SET_TARGET;
+    };
+  }
+  function targetForDefault(muscleId) {
+    if (muscleId === "cardio") return CARDIO_DAYS_TARGET;
+    return SET_TARGETS[muscleId] || DEFAULT_SET_TARGET;
+  }
+
+  // ── Fill state keys (volume-based) ─────────────────────────────────────
+  // 0          → empty
+  // 1..target-1 → partial (in progress)
+  // ≥ target    → hit (goal met)
+  function stateFor(count, target) {
+    if (!count || count <= 0) return "empty";
+    if (count >= target) return "hit";
+    return "partial";
   }
   // Solid colors (for badge dots / borders / count labels)
   var STATE_COLOR = {
     empty:   "#3A4254",
-    partial: "#EF4444",
+    partial: "#F59E0B",   // amber — "in progress, not enough volume yet"
     hit:     "#22C55E"
   };
 
@@ -176,6 +199,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
     var counts = props.counts;
     var selected = props.selected;
     var onSelect = props.onSelect;
+    var targetFor = props.targetFor || targetForDefault;
 
     return (
       <svg viewBox="0 0 200 440" className="md-svg" preserveAspectRatio="xMidYMid meet">
@@ -186,11 +210,11 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
             <stop offset="100%" stopColor="#232A38" />
           </linearGradient>
 
-          {/* ── Partial (1 day) ── soft red with gradient warmth */}
+          {/* ── Partial (in progress) ── amber gradient */}
           <linearGradient id="md-grad-partial" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#F87171" />
-            <stop offset="60%" stopColor="#EF4444" />
-            <stop offset="100%" stopColor="#B91C1C" />
+            <stop offset="0%" stopColor="#FBBF24" />
+            <stop offset="60%" stopColor="#F59E0B" />
+            <stop offset="100%" stopColor="#B45309" />
           </linearGradient>
 
           {/* ── Hit (2+ days) ── green with gradient glow */}
@@ -244,7 +268,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
         <g className="md-regions">
           {regions.map(function(r) {
             var count = counts[r.id] || 0;
-            var state = stateFor(count);
+            var state = stateFor(count, targetFor(r.id));
             var fill = "url(#md-grad-" + state + ")";
             var isSel = selected === r.id;
             var filter = state === "empty" ? null : "url(#md-glow)";
@@ -279,14 +303,22 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
   // MuscleTracker — top-level component
   // ══════════════════════════════════════════════════════════════════════
   function MuscleTracker(props) {
-    var data = props.weeklyMuscles || { dates: {}, sessions: {} };
+    var data = props.weeklyMuscles || { dates: {}, sessions: {}, sets: {} };
     var datesByMuscle = data.dates || {};
     var sessions = data.sessions || {};
+    var setsByMuscle = data.sets || {};
+    var setTargetOverrides = props.setTargets || {};
+    var updateSetTarget = props.updateSetTarget;
+    var targetFor = makeTargetFor(setTargetOverrides);
 
-    // Derive day counts
+    // Volume-based counts for body muscles. Cardio still uses days.
     var counts = {};
-    Object.keys(datesByMuscle).forEach(function(m) {
-      counts[m] = (datesByMuscle[m] || []).length;
+    TRACKED.forEach(function(m) {
+      if (m.id === "cardio") {
+        counts.cardio = (datesByMuscle.cardio || []).length;
+      } else {
+        counts[m.id] = setsByMuscle[m.id] || 0;
+      }
     });
 
     var _side = useState("front");
@@ -294,14 +326,43 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
     var _sel = useState(null);
     var selected = _sel[0], setSelected = _sel[1];
 
-    var target = 2; // days/week target
+    // Inline target editor state (only one muscle edited at a time)
+    var _editing = useState(false);
+    var editingTarget = _editing[0], setEditingTarget = _editing[1];
+    var _editVal = useState("");
+    var editVal = _editVal[0], setEditVal = _editVal[1];
+
     var select = function(id) {
+      setEditingTarget(false);
       setSelected(function(cur) { return cur === id ? null : id; });
     };
 
+    var beginEdit = function() {
+      setEditVal(String(targetFor(selected)));
+      setEditingTarget(true);
+    };
+    var commitEdit = function() {
+      var v = parseInt(editVal, 10);
+      if (!isNaN(v) && v >= 1 && v <= 99 && updateSetTarget) {
+        updateSetTarget(selected, v);
+      }
+      setEditingTarget(false);
+    };
+    var resetEdit = function() {
+      if (updateSetTarget) updateSetTarget(selected, null);
+      setEditingTarget(false);
+    };
+    var cancelEdit = function() {
+      setEditingTarget(false);
+    };
+
     var selectedMuscle = selected ? TRACKED.find(function(m) { return m.id === selected; }) : null;
+    var selectedTarget = selected ? targetFor(selected) : 0;
     var selectedCount = selected ? (counts[selected] || 0) : 0;
-    var selectedState = stateFor(selectedCount);
+    var selectedState = stateFor(selectedCount, selectedTarget);
+    var selectedIsCardio = selected === "cardio";
+    var selectedUnit = selectedIsCardio ? "days" : "sets";
+    var selectedPct = selectedTarget > 0 ? Math.min(100, Math.round((selectedCount / selectedTarget) * 100)) : 0;
     var selectedSessions = selected ? (sessions[selected] || []) : [];
 
     // Group sessions by unique day for detail display
@@ -314,11 +375,13 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
     });
 
     var cardioCount = counts.cardio || 0;
-    var cardioState = stateFor(cardioCount);
+    var cardioState = stateFor(cardioCount, CARDIO_DAYS_TARGET);
 
-    // Summary: count how many muscles hit target vs total (excluding cardio from body count)
+    // Summary: how many body muscles have reached their volume target.
     var bodyMuscles = TRACKED.filter(function(m) { return m.side !== "badge"; });
-    var hitCount = bodyMuscles.filter(function(m) { return (counts[m.id] || 0) >= target; }).length;
+    var hitCount = bodyMuscles.filter(function(m) {
+      return (counts[m.id] || 0) >= targetFor(m.id);
+    }).length;
 
     return (
       <div className="md-card fade-in">
@@ -330,8 +393,8 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
           </div>
           <div className="md-legend">
             <span className="md-legend-item"><span className="md-legend-dot" style={{ background: STATE_COLOR.empty }} />0</span>
-            <span className="md-legend-item"><span className="md-legend-dot" style={{ background: STATE_COLOR.partial }} />1</span>
-            <span className="md-legend-item"><span className="md-legend-dot" style={{ background: STATE_COLOR.hit }} />2+</span>
+            <span className="md-legend-item"><span className="md-legend-dot" style={{ background: STATE_COLOR.partial }} />in&nbsp;progress</span>
+            <span className="md-legend-item"><span className="md-legend-dot" style={{ background: STATE_COLOR.hit }} />target</span>
           </div>
         </div>
 
@@ -350,7 +413,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
 
         {/* Diagram */}
         <div className="md-stage">
-          <BodyDiagram side={side} counts={counts} selected={selected} onSelect={select} />
+          <BodyDiagram side={side} counts={counts} selected={selected} onSelect={select} targetFor={targetFor} />
         </div>
 
         {/* Cardio badge */}
@@ -361,7 +424,7 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
           <span className="md-cardio-icon pq-icon pq-icon-cardio" aria-hidden="true"></span>
           <span className="md-cardio-label">Cardio</span>
           <span className="mono md-cardio-count" style={{ color: STATE_COLOR[cardioState] }}>
-            {cardioCount}/{target} days
+            {cardioCount}/{CARDIO_DAYS_TARGET} days
           </span>
         </button>
 
@@ -371,10 +434,56 @@ window.PhysIQ.Components = window.PhysIQ.Components || {};
             <div className="md-tooltip-head">
               <span className={"md-tooltip-dot md-state-" + selectedState} style={{ background: STATE_COLOR[selectedState] }} />
               <span className="md-tooltip-name">{selectedMuscle.label}</span>
-              <span className="mono md-tooltip-count" style={{ color: STATE_COLOR[selectedState] }}>
-                {selectedCount}/{target} days
-              </span>
+              {editingTarget && !selectedIsCardio ? (
+                <div className="md-target-edit">
+                  <span className="mono md-target-edit-prefix">{selectedCount}/</span>
+                  <input
+                    className="mono md-target-edit-input"
+                    type="number"
+                    min="1"
+                    max="99"
+                    value={editVal}
+                    autoFocus
+                    onChange={function(e) { setEditVal(e.target.value); }}
+                    onKeyDown={function(e) {
+                      if (e.key === "Enter") commitEdit();
+                      else if (e.key === "Escape") cancelEdit();
+                    }}
+                  />
+                  <span className="mono md-target-edit-suffix">sets</span>
+                </div>
+              ) : (
+                <span className="mono md-tooltip-count" style={{ color: STATE_COLOR[selectedState] }}>
+                  {selectedCount}/{selectedTarget} {selectedUnit}
+                </span>
+              )}
+              {!selectedIsCardio && updateSetTarget && (
+                editingTarget ? (
+                  <div className="md-target-actions">
+                    <button className="md-target-btn md-target-save" onClick={commitEdit} title="Save">{"✓"}</button>
+                    {typeof setTargetOverrides[selected] === "number" && (
+                      <button className="md-target-btn md-target-reset" onClick={resetEdit} title="Reset to default">{"↺"}</button>
+                    )}
+                    <button className="md-target-btn md-target-cancel" onClick={cancelEdit} title="Cancel">{"✕"}</button>
+                  </div>
+                ) : (
+                  <button className="md-target-btn md-target-edit-trigger" onClick={beginEdit} title="Edit weekly target">
+                    Edit
+                  </button>
+                )
+              )}
             </div>
+            {!selectedIsCardio && (
+              <div className="md-tooltip-bar">
+                <div
+                  className={"md-tooltip-bar-fill md-bar-" + selectedState}
+                  style={{ width: selectedPct + "%" }}
+                />
+              </div>
+            )}
+            {!selectedIsCardio && typeof setTargetOverrides[selected] === "number" && !editingTarget && (
+              <div className="md-target-hint">Custom target {"·"} default {SET_TARGETS[selected] || DEFAULT_SET_TARGET}</div>
+            )}
             {Object.keys(byDay).length > 0 ? (
               <div className="md-tooltip-sessions">
                 {Object.keys(byDay).map(function(k) {

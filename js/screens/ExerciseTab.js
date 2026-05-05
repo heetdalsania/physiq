@@ -25,8 +25,9 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
 
   // ─── Main Component ───────────────────────────────────────────────────
   var MuscleTracker = (window.PhysIQ.Components || {}).MuscleTracker;
+  var RecoveryTracker = (window.PhysIQ.Components || {}).RecoveryTracker;
 
-  function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout, weeklyMuscles }) {
+  function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout, weeklyMuscles, setTargets, updateSetTarget }) {
     var _view = useState("main");
     var view = _view[0], setView = _view[1];
 
@@ -316,7 +317,18 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
           {/* ── Weekly Muscle Tracker ── */}
           {MuscleTracker && (
             <div style={{ marginTop: 28 }}>
-              <MuscleTracker weeklyMuscles={weeklyMuscles} />
+              <MuscleTracker
+                weeklyMuscles={weeklyMuscles}
+                setTargets={setTargets}
+                updateSetTarget={updateSetTarget}
+              />
+            </div>
+          )}
+
+          {/* ── Recovery (guidance, not restriction) ── */}
+          {RecoveryTracker && (
+            <div style={{ marginTop: 18 }}>
+              <RecoveryTracker weeklyMuscles={weeklyMuscles} />
             </div>
           )}
         </div>
