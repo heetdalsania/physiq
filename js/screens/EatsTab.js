@@ -953,7 +953,7 @@ window.PhysIQ.Screens = window.PhysIQ.Screens || {};
               </div>
             </details>
 
-            <button className="btn btn-primary" onClick={addMeal} style={{ marginTop: 16 }}>+ Log Meal</button>
+            <button className="btn btn-primary" onClick={addMeal} style={{ marginTop: 24 }}>+ Log Meal</button>
           </div>
         )}
 

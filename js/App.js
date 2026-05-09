@@ -890,7 +890,7 @@ window.PhysIQ = window.PhysIQ || {};
               );
             }
             return (
-              <button key={t.id} className={"nav-btn" + (tab === t.id ? " active" : "")} onClick={function() { setTab(t.id); setAddMenuOpen(false); setPopupType(null); }}>
+              <button key={t.id} className={"nav-btn" + (tab === t.id && !addMenuOpen && !popupType ? " active" : "")} onClick={function() { setTab(t.id); setAddMenuOpen(false); setPopupType(null); }}>
                 <span className={"nav-icon pq-icon " + t.iconClass} aria-hidden="true"></span>
                 <span>{t.label}</span>
               </button>

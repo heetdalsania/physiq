@@ -2816,43 +2816,44 @@ body {
 
 /* ─── Manual Entry Section ──────────────────────────────────────────────── */
 .eats-manual-section {
-    padding-bottom: 16px
+    padding: 8px 6px 20px
 }
 
 .eats-manual-title {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-white);
-    margin-bottom: 4px
+    margin-bottom: 6px
 }
 
 .eats-manual-sub {
     font-size: 12px;
     color: var(--text-muted);
-    margin-bottom: 14px
+    margin-bottom: 20px
 }
 
 .eats-manual-name {
-    margin-bottom: 12px !important
+    margin-bottom: 20px !important;
+    padding: 14px 12px !important
 }
 
 .eats-manual-macros-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px
+    gap: 18px 14px
 }
 
 .eats-manual-field {
     display: flex;
     flex-direction: column;
-    gap: 4px
+    gap: 8px
 }
 
 .eats-manual-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     color: var(--text-muted)
 }
 
@@ -2875,7 +2876,7 @@ body {
 }
 
 .eats-manual-extras {
-    margin-top: 12px
+    margin-top: 16px
 }
 
 .eats-manual-extras-toggle {
