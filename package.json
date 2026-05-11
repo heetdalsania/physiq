@@ -1,0 +1,19 @@
+{
+  "name": "physiq-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PhysiQ Engine — nutrition & fitness optimizer.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch"
+  },
+  "dependencies": {
+    "html5-qrcode": "2.3.8",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}
