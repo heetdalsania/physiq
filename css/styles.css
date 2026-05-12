@@ -130,14 +130,17 @@ body {
     transition: background .3s, color .3s;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility
+    text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch
 }
 
 #app {
     max-width: 480px;
     margin: 0 auto;
     position: relative;
-    padding-bottom: 80px
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: calc(80px + env(safe-area-inset-bottom))
 }
 
 /* ─── Typography ─────────────────────────────────────────────────────────── */
@@ -196,7 +199,9 @@ body {
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
     transition: all .2s;
-    -webkit-appearance: none
+    -webkit-appearance: none;
+    -webkit-touch-callout: none;
+    user-select: none
 }
 
 .btn-primary {
@@ -253,7 +258,9 @@ body {
     border-top: 1px solid var(--border);
     display: flex;
     padding: 8px 0 max(12px, env(safe-area-inset-bottom));
-    z-index: 100
+    z-index: 100;
+    -webkit-touch-callout: none;
+    user-select: none
 }
 
 .nav-btn {

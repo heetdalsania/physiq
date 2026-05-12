@@ -1,0 +1,17 @@
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.physiq.engine',
+  appName: 'PhysiQ Engine',
+  webDir: 'dist',
+  server: {
+    allowNavigation: ['world.openfoodfacts.org']
+  },
+  ios: {
+    contentInset: 'always',
+    allowsLinkPreview: false,
+    backgroundColor: '#0B0F1A'
+  }
+};
+
+export default config;
