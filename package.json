@@ -9,6 +9,7 @@
     "dev": "node build.mjs --watch"
   },
   "dependencies": {
+    "@capacitor/barcode-scanner": "^3.0.2",
     "@capacitor/cli": "^8.3.3",
     "@capacitor/core": "^8.3.3",
     "@capacitor/haptics": "^8.0.2",
@@ -17,7 +18,6 @@
     "@capacitor/share": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
-    "html5-qrcode": "2.3.8",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
