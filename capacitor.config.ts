@@ -11,6 +11,13 @@ const config: CapacitorConfig = {
     contentInset: 'always',
     allowsLinkPreview: false,
     backgroundColor: '#0B0F1A'
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 0,
+      autoHide: false,
+      backgroundColor: '#0B0F1A'
+    }
   }
 };
 

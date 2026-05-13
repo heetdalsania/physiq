@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { ProjectionChart } from "../components/Charts.js";
 import { WeightTrackingChart } from "../components/WeightCharts.js";
+import { shareText, triggerHaptic } from "../utils/native.js";
+import { GOALS } from "../data/constants.js";
 
 export function ProfileTab(props) {
   const profile = props.profile, targets = props.targets, email = props.email, history = props.history;
@@ -25,6 +27,20 @@ export function ProfileTab(props) {
     setWeightInput("");
   };
 
+  const shareProgress = function() {
+    const goalLabel = (GOALS.find(function(g) { return g.id === profile.goal; }) || {}).label || "";
+    const latest = weightLog.length > 0 ? weightLog[weightLog.length - 1].weight : null;
+    const lines = [
+      "PhysiQ Engine — " + (profile.name || "My progress"),
+      "Mode: " + goalLabel,
+      "TDEE: " + targets.tdee + " kcal · Target: " + targets.calories + " kcal",
+      "Lean mass: " + targets.leanMass + " lb · Protein: " + targets.protein + "g/day"
+    ];
+    if (latest !== null) lines.push("Latest weight: " + latest + " lb");
+    triggerHaptic("light");
+    shareText("PhysiQ Engine Progress", lines.join("\n"));
+  };
+
   return (
     <div className="fade-in" style={{ paddingTop: 16 }}>
       <div className="account-bar">
@@ -33,6 +49,7 @@ export function ProfileTab(props) {
           <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-bright)" }}>{profile.name || "User"}</div>
           <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{email}</div>
         </div>
+        <button className="logout-btn" onClick={shareProgress} title="Share your progress" style={{ marginRight: 6 }}>Share</button>
         <button className="logout-btn" onClick={function() { setScreen("login"); setEmail(""); setLoginEmail(""); }}>Log out</button>
       </div>
 
