@@ -24,6 +24,12 @@ import {
 } from "./utils/storage.js";
 import { calcTargets, getSuggestions } from "./utils/calculations.js";
 import { getMealPeriod, MEAL_PERIODS } from "./utils/foodSearch.js";
+import {
+  triggerHaptic,
+  configureStatusBar,
+  configureKeyboard,
+  hideSplash
+} from "./utils/native.js";
 
 import { PortionModal } from "./components/PortionModal.js";
 
@@ -184,6 +190,13 @@ function App() {
 
   const targets = useMemo(function() { return calcTargets(profile, intake); }, [profile, intake.creatine]);
   const suggestions = useMemo(function() { return getSuggestions(profile, targets, intake); }, [profile, targets, intake]);
+
+  useEffect(function() {
+    // Native platform bring-up. All four calls no-op on web.
+    configureStatusBar();
+    configureKeyboard();
+    hideSplash();
+  }, []);
 
   useEffect(function() {
     const last = getLastEmail();
@@ -347,6 +360,7 @@ function App() {
       if (idx >= 0) prev[idx] = entry; else prev.push(entry);
       return Object.assign({}, p, { weightLog: prev, weight: lbs });
     });
+    triggerHaptic("light");
     showToast("Weight logged");
   };
 
@@ -413,11 +427,13 @@ function App() {
     const label = session.totalSets > 0 && session.completedSets === session.totalSets
       ? "Workout complete!"
       : "Workout saved (" + session.completedSets + "/" + session.totalSets + " sets)";
+    triggerHaptic("medium");
     showToast(label);
   };
 
   const logNutrients = function(name, nums, period) {
     const mealPeriod = period || activeMealPeriod || getMealPeriod();
+    triggerHaptic("light");
     setMealLog(function(prev) {
       return prev.concat([Object.assign({
         id: Date.now(),
@@ -780,7 +796,7 @@ function App() {
             );
           }
           return (
-            <button key={t.id} className={"nav-btn" + (tab === t.id && !addMenuOpen && !popupType ? " active" : "")} onClick={function() { setTab(t.id); setAddMenuOpen(false); setPopupType(null); }}>
+            <button key={t.id} className={"nav-btn" + (tab === t.id && !addMenuOpen && !popupType ? " active" : "")} onClick={function() { triggerHaptic("light"); setTab(t.id); setAddMenuOpen(false); setPopupType(null); }}>
               <span className={"nav-icon pq-icon " + t.iconClass} aria-hidden="true"></span>
               <span>{t.label}</span>
             </button>
