@@ -1,5 +1,5 @@
 import * as esbuild from "esbuild";
-import { readFile, writeFile, mkdir, copyFile, rm } from "node:fs/promises";
+import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,7 +25,6 @@ const HTML = `<!DOCTYPE html>
 </head>
 <body data-theme="dark">
 <div id="app"></div>
-<script src="vendor/html5-qrcode.min.js"></script>
 <script type="module" src="app.min.js"></script>
 </body>
 </html>
@@ -34,19 +33,11 @@ const HTML = `<!DOCTYPE html>
 async function prepareDist() {
   if (existsSync(DIST)) await rm(DIST, { recursive: true, force: true });
   await mkdir(DIST, { recursive: true });
-  await mkdir(resolve(DIST, "vendor"), { recursive: true });
 }
 
 async function copyAssets() {
   const css = await readFile(resolve(ROOT, "css/styles.css"), "utf8");
   await writeFile(resolve(DIST, "styles.min.css"), css);
-
-  const qr = resolve(ROOT, "node_modules/html5-qrcode/html5-qrcode.min.js");
-  if (existsSync(qr)) {
-    await copyFile(qr, resolve(DIST, "vendor/html5-qrcode.min.js"));
-  } else {
-    console.warn("[build] html5-qrcode not found in node_modules — run `npm install` first.");
-  }
 
   await writeFile(resolve(DIST, "index.html"), HTML);
 }

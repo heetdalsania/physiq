@@ -1,6 +1,6 @@
 /* ─── PHYSIQ ENGINE — Eats Tab (MyFitnessPal-Inspired) ───────────────────── */
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { FF_RESTAURANTS, FF_MENU } from "../data/fastFoodMenu.js";
 import {
   searchOpenFoodFacts,
@@ -15,6 +15,8 @@ import {
   matchChainRestaurant
 } from "../utils/nearbyRestaurants.js";
 import { MealPeriodHeader } from "../components/MealPeriodHeader.js";
+import { isNative, triggerHaptic } from "../utils/native.js";
+import { CapacitorBarcodeScanner, CapacitorBarcodeScannerTypeHint } from "@capacitor/barcode-scanner";
 
 // ─── Calorie Ring SVG Component ──────────────────────────────────────────
 function CalorieRing(props) {
@@ -208,14 +210,11 @@ export function EatsTab(props) {
   const [chainSearch, setChainSearch] = useState("");
   const [chainCat, setChainCat] = useState("All");
 
-  const [scanActive, setScanActive] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanLoading, setScanLoading] = useState(false);
   const [scanError, setScanError] = useState("");
   const [scanHistory, setScanHistory] = useState([]);
   const [manualBarcode, setManualBarcode] = useState("");
-  const scannerRef = useRef(null);
-  const scannerDivId = "barcode-scanner-reader";
 
   const recentFoods = props.recentFoods || [];
 
@@ -284,27 +283,10 @@ export function EatsTab(props) {
     setEatsMode("search");
   };
 
-  const stopScanner = useCallback(function() {
-    if (scannerRef.current) {
-      try {
-        scannerRef.current.stop().then(function() {
-          scannerRef.current.clear();
-          scannerRef.current = null;
-        }).catch(function() {
-          scannerRef.current = null;
-        });
-      } catch (e) {
-        scannerRef.current = null;
-      }
-    }
-    setScanActive(false);
-  }, []);
-
   const handleBarcodeLookup = useCallback(function(code) {
     setScanLoading(true);
     setScanError("");
     setScanResult(null);
-    stopScanner();
 
     lookupBarcode(code)
       .then(function(food) {
@@ -313,6 +295,7 @@ export function EatsTab(props) {
           return;
         }
         setScanResult(food);
+        triggerHaptic("medium");
         setScanHistory(function(prev) {
           const filtered = prev.filter(function(h) { return h.barcode !== code; });
           return [food].concat(filtered).slice(0, 10);
@@ -324,70 +307,34 @@ export function EatsTab(props) {
       .finally(function() {
         setScanLoading(false);
       });
-  }, [stopScanner]);
+  }, []);
 
-  const startScanner = useCallback(function() {
+  const startNativeScan = useCallback(async function() {
     setScanResult(null);
     setScanError("");
-    setScanActive(true);
 
-    setTimeout(function() {
-      if (scannerRef.current) {
-        try { scannerRef.current.stop().catch(function() {}); } catch (e) {}
-      }
-
-      const scanner = new Html5Qrcode(scannerDivId);
-      scannerRef.current = scanner;
-
-      scanner.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 280, height: 160 },
-          aspectRatio: 1.5,
-          formatsToSupport: [
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.UPC_A,
-            Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.CODE_128,
-            Html5QrcodeSupportedFormats.CODE_39
-          ]
-        },
-        function onScanSuccess(decodedText) {
-          handleBarcodeLookup(decodedText);
-        },
-        function onScanFailure() {
-          // Silence — continues scanning
-        }
-      ).catch(function(err) {
-        setScanActive(false);
-        const msg = (err && err.toString) ? err.toString() : "";
-        if (msg.indexOf("NotAllowedError") !== -1 || msg.indexOf("Permission") !== -1) {
-          setScanError("Camera permission denied. Please allow camera access in your browser settings, or enter the barcode manually below.");
-        } else if (msg.indexOf("NotFoundError") !== -1) {
-          setScanError("No camera found. Use the manual entry below to type the barcode number.");
-        } else {
-          setScanError("Could not start camera: " + msg + ". Try manual entry below.");
-        }
+    try {
+      // The official plugin handles camera permissions internally
+      const result = await CapacitorBarcodeScanner.scanBarcode({
+        hint: CapacitorBarcodeScannerTypeHint.ALL
       });
-    }, 300);
-  }, [handleBarcodeLookup]);
 
-  useEffect(function() {
-    if (eatsMode !== "scan") {
-      stopScanner();
-    }
-  }, [eatsMode, stopScanner]);
-
-  useEffect(function() {
-    return function() {
-      if (scannerRef.current) {
-        try { scannerRef.current.stop().catch(function() {}); } catch (e) {}
-        scannerRef.current = null;
+      if (result && result.ScanResult) {
+        handleBarcodeLookup(result.ScanResult);
       }
-    };
-  }, []);
+    } catch (err) {
+      const msg = (err && err.message) ? err.message : String(err);
+      if (msg.indexOf("cancel") !== -1 || msg.indexOf("Cancel") !== -1) {
+        // User cancelled — not an error
+        return;
+      }
+      if (msg.indexOf("permission") !== -1 || msg.indexOf("Permission") !== -1 || msg.indexOf("denied") !== -1) {
+        setScanError("Camera permission denied. Please allow camera access in Settings, or enter the barcode manually below.");
+      } else {
+        setScanError("Scanner error: " + msg + ". Try manual entry below.");
+      }
+    }
+  }, [handleBarcodeLookup]);
 
   const chainItems = useMemo(function() {
     if (!chainDetail || !FF_MENU[chainDetail]) return [];
@@ -605,21 +552,18 @@ export function EatsTab(props) {
           )}
 
           {!scanResult && (
-            <div className="scan-camera-section">
-              {scanActive ? (
-                <div className="scan-viewport-wrap">
-                  <div id={scannerDivId} className="scan-viewport" />
-                  <button className="scan-stop-btn" onClick={stopScanner}>Stop Camera</button>
-                </div>
-              ) : (
-                <div className="scan-start-section">
-                  <div className="scan-start-icon"><span className="pq-icon pq-icon-barcode" aria-hidden="true"></span></div>
-                  <div className="scan-start-title">Barcode Scanner</div>
-                  <div className="scan-start-sub">Point your camera at any food barcode to instantly look up nutrition info from Open Food Facts</div>
-                  <button className="btn btn-primary scan-start-btn" onClick={startScanner} disabled={scanLoading}>
-                    {scanLoading ? "Looking up..." : "Open Camera"}
+            <div className="scan-start-section">
+              <div className="scan-start-icon"><span className="pq-icon pq-icon-barcode" aria-hidden="true"></span></div>
+              <div className="scan-start-title">Barcode Scanner</div>
+              {isNative() ? (
+                <div>
+                  <div className="scan-start-sub">Tap below to open the camera and scan any food barcode for instant nutrition lookup</div>
+                  <button className="btn btn-primary scan-start-btn" onClick={startNativeScan} disabled={scanLoading}>
+                    {scanLoading ? "Looking up..." : "Scan Barcode"}
                   </button>
                 </div>
+              ) : (
+                <div className="scan-start-sub">Enter a barcode number below to look up nutrition info from Open Food Facts. Camera scanning is available in the iOS app.</div>
               )}
             </div>
           )}
@@ -635,9 +579,11 @@ export function EatsTab(props) {
             <div className="scan-error fade-in">
               <div className="scan-error-icon"><span className="pq-icon pq-icon-alert" aria-hidden="true"></span></div>
               <div className="scan-error-msg">{scanError}</div>
-              <button className="btn btn-primary" style={{ maxWidth: 200, margin: "12px auto 0" }} onClick={function() { setScanError(""); startScanner(); }}>
-                Try Again
-              </button>
+              {isNative() && (
+                <button className="btn btn-primary" style={{ maxWidth: 200, margin: "12px auto 0" }} onClick={function() { setScanError(""); startNativeScan(); }}>
+                  Try Again
+                </button>
+              )}
             </div>
           )}
 
@@ -645,7 +591,7 @@ export function EatsTab(props) {
             <div className="scan-manual-section">
               <div className="scan-manual-divider">
                 <span className="scan-manual-divider-line" />
-                <span className="scan-manual-divider-text">or enter barcode manually</span>
+                <span className="scan-manual-divider-text">{isNative() ? "or enter barcode manually" : "Enter barcode number"}</span>
                 <span className="scan-manual-divider-line" />
               </div>
               <div className="scan-manual-row">
