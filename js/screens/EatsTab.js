@@ -218,13 +218,13 @@ export function EatsTab(props) {
 
   const recentFoods = props.recentFoods || [];
 
-  const doSearch = useCallback(function() {
-    if (!searchQuery.trim()) return;
+  const doSearch = useCallback(function(q) {
+    if (!q.trim()) return;
     setSearchLoading(true);
     setSearchError("");
     setSearchResults([]);
 
-    searchOpenFoodFacts(searchQuery, 15)
+    searchOpenFoodFacts(q, 15)
       .then(function(result) {
         setSearchResults(result.foods);
         setSearchCount(result.count);
@@ -232,13 +232,33 @@ export function EatsTab(props) {
           setSearchError("No results found. Try a different search.");
         }
       })
-      .catch(function() {
-        setSearchError("Could not reach Open Food Facts. Please try again.");
+      .catch(function(err) {
+        if (err.message && err.message.includes("Search needs internet")) {
+          setSearchError(err.message);
+        } else {
+          setSearchError("Could not reach Open Food Facts. Please try again.");
+        }
       })
       .finally(function() {
         setSearchLoading(false);
       });
-  }, [searchQuery]);
+  }, []);
+
+  const searchTimeoutRef = React.useRef(null);
+  useEffect(function() {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setSearchError("");
+      return;
+    }
+    searchTimeoutRef.current = setTimeout(function() {
+      doSearch(searchQuery);
+    }, 300);
+    return function() {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [searchQuery, doSearch]);
 
   const fetchNearby = useCallback(function() {
     if (nearbyFetched) return;
@@ -301,8 +321,12 @@ export function EatsTab(props) {
           return [food].concat(filtered).slice(0, 10);
         });
       })
-      .catch(function() {
-        setScanError("Failed to lookup barcode. Please check your connection and try again.");
+      .catch(function(err) {
+        if (err.message && err.message.includes("Search needs internet")) {
+          setScanError(err.message);
+        } else {
+          setScanError("Failed to lookup barcode. Please check your connection and try again.");
+        }
       })
       .finally(function() {
         setScanLoading(false);
@@ -451,13 +475,13 @@ export function EatsTab(props) {
                 placeholder='Search 2.5M+ foods...'
                 value={searchQuery}
                 onChange={function(e) { setSearchQuery(e.target.value); }}
-                onKeyDown={function(e) { if (e.key === "Enter") doSearch(); }}
+                onKeyDown={function(e) { if (e.key === "Enter") { if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current); doSearch(searchQuery); } }}
               />
               {searchQuery && (
                 <button className="eats-search-clear" onClick={function() { setSearchQuery(""); setSearchResults([]); setSearchError(""); }}>×</button>
               )}
             </div>
-            <button className="eats-search-btn" onClick={doSearch} disabled={searchLoading || !searchQuery.trim()}>
+            <button className="eats-search-btn" onClick={function() { if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current); doSearch(searchQuery); }} disabled={searchLoading || !searchQuery.trim()}>
               {searchLoading ? "..." : "Search"}
             </button>
           </div>

@@ -1,6 +1,7 @@
 /* ─── PHYSIQ ENGINE — Nearby Restaurants (Overpass/OSM) ───────────────────── */
 
 import { FF_RESTAURANTS } from "../data/fastFoodMenu.js";
+import { fetchWithTimeout, isOffline } from "./network.js";
 
 export function getUserLocation() {
   return new Promise(function(resolve, reject) {
@@ -54,6 +55,10 @@ export function matchChainRestaurant(name, brand) {
 }
 
 export function fetchNearbyRestaurants(lat, lng, radiusMeters) {
+  if (isOffline()) {
+    return Promise.reject(new Error("Nearby restaurants requires internet connection."));
+  }
+
   radiusMeters = radiusMeters || 2000;
 
   const cacheKey = "pq_nearby_" + lat.toFixed(3) + "_" + lng.toFixed(3) + "_" + radiusMeters;
@@ -72,7 +77,7 @@ export function fetchNearbyRestaurants(lat, lng, radiusMeters) {
     'way["amenity"~"restaurant|fast_food"]["name"](around:' + radiusMeters + ',' + lat + ',' + lng + ');' +
     ');out center body;';
 
-  return fetch("https://overpass-api.de/api/interpreter", {
+  return fetchWithTimeout("https://overpass-api.de/api/interpreter", 10000, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: "data=" + encodeURIComponent(query)

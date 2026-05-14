@@ -1,6 +1,29 @@
 /* ─── PHYSIQ ENGINE — Food Search (Open Food Facts) ──────────────────────── */
 
+import { fetchWithTimeout, isOffline } from "./network.js";
+import { get, set } from "./storage.js";
+
 let _searchSeen = null;
+
+const CACHE_KEY = "pq_food_search_cache";
+let searchCache = null;
+
+function getSearchCache() {
+  if (!searchCache) {
+    searchCache = get(CACHE_KEY, {});
+  }
+  return searchCache;
+}
+
+function saveToSearchCache(query, result) {
+  const cache = getSearchCache();
+  const keys = Object.keys(cache);
+  if (keys.length >= 50) {
+    delete cache[keys[0]];
+  }
+  cache[query] = result;
+  set(CACHE_KEY, cache);
+}
 
 function isEnglishText(str) {
   if (!str) return false;
@@ -33,6 +56,16 @@ function relevanceScore(name, query) {
 
 export function searchOpenFoodFacts(query, pageSize) {
   if (!query || !query.trim()) return Promise.resolve({ foods: [], count: 0 });
+  const qStr = query.trim().toLowerCase();
+
+  if (isOffline()) {
+    return Promise.reject(new Error("Search needs internet — manual entry still works."));
+  }
+
+  const cache = getSearchCache();
+  if (cache[qStr]) {
+    return Promise.resolve(cache[qStr]);
+  }
 
   const fetchSize = Math.max(pageSize || 40, 40);
 
@@ -49,7 +82,7 @@ export function searchOpenFoodFacts(query, pageSize) {
     "&tag_0=en";
 
   const attemptFetch = function(retries) {
-    return fetch(url)
+    return fetchWithTimeout(url, 10000)
       .then(function(res) {
         if (!res.ok) {
           if (retries > 0) {
@@ -168,7 +201,9 @@ export function searchOpenFoodFacts(query, pageSize) {
 
     _searchSeen = null;
 
-    return { foods: foods, count: data.count || 0 };
+    const result = { foods: foods, count: data.count || 0 };
+    saveToSearchCache(qStr, result);
+    return result;
   });
 }
 
@@ -197,13 +232,24 @@ export const MEAL_PERIODS = [
 
 export function lookupBarcode(barcode) {
   if (!barcode || !barcode.trim()) return Promise.resolve(null);
+  const bStr = barcode.trim();
+
+  if (isOffline()) {
+    return Promise.reject(new Error("Search needs internet — manual entry still works."));
+  }
+
+  const cache = getSearchCache();
+  const cacheKey = "barcode_" + bStr;
+  if (cache[cacheKey]) {
+    return Promise.resolve(cache[cacheKey]);
+  }
 
   const url = "https://world.openfoodfacts.org/api/v2/product/" +
     encodeURIComponent(barcode.trim()) +
     ".json?fields=product_name,nutriments,brands,image_small_url,image_url,serving_size,serving_quantity,nutrition_grades,categories_tags";
 
   const attemptFetch = function(retries) {
-    return fetch(url)
+    return fetchWithTimeout(url, 10000)
       .then(function(res) {
         if (!res.ok) {
           if (retries > 0) {
@@ -269,7 +315,7 @@ export function lookupBarcode(barcode) {
       potassium = n["potassium_100g"] || n["potassium"] || 0;
     }
 
-    return {
+    const result = {
       name:      p.product_name,
       brand:     p.brands || "",
       image:     p.image_small_url || p.image_url || "",
@@ -288,5 +334,8 @@ export function lookupBarcode(barcode) {
       _perServing: hasServing,
       _servingGrams: servQty || 0
     };
+
+    saveToSearchCache(cacheKey, result);
+    return result;
   });
 }
