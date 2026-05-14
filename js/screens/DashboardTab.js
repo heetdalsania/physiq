@@ -4,6 +4,7 @@ import React from "react";
 import { ProgressRing } from "../components/ProgressRing.js";
 import { NutrientCard } from "../components/NutrientCard.js";
 import { MUSCLE_GROUPS } from "../data/constants.js";
+import { isDevMode } from "../utils/devMode.js";
 
 const SUGGESTION_COLORS = { critical: "#EF4444", warning: "#FBBF24", info: "#14B8A6", muscle: "#D946EF" };
 const SUGGESTION_ICONS = { critical: "pq-icon-alert", warning: "pq-icon-alert", info: "pq-icon-health", muscle: "pq-icon-muscle" };
@@ -155,50 +156,54 @@ export function DashboardTab({ intake, targets, profile, suggestions, mealLog, a
         <button className="reset-btn" onClick={resetDay}>Reset Today</button>
       </div>
 
-      <div className="label">Developer</div>
-      <div className="dev-panel">
-        <div className="dev-panel-row">
-          <div style={{ flex: 1 }}>
-            <div className="dev-panel-title">Dev Mode</div>
-            <div className="dev-panel-sub">
-              Override the app's "today" for testing time-based features.
+      {isDevMode() && (
+        <React.Fragment>
+          <div className="label">Developer</div>
+          <div className="dev-panel">
+            <div className="dev-panel-row">
+              <div style={{ flex: 1 }}>
+                <div className="dev-panel-title">Dev Mode</div>
+                <div className="dev-panel-sub">
+                  Override the app's "today" for testing time-based features.
+                </div>
+              </div>
+              <button
+                className={"dev-toggle-btn" + (devMode ? " on" : "")}
+                onClick={toggleDevMode}
+              >
+                {devMode ? "ON" : "OFF"}
+              </button>
             </div>
-          </div>
-          <button
-            className={"dev-toggle-btn" + (devMode ? " on" : "")}
-            onClick={toggleDevMode}
-          >
-            {devMode ? "ON" : "OFF"}
-          </button>
-        </div>
 
-        {devMode && (
-          <div className="dev-panel-controls fade-in">
-            <div className="dev-current">
-              <span className="dev-current-label">Current App Date</span>
-              <span className="dev-current-date mono">{devDateLabel || devDate}</span>
-            </div>
-            <div className="dev-shift-row">
-              <button className="dev-shift-btn" onClick={function() { shiftDevDate(-7); }}>-7d</button>
-              <button className="dev-shift-btn" onClick={function() { shiftDevDate(-1); }}>-1d</button>
-              <button className="dev-shift-btn" onClick={function() { shiftDevDate(1); }}>+1d</button>
-              <button className="dev-shift-btn" onClick={function() { shiftDevDate(7); }}>+7d</button>
-            </div>
-            <div className="dev-pick-row">
-              <label className="dev-pick-label">Pick date</label>
-              <input
-                type="date"
-                className="dev-pick-input mono"
-                value={devDate || ""}
-                onChange={function(e) { if (e.target.value) changeDevDate(e.target.value); }}
-              />
-            </div>
-            <div className="dev-panel-note">
-              Logged workouts and meals will use this date until Dev Mode is turned off.
-            </div>
+            {devMode && (
+              <div className="dev-panel-controls fade-in">
+                <div className="dev-current">
+                  <span className="dev-current-label">Current App Date</span>
+                  <span className="dev-current-date mono">{devDateLabel || devDate}</span>
+                </div>
+                <div className="dev-shift-row">
+                  <button className="dev-shift-btn" onClick={function() { shiftDevDate(-7); }}>-7d</button>
+                  <button className="dev-shift-btn" onClick={function() { shiftDevDate(-1); }}>-1d</button>
+                  <button className="dev-shift-btn" onClick={function() { shiftDevDate(1); }}>+1d</button>
+                  <button className="dev-shift-btn" onClick={function() { shiftDevDate(7); }}>+7d</button>
+                </div>
+                <div className="dev-pick-row">
+                  <label className="dev-pick-label">Pick date</label>
+                  <input
+                    type="date"
+                    className="dev-pick-input mono"
+                    value={devDate || ""}
+                    onChange={function(e) { if (e.target.value) changeDevDate(e.target.value); }}
+                  />
+                </div>
+                <div className="dev-panel-note">
+                  Logged workouts and meals will use this date until Dev Mode is turned off.
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </React.Fragment>
+      )}
     </div>
   );
 }
