@@ -44,6 +44,9 @@ import { CalendarTab } from "./screens/CalendarTab.js";
 import { ExerciseTab } from "./screens/ExerciseTab.js";
 import { ProfileTab } from "./screens/ProfileTab.js";
 
+import { ErrorBoundary } from "./components/ErrorBoundary.js";
+import { isDevMode } from "./utils/devMode.js";
+
 // ─── Weekly muscle-tracker helpers ──────────────────────────────────────
 // Week boundary: Monday 00:00 local time.
 function getMondayKey(date) {
@@ -207,6 +210,24 @@ function App() {
       showToast(payload.message);
     });
     return unsubscribe;
+  }, []);
+
+  useEffect(function() {
+    const handleGlobalError = function(event) {
+      console.error("Global Error Caught:", event.error || event.message);
+      showToast("An unexpected error occurred.");
+    };
+    const handleUnhandledRejection = function(event) {
+      console.error("Unhandled Promise Rejection:", event.reason);
+      showToast("An unexpected error occurred.");
+    };
+
+    window.addEventListener("error", handleGlobalError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    return function() {
+      window.removeEventListener("error", handleGlobalError);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+    };
   }, []);
 
   useEffect(function() {
@@ -672,7 +693,7 @@ function App() {
 
   return (
     <React.Fragment>
-      {devMode && (
+      {isDevMode() && devMode && (
         <div className="dev-banner" onClick={function() { setTab("dashboard"); }}>
           <span className="dev-banner-dot" />
           <span className="dev-banner-text">DEV MODE ACTIVE — {devDateLabel}</span>
@@ -709,72 +730,84 @@ function App() {
 
       <div className="app-content" style={{ padding: "0 16px" }}>
         {tab === "dashboard" && (
-          <DashboardTab
-            intake={intake} targets={targets} profile={profile}
-            suggestions={suggestions} mealLog={mealLog}
-            addWater={addWater} addCreatine={addCreatine} removeMeal={removeMeal} resetDay={resetDay}
-            onQuickNav={function(tabId) { setTab(tabId); setAddMenuOpen(false); setPopupType(null); }}
-            devMode={devMode} devDate={devDate}
-            toggleDevMode={toggleDevMode} changeDevDate={changeDevDate} shiftDevDate={shiftDevDate}
-          />
+          <ErrorBoundary>
+            <DashboardTab
+              intake={intake} targets={targets} profile={profile}
+              suggestions={suggestions} mealLog={mealLog}
+              addWater={addWater} addCreatine={addCreatine} removeMeal={removeMeal} resetDay={resetDay}
+              onQuickNav={function(tabId) { setTab(tabId); setAddMenuOpen(false); setPopupType(null); }}
+              devMode={devMode} devDate={devDate}
+              toggleDevMode={toggleDevMode} changeDevDate={changeDevDate} shiftDevDate={shiftDevDate}
+            />
+          </ErrorBoundary>
         )}
 
         {tab === "eats" && (
-          <EatsTab
-            intake={intake} targets={targets}
-            mealLog={mealLog}
-            addSearchFood={addSearchFood}
-            addFF={addFF}
-            mealForm={mealForm} setMealForm={setMealForm} addMeal={addMeal}
-            removeMeal={removeMeal}
-            moveMealToPeriod={moveMealToPeriod}
-            activeMealPeriod={activeMealPeriod}
-            setActiveMealPeriod={setActiveMealPeriod}
-            reAddFood={reAddFood}
-            recentFoods={recentFoods}
-          />
+          <ErrorBoundary>
+            <EatsTab
+              intake={intake} targets={targets}
+              mealLog={mealLog}
+              addSearchFood={addSearchFood}
+              addFF={addFF}
+              mealForm={mealForm} setMealForm={setMealForm} addMeal={addMeal}
+              removeMeal={removeMeal}
+              moveMealToPeriod={moveMealToPeriod}
+              activeMealPeriod={activeMealPeriod}
+              setActiveMealPeriod={setActiveMealPeriod}
+              reAddFood={reAddFood}
+              recentFoods={recentFoods}
+            />
+          </ErrorBoundary>
         )}
 
         {tab === "health" && (
-          <HealthTab
-            profile={profile} targets={targets}
-            up={up} workoutLog={workoutLog}
-          />
+          <ErrorBoundary>
+            <HealthTab
+              profile={profile} targets={targets}
+              up={up} workoutLog={workoutLog}
+            />
+          </ErrorBoundary>
         )}
 
         {tab === "calendar" && (
-          <CalendarTab
-            history={history}
-            workoutLog={workoutLog}
-            intake={intake}
-            targets={targets}
-            profile={profile}
-            devTick={devMode + "|" + devDate}
-          />
+          <ErrorBoundary>
+            <CalendarTab
+              history={history}
+              workoutLog={workoutLog}
+              intake={intake}
+              targets={targets}
+              profile={profile}
+              devTick={devMode + "|" + devDate}
+            />
+          </ErrorBoundary>
         )}
 
         {tab === "exercise" && (
-          <ExerciseTab
-            routines={routines}
-            saveRoutine={saveRoutine}
-            deleteRoutine={deleteRoutine}
-            logCompletedWorkout={logCompletedWorkout}
-            weeklyMuscles={weeklyMuscles}
-            setTargets={setTargets}
-            updateSetTarget={updateSetTarget}
-          />
+          <ErrorBoundary>
+            <ExerciseTab
+              routines={routines}
+              saveRoutine={saveRoutine}
+              deleteRoutine={deleteRoutine}
+              logCompletedWorkout={logCompletedWorkout}
+              weeklyMuscles={weeklyMuscles}
+              setTargets={setTargets}
+              updateSetTarget={updateSetTarget}
+            />
+          </ErrorBoundary>
         )}
 
         {tab === "profile" && (
-          <ProfileTab
-            profile={profile} targets={targets} email={email} history={history}
-            up={up} logWeight={logWeight}
-            editingBMR={editingBMR} setEditingBMR={setEditingBMR}
-            bmrInput={bmrInput} setBmrInput={setBmrInput}
-            editing={editing} setEditing={setEditing}
-            theme={theme} setTheme={setTheme}
-            setScreen={setScreen} setEmail={setEmail} setLoginEmail={setLoginEmail}
-          />
+          <ErrorBoundary>
+            <ProfileTab
+              profile={profile} targets={targets} email={email} history={history}
+              up={up} logWeight={logWeight}
+              editingBMR={editingBMR} setEditingBMR={setEditingBMR}
+              bmrInput={bmrInput} setBmrInput={setBmrInput}
+              editing={editing} setEditing={setEditing}
+              theme={theme} setTheme={setTheme}
+              setScreen={setScreen} setEmail={setEmail} setLoginEmail={setLoginEmail}
+            />
+          </ErrorBoundary>
         )}
       </div>
 
@@ -903,4 +936,8 @@ function App() {
 // see the up-to-date shape.
 runMigrations();
 
-createRoot(document.getElementById("app")).render(<App />);
+createRoot(document.getElementById("app")).render(
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+);

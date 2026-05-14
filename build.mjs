@@ -52,7 +52,8 @@ const esbuildOptions = {
   loader: { ".js": "jsx" },
   outfile: resolve(DIST, "app.min.js"),
   legalComments: "none",
-  logLevel: "info"
+  logLevel: "info",
+  drop: watch ? [] : ["console"]
 };
 
 async function build() {
