@@ -1,9 +1,11 @@
 /* ─── PHYSIQ ENGINE — Profile Tab ─────────────────────────────────────────── */
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ProjectionChart } from "../components/Charts.js";
 import { WeightTrackingChart } from "../components/WeightCharts.js";
 import { shareText, triggerHaptic } from "../utils/native.js";
+import { exportAll, importAll, getUsageBytes } from "../utils/storage.js";
+import { emitToast } from "../utils/toast.js";
 import { GOALS } from "../data/constants.js";
 
 export function ProfileTab(props) {
@@ -39,6 +41,64 @@ export function ProfileTab(props) {
     if (latest !== null) lines.push("Latest weight: " + latest + " lb");
     triggerHaptic("light");
     shareText("PhysiQ Engine Progress", lines.join("\n"));
+  };
+
+  const importInputRef = useRef(null);
+
+  const handleExport = function() {
+    const snapshot = exportAll();
+    let blobUrl = null;
+    try {
+      const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+      blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      a.download = "physiq-backup-" + stamp + ".json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      triggerHaptic("light");
+      emitToast("Exported " + Object.keys(snapshot.data).length + " entries", { type: "info" });
+    } catch (e) {
+      emitToast("Export failed", { type: "error" });
+    } finally {
+      if (blobUrl) {
+        try { URL.revokeObjectURL(blobUrl); } catch (e) {}
+      }
+    }
+  };
+
+  const handleImport = function() {
+    if (importInputRef.current) importInputRef.current.click();
+  };
+
+  const onImportFile = function(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    if (!window.confirm("Import will overwrite existing data. Continue?")) {
+      event.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function() {
+      let json;
+      try { json = JSON.parse(reader.result); }
+      catch (e) {
+        emitToast("Import failed — file is not valid JSON", { type: "error" });
+        return;
+      }
+      const ok = importAll(json);
+      if (ok) {
+        // Reload so all components rehydrate from the new storage state.
+        setTimeout(function() { window.location.reload(); }, 600);
+      }
+    };
+    reader.onerror = function() {
+      emitToast("Could not read file", { type: "error" });
+    };
+    reader.readAsText(file);
+    event.target.value = "";
   };
 
   return (
@@ -189,9 +249,25 @@ export function ProfileTab(props) {
       )}
 
       <div className="label">Appearance</div>
-      <div className="flex-row" style={{ gap: 12, marginBottom: 30 }}>
+      <div className="flex-row" style={{ gap: 12, marginBottom: 20 }}>
         <span style={{ fontSize: 14, color: "var(--text-dim)", flex: 1, fontWeight: 500 }}>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
         <button className="theme-toggle" onClick={function() { setTheme(function(t) { return t === "dark" ? "light" : "dark"; }); }} />
+      </div>
+
+      <div className="label">Data</div>
+      <div className="flex-row" style={{ gap: 8, marginBottom: 8 }}>
+        <button className="logout-btn" onClick={handleExport} style={{ flex: 1 }}>Export Data</button>
+        <button className="logout-btn" onClick={handleImport} style={{ flex: 1 }}>Import Data</button>
+        <input
+          ref={importInputRef}
+          type="file"
+          accept="application/json,.json"
+          onChange={onImportFile}
+          style={{ display: "none" }}
+        />
+      </div>
+      <div style={{ fontSize: 11, color: "var(--text-faint)", marginBottom: 30 }}>
+        Local storage: {Math.round(getUsageBytes() / 1024)} KB used
       </div>
     </div>
   );

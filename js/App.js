@@ -20,8 +20,10 @@ import {
   sv,
   loadTheme,
   getLastEmail,
-  uKey
+  uKey,
+  runMigrations
 } from "./utils/storage.js";
+import { subscribeToast } from "./utils/toast.js";
 import { calcTargets, getSuggestions } from "./utils/calculations.js";
 import { getMealPeriod, MEAL_PERIODS } from "./utils/foodSearch.js";
 import {
@@ -196,6 +198,15 @@ function App() {
     configureStatusBar();
     configureKeyboard();
     hideSplash();
+  }, []);
+
+  // Storage-layer warnings (corruption, quota) route through the existing
+  // toast UI via the toast.js event bus.
+  useEffect(function() {
+    const unsubscribe = subscribeToast(function(payload) {
+      showToast(payload.message);
+    });
+    return unsubscribe;
   }, []);
 
   useEffect(function() {
@@ -886,5 +897,10 @@ function App() {
     </React.Fragment>
   );
 }
+
+// Apply any pending storage migrations before React mounts so all read
+// paths (including direct localStorage reads in App's state initializers)
+// see the up-to-date shape.
+runMigrations();
 
 createRoot(document.getElementById("app")).render(<App />);
