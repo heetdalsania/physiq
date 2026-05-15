@@ -1,6 +1,6 @@
 /* ─── PHYSIQ ENGINE — Main App Component (entry point) ───────────────────── */
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { createRoot } from "react-dom/client";
 
 import {
@@ -201,6 +201,43 @@ function App() {
     configureStatusBar();
     configureKeyboard();
     hideSplash();
+  }, []);
+
+  // ── Step 8: per-tab scroll position preservation ──────────────────
+  // Save the outgoing tab's scrollY synchronously (before React updates
+  // the DOM, otherwise the browser clamps scrollY to the new content's
+  // height and we lose the position) and restore the incoming tab's
+  // saved scrollY in useLayoutEffect (before paint, so no snap).
+  const scrollPositionsRef = useRef({});
+  const prevTabRef = useRef(tab);
+  const goToTab = function(nextTab) {
+    if (nextTab !== tab) scrollPositionsRef.current[tab] = window.scrollY;
+    setTab(nextTab);
+  };
+  useLayoutEffect(function() {
+    if (prevTabRef.current === tab) return;
+    const target = scrollPositionsRef.current[tab] || 0;
+    window.scrollTo(0, target);
+    prevTabRef.current = tab;
+  }, [tab]);
+
+  // ── Step 8: keep focused inputs visible above the iOS keyboard ────
+  // Triggers ~250ms after focus so the WKWebView keyboard has time to
+  // resize. No-op on web where the input is already in view.
+  useEffect(function() {
+    const onFocusIn = function(e) {
+      const t = e.target;
+      if (!t || !t.tagName) return;
+      const tag = t.tagName;
+      if (tag !== "INPUT" && tag !== "TEXTAREA" && !t.isContentEditable) return;
+      setTimeout(function() {
+        if (document.activeElement === t && typeof t.scrollIntoView === "function") {
+          try { t.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (err) {}
+        }
+      }, 250);
+    };
+    document.addEventListener("focusin", onFocusIn);
+    return function() { document.removeEventListener("focusin", onFocusIn); };
   }, []);
 
   // Storage-layer warnings (corruption, quota) route through the existing
@@ -694,7 +731,7 @@ function App() {
   return (
     <React.Fragment>
       {isDevMode() && devMode && (
-        <div className="dev-banner" onClick={function() { setTab("dashboard"); }}>
+        <div className="dev-banner" onClick={function() { goToTab("dashboard"); }}>
           <span className="dev-banner-dot" />
           <span className="dev-banner-text">DEV MODE ACTIVE — {devDateLabel}</span>
         </div>
@@ -735,7 +772,7 @@ function App() {
               intake={intake} targets={targets} profile={profile}
               suggestions={suggestions} mealLog={mealLog}
               addWater={addWater} addCreatine={addCreatine} removeMeal={removeMeal} resetDay={resetDay}
-              onQuickNav={function(tabId) { setTab(tabId); setAddMenuOpen(false); setPopupType(null); }}
+              onQuickNav={function(tabId) { goToTab(tabId); setAddMenuOpen(false); setPopupType(null); }}
               devMode={devMode} devDate={devDate}
               toggleDevMode={toggleDevMode} changeDevDate={changeDevDate} shiftDevDate={shiftDevDate}
             />
@@ -840,7 +877,7 @@ function App() {
             );
           }
           return (
-            <button key={t.id} className={"nav-btn" + (tab === t.id && !addMenuOpen && !popupType ? " active" : "")} onClick={function() { triggerHaptic("light"); setTab(t.id); setAddMenuOpen(false); setPopupType(null); }}>
+            <button key={t.id} className={"nav-btn" + (tab === t.id && !addMenuOpen && !popupType ? " active" : "")} onClick={function() { triggerHaptic("light"); goToTab(t.id); setAddMenuOpen(false); setPopupType(null); }}>
               <span className={"nav-icon pq-icon " + t.iconClass} aria-hidden="true"></span>
               <span>{t.label}</span>
             </button>
