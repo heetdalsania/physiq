@@ -256,8 +256,8 @@ export function ProfileTab(props) {
 
       <div className="label">Data</div>
       <div className="flex-row" style={{ gap: 8, marginBottom: 8 }}>
-        <button className="logout-btn" onClick={handleExport} style={{ flex: 1 }}>Export Data</button>
-        <button className="logout-btn" onClick={handleImport} style={{ flex: 1 }}>Import Data</button>
+        <button className="logout-btn" onClick={handleExport} style={{ flex: 1, padding: "10px 14px", fontSize: 12 }}>Export Data</button>
+        <button className="logout-btn" onClick={handleImport} style={{ flex: 1, padding: "10px 14px", fontSize: 12 }}>Import Data</button>
         <input
           ref={importInputRef}
           type="file"

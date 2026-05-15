@@ -140,7 +140,56 @@ body {
     margin: 0 auto;
     position: relative;
     padding-top: env(safe-area-inset-top);
-    padding-bottom: calc(80px + env(safe-area-inset-bottom))
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right)
+}
+
+/* ─── Step 8 — iOS UX polish ──────────────────────────────────────────────
+   Touch-target floor (Apple HIG 44pt minimum) and modern tap latency
+   removal. Declared at low specificity so any explicit per-component
+   sizing later in this file wins by source order. */
+.pq-btn, button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation
+}
+a, input, textarea, select, label {
+    touch-action: manipulation
+}
+
+/* Compact / inline utility buttons that are designed smaller than 44pt
+   on purpose — opt them out of the global floor so they keep their
+   intended visual size. Tap accuracy on these is preserved by their
+   tight layout context (rows with comfortable surrounding padding). */
+.bmr-edit-btn,
+.logout-btn,
+.meal-remove,
+.meal-period-add-btn,
+.meal-period-item-remove,
+.eats-search-clear,
+.eats-popular-chip,
+.eats-cat-chip,
+.eats-recent-chip,
+.eats-chain-back,
+.scan-result-close,
+.dev-toggle-btn,
+.dev-shift-btn,
+.cal-today-btn,
+.cal-nav-btn,
+.draft-set-del,
+.draft-ex-remove,
+.routine-delete-btn,
+.routine-edit-btn,
+.set-del-btn,
+.set-done-checkbox,
+.md-target-btn,
+.md-toggle-btn,
+.add-menu-card-icon,
+.picker-cat-pill,
+.weight-log-btn {
+    min-height: auto;
+    min-width: auto
 }
 
 /* ─── Typography ─────────────────────────────────────────────────────────── */
@@ -3662,8 +3711,8 @@ body {
 }
 
 .set-done-checkbox {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     border: 2px solid var(--border);
     background: none;
@@ -5274,9 +5323,9 @@ body {
 }
 
 .cal-nav-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text-dim);
@@ -6788,21 +6837,60 @@ body[data-theme="light"]::before {
 }
 
 .theme-toggle {
-    width: 48px;
-    height: 26px;
-    background: linear-gradient(135deg, rgba(45, 212, 191, 0.14), rgba(251, 146, 60, 0.11));
-    border-color: var(--border)
+    width: 54px;
+    height: 30px;
+    /* Step 8's global 44pt min-target inflates this pill — opt out and
+       extend the tap area via the invisible ::before below instead. */
+    min-height: auto;
+    min-width: auto;
+    background:
+        linear-gradient(135deg, rgba(45, 212, 191, 0.18), rgba(251, 146, 60, 0.08));
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.42),
+        0 1px 0 rgba(255, 255, 255, 0.04)
+}
+
+.theme-toggle::before {
+    content: '';
+    position: absolute;
+    inset: -7px -4px;
+    border-radius: 22px
 }
 
 .theme-toggle::after {
-    width: 18px;
-    height: 18px;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
     background: linear-gradient(135deg, var(--teal), var(--cyan));
-    box-shadow: 0 0 14px rgba(45, 212, 191, 0.4)
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.42),
+        0 0 14px rgba(45, 212, 191, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    transition: transform .35s cubic-bezier(0.4, 0, 0.2, 1), background .35s, box-shadow .35s
+}
+
+[data-theme="light"] .theme-toggle {
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.22), rgba(45, 212, 191, 0.08))
 }
 
 [data-theme="light"] .theme-toggle::after {
-    transform: translateX(22px)
+    transform: translateX(24px);
+    background: linear-gradient(135deg, #FBBF24, #F97316);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.22),
+        0 0 14px rgba(251, 146, 60, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4)
+}
+
+/* Sun/moon indicator next to the toggle — subtle scale on hover. */
+.theme-indicator {
+    opacity: 0.65;
+    transition: opacity .25s, transform .25s
+}
+.theme-indicator:hover {
+    opacity: 1
 }
 
 .onboard-screen {
