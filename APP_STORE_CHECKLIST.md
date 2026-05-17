@@ -397,7 +397,7 @@ git add . && git commit -m "Step 8: iOS UX polish — touch targets, scroll pres
 
 ## Step 9 — App Icon & Splash Screen Assets
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
