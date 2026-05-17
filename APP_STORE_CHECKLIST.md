@@ -9,7 +9,7 @@
 
 ## Step 1 — Initialize Build System (esbuild)
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
@@ -59,7 +59,7 @@ git add . && git commit -m "Step 1: esbuild build system, convert to ES modules"
 
 ## Step 2 — Capacitor iOS Project Setup
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None (Xcode is free)
 
@@ -111,7 +111,7 @@ git add . && git commit -m "Step 2: Capacitor iOS project setup with safe-area C
 
 ## Step 3 — Core Capacitor Plugins (Haptics, StatusBar, Keyboard, SplashScreen)
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
@@ -165,7 +165,7 @@ git add . && git commit -m "Step 3: Capacitor plugins — haptics, status bar, k
 
 ## Step 4 — Native Barcode Scanner
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
@@ -210,7 +210,7 @@ git add . && git commit -m "Step 4: Native barcode scanner via MLKit, remove htm
 
 ## Step 5 — Harden Storage Layer
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
@@ -258,7 +258,7 @@ git add . && git commit -m "Step 5: Hardened storage — quota guard, corruption
 
 ## Step 6 — Network Layer Hardening
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
@@ -302,7 +302,7 @@ git add . && git commit -m "Step 6: Network hardening — debounce, timeout, LRU
 
 ## Step 7 — Error Boundaries & Stability
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
@@ -397,7 +397,7 @@ git add . && git commit -m "Step 8: iOS UX polish — touch targets, scroll pres
 
 ## Step 9 — App Icon & Splash Screen Assets
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
