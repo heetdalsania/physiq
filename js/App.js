@@ -101,6 +101,7 @@ function App() {
   const [tab, setTab] = useState("dashboard");
   const scrollPositions = useRef({});
   const prevTab = useRef(tab);
+  const addMenuSheetRef = useRef(null);
 
   useEffect(function() {
     scrollPositions.current[prevTab.current] = window.scrollY;
@@ -720,12 +721,13 @@ function App() {
         confirmPortion={confirmPortion}
       />
 
-      <div className="app-header" style={{ padding: "20px 20px 16px", background: "linear-gradient(180deg,var(--bg-header) 0%,transparent 100%)" }}>
+      <div className="app-header" style={{ paddingTop: "calc(20px + env(safe-area-inset-top))", paddingRight: 20, paddingBottom: 16, paddingLeft: 20, background: "linear-gradient(180deg, var(--bg-header) 0%, rgba(59,130,246,0) 100%)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
           <div className="mono" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2.5, color: "var(--blue)" }}>PHYSIQ ENGINE</div>
-          <div className="flex-row" style={{ gap: 8 }}>
-            <span className={"theme-indicator pq-icon " + (theme === "dark" ? "pq-icon-moon" : "pq-icon-sun")} aria-hidden="true"></span>
-            <button className="theme-toggle" onClick={function() { setTheme(function(t) { return t === "dark" ? "light" : "dark"; }); }} />
+          <div className="flex-row">
+            <button className="theme-toggle" onClick={function() { setTheme(function(t) { return t === "dark" ? "light" : "dark"; }); }} aria-label="Toggle theme">
+              <span className={"pq-icon " + (theme === "dark" ? "pq-icon-moon" : "pq-icon-sun")} aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div className="app-mode-title" style={{ fontSize: 24, fontWeight: 700, color: "var(--text-white)", lineHeight: 1.2, letterSpacing: -0.3 }}>
@@ -860,7 +862,28 @@ function App() {
 
       {addMenuOpen && !popupType && (
         <div className="add-menu-backdrop" onClick={function() { setAddMenuOpen(false); }}>
-          <div className="add-menu-sheet" onClick={function(e) { e.stopPropagation(); }}>
+          <div className="add-menu-sheet" 
+            ref={addMenuSheetRef}
+            onClick={function(e) { e.stopPropagation(); }}
+            onTouchStart={function(e) { 
+              window._sheetStartY = e.touches[0].clientY; 
+              if(addMenuSheetRef.current) addMenuSheetRef.current.style.transition = 'none';
+            }}
+            onTouchMove={function(e) {
+              const delta = Math.max(0, e.touches[0].clientY - window._sheetStartY);
+              if(addMenuSheetRef.current) addMenuSheetRef.current.style.transform = "translateY(" + delta + "px)";
+            }}
+            onTouchEnd={function(e) { 
+              const delta = Math.max(0, e.changedTouches[0].clientY - window._sheetStartY);
+              if(addMenuSheetRef.current) addMenuSheetRef.current.style.transition = 'transform 0.25s cubic-bezier(0.2,0.8,0.2,1)';
+              if (delta > 80) {
+                if(addMenuSheetRef.current) addMenuSheetRef.current.style.transform = 'translateY(100%)';
+                setTimeout(function() { setAddMenuOpen(false); }, 200);
+              } else {
+                if(addMenuSheetRef.current) addMenuSheetRef.current.style.transform = 'translateY(0)';
+              }
+            }}
+          >
             <div className="add-menu-handle" />
             <div className="add-menu-title">Quick Access</div>
             <div className="add-menu-cards">

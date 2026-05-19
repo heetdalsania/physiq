@@ -120,30 +120,31 @@
     -webkit-tap-highlight-color: transparent
 }
 
-body {
+html, body {
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', -apple-system, sans-serif;
-    min-height: 100vh;
-    min-height: 100dvh;
-    overflow-x: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     transition: background .3s, color .3s;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch
 }
 
 #app {
     max-width: 480px;
     width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     margin: 0 auto;
     position: relative;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: calc(80px + env(safe-area-inset-bottom))
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
 /* ─── Typography ─────────────────────────────────────────────────────────── */
@@ -265,7 +266,8 @@ body {
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
     display: flex;
-    padding: 8px 0 max(12px, env(safe-area-inset-bottom));
+    align-items: center;
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
     z-index: 100;
     -webkit-touch-callout: none;
     user-select: none
@@ -280,7 +282,7 @@ body {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 6px 0;
+    padding: 6px 12px;
     color: var(--text-faint);
     transition: color .2s;
     font-family: 'DM Sans', sans-serif
@@ -291,13 +293,15 @@ body {
 }
 
 .nav-btn span:first-child {
-    font-size: 16px
+    font-size: 22px;
+    line-height: 1;
 }
 
 .nav-btn span:last-child {
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: .5px
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .5px;
+    line-height: 1;
 }
 
 /* ─── Layout Helpers ─────────────────────────────────────────────────────── */
@@ -586,30 +590,22 @@ body {
 /* ─── Theme Toggle ───────────────────────────────────────────────────────── */
 .theme-toggle {
     width: 44px;
-    height: 24px;
-    border-radius: 12px;
-    cursor: pointer;
-    background: var(--track);
-    border: 1px solid var(--border);
-    position: relative;
-    transition: all .3s;
-    flex-shrink: 0
-}
-
-.theme-toggle::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 16px;
-    height: 16px;
+    height: 44px;
     border-radius: 50%;
-    background: var(--blue);
-    transition: transform .3s
+    cursor: pointer;
+    background: transparent !important;
+    -webkit-appearance: none;
+    border: none;
+    color: var(--text-faint);
+    transition: color .3s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
 }
-
-[data-theme="light"] .theme-toggle::after {
-    transform: translateX(20px)
+.theme-toggle:hover {
+    color: var(--text-bright);
 }
 
 /* ─── BMR Controls ───────────────────────────────────────────────────────── */
@@ -3006,8 +3002,9 @@ body {
 
 /* ─── Onboarding ─────────────────────────────────────────────────────────── */
 .onboard-screen {
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -3512,6 +3509,7 @@ body {
 }
 
 /* ─── Start / End Workout Buttons ───────────────────────────────────────── */
+
 .start-workout-btn {
     padding: 6px 12px;
     border-radius: 8px;
@@ -3806,26 +3804,20 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--blue), var(--purple-light, #a855f7));
-    color: #fff !important;
-    font-size: 18px !important;
-    font-weight: 400;
-    line-height: 1;
-    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
-    transform: translateY(-2px);
-    transition: transform .2s, box-shadow .2s
+    background: transparent !important;
+    color: inherit !important;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
 .nav-add-btn:hover .nav-add-circle {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.45)
+    transform: none;
+    box-shadow: none;
 }
 
 .nav-add-btn.active .nav-add-circle {
-    box-shadow: 0 3px 14px rgba(168, 85, 247, 0.55)
+    color: var(--blue) !important;
+    box-shadow: none;
 }
 
 /* ─── Add Menu Bottom Sheet ───────────────────────────────────────────── */
@@ -3850,8 +3842,8 @@ body {
     border-top-right-radius: 20px;
     border: 1px solid var(--border);
     border-bottom: none;
-    padding: 10px 18px calc(24px + env(safe-area-inset-bottom));
-    margin-bottom: 72px;
+    padding: 10px 18px calc(100px + env(safe-area-inset-bottom));
+    margin-bottom: 0;
     animation: addMenuSlide .25s cubic-bezier(.2,.8,.2,1)
 }
 
@@ -6761,20 +6753,23 @@ body[data-theme="light"]::before {
 }
 
 .nav {
-    margin: 0 auto 10px;
-    width: calc(100% - 20px);
-    border: 1px solid var(--border);
-    border-radius: 18px;
+    margin: 0 auto;
+    bottom: 0;
+    width: 100%;
+    border: none;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 1px),
         var(--nav-bg);
-    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
-    padding: 8px 6px max(10px, env(safe-area-inset-bottom))
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+    height: 85px;
+    padding: 0 16px 10px 16px;
+    align-items: center;
 }
 
 .nav-btn {
     border-radius: 10px;
-    min-height: 48px
 }
 
 .nav-btn.active {
@@ -6787,12 +6782,18 @@ body[data-theme="light"]::before {
 }
 
 .nav-add-circle {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--orange), var(--pink) 46%, var(--purple-light));
-    color: #fff !important;
-    box-shadow: 0 12px 22px rgba(251, 146, 60, 0.28)
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: transparent !important;
+    color: var(--text-faint) !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.nav-add-circle span.pq-icon {
+    width: 22px;
+    height: 22px;
 }
 
 .theme-toggle {
@@ -6977,15 +6978,16 @@ body[data-theme="light"]::before {
 
 /* ─── Icon & Quick Access Harmonization ─────────────────────────────────── */
 .nav-add-circle {
-    background: linear-gradient(135deg, var(--teal), var(--cyan) 54%, var(--green));
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: #03120F !important;
-    box-shadow: 0 12px 24px rgba(20, 184, 166, 0.32)
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-faint) !important;
+    box-shadow: none !important;
 }
 
 .nav-add-btn.active .nav-add-circle,
 .nav-add-btn:hover .nav-add-circle {
-    box-shadow: 0 14px 28px rgba(20, 184, 166, 0.42)
+    box-shadow: none !important;
+    color: var(--blue-light) !important;
 }
 
 .add-menu-card {
@@ -7204,15 +7206,11 @@ body[data-theme="light"]::before {
 .pq-icon-list { --pq-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 6h12M8 12h12M8 18h12M4 6h.1M4 12h.1M4 18h.1'/%3E%3C/svg%3E") }
 
 .nav-icon.pq-icon {
-    width: 19px;
-    height: 19px
+    width: 22px;
+    height: 22px;
 }
 
-.nav-add-circle .pq-icon {
-    width: 19px;
-    height: 19px;
-    color: #03120F
-}
+
 
 .app-mode-title {
     display: flex;
