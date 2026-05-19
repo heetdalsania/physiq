@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — PhysiQ Engine</title>
+<meta name="description" content="Privacy policy for PhysiQ Engine — a local-first nutrition and fitness app.">
+<style>
+  :root {
+    --bg: #0B0F1A;
+    --fg: #E8ECF4;
+    --muted: #94A3B8;
+    --accent: #2DD4BF;
+    --rule: rgba(255, 255, 255, 0.08);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+  .updated {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 32px 0 12px;
+    letter-spacing: -0.2px;
+  }
+  p { margin: 0 0 12px; }
+  ul {
+    margin: 0 0 16px;
+    padding-left: 22px;
+  }
+  li { margin-bottom: 6px; }
+  strong { color: #FFF; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .summary {
+    background: rgba(45, 212, 191, 0.08);
+    border: 1px solid rgba(45, 212, 191, 0.2);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin: 0 0 32px;
+  }
+  .summary p:last-child { margin-bottom: 0; }
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F7F8FB;
+      --fg: #0F172A;
+      --muted: #475569;
+      --accent: #0D9488;
+      --rule: rgba(15, 23, 42, 0.1);
+    }
+    strong { color: #000; }
+    .summary { background: rgba(13, 148, 136, 0.07); border-color: rgba(13, 148, 136, 0.22); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">PhysiQ Engine</div>
+    <h1>Privacy Policy</h1>
+    <div class="updated">Last updated: May 15, 2026</div>
+  </header>
+
+  <section class="summary">
+    <p><strong>Short version:</strong> PhysiQ Engine is local-first. There are no accounts, no servers, no cloud sync, and no analytics. Your data stays on your device. The only data that leaves your device is anonymous food-search text and (if you opt in) your approximate location for finding nearby restaurants — neither is linked to your identity.</p>
+  </section>
+
+  <h2>1. Who we are</h2>
+  <p>PhysiQ Engine is an independent nutrition and fitness tracking app distributed through the Apple App Store. This policy describes what the app does with your information.</p>
+
+  <h2>2. What we store on your device</h2>
+  <p>All profile data, meal logs, workouts, weight history, and preferences are stored locally on your device using standard browser storage (equivalent to <code>NSUserDefaults</code> on iOS). Specifically:</p>
+  <ul>
+    <li>Your profile (name, age, weight, height, sex, body fat %, activity, goal)</li>
+    <li>Daily nutrition intake and meal log</li>
+    <li>Workout routines and completed session history</li>
+    <li>Weight log entries</li>
+    <li>App preferences (theme, last-used email)</li>
+  </ul>
+  <p>This data <strong>never leaves your device</strong>. We do not sync it to any server. We do not have access to it. If you delete the app, the data is deleted with it.</p>
+  <p>You can export your data at any time as a JSON file from <strong>Profile → Data → Export Data</strong>, and re-import it later with <strong>Import Data</strong>.</p>
+
+  <h2>3. What we send over the network</h2>
+
+  <h3 style="font-size: 16px; margin: 18px 0 8px;">Food search</h3>
+  <p>When you search for a food or scan a barcode, the app sends only your search term or barcode number to <a href="https://world.openfoodfacts.org/" rel="noopener" target="_blank">Open Food Facts</a>, a public, free, open-data food database. Open Food Facts does not require an account and does not associate queries with any user identity. We do not send your profile, your meal log, or any other personal data with these requests.</p>
+
+  <h3 style="font-size: 16px; margin: 18px 0 8px;">Nearby restaurants (optional)</h3>
+  <p>If you choose to use the "Nearby" mode in the Eats tab, the app asks for your location. With your permission, your latitude and longitude are sent to <a href="https://overpass-api.de/" rel="noopener" target="_blank">OpenStreetMap's Overpass API</a> to look up nearby restaurants. Your location is not stored by the app, is not shared anywhere else, and is not associated with you. You can deny or revoke location permission at any time in iOS Settings — the rest of the app continues to work normally.</p>
+
+  <h2>4. Camera</h2>
+  <p>The camera is used only for scanning food barcodes. The camera feed is processed entirely on-device by the system barcode scanner. No image, frame, or video data is ever stored or transmitted. You can deny camera permission and use manual barcode entry instead.</p>
+
+  <h2>5. What we don't do</h2>
+  <ul>
+    <li><strong>No accounts.</strong> The email you enter at startup is stored only on your device to identify your profile slot. It is never sent anywhere.</li>
+    <li><strong>No analytics.</strong> No SDKs, no telemetry, no event tracking, no crash-reporting services.</li>
+    <li><strong>No advertising.</strong> No ad networks, no ad tracking, no IDFA usage.</li>
+    <li><strong>No third-party trackers.</strong> The app does not include any third-party tracking domains.</li>
+    <li><strong>No personal data sold or shared.</strong> Because we don't collect it in the first place.</li>
+  </ul>
+
+  <h2>6. Children</h2>
+  <p>PhysiQ Engine is not directed at children under 13. Because we do not collect personal information from anyone, no special handling is required.</p>
+
+  <h2>7. Your rights</h2>
+  <p>Because all your data is on your device, you control it directly:</p>
+  <ul>
+    <li><strong>Access:</strong> View any data via the app's screens.</li>
+    <li><strong>Export:</strong> <em>Profile → Data → Export Data</em> produces a JSON backup.</li>
+    <li><strong>Delete:</strong> Uninstalling the app removes all data immediately and permanently.</li>
+  </ul>
+
+  <h2>8. Changes to this policy</h2>
+  <p>If material changes are made to this policy, the updated date above will change and the new policy will replace this one at the same URL.</p>
+
+  <h2>9. Contact</h2>
+  <p>Questions? Open an issue on the project's GitHub repository or reach out via the support link on the App Store listing.</p>
+
+  <footer>
+    PhysiQ Engine is a personal, non-commercial project. This privacy policy is provided to comply with Apple App Store requirements and is written in plain language because it should be readable.
+  </footer>
+</main>
+</body>
+</html>
