@@ -8,7 +8,6 @@ const config: CapacitorConfig = {
     allowNavigation: ['world.openfoodfacts.org']
   },
   ios: {
-    contentInset: 'always',
     allowsLinkPreview: false,
     backgroundColor: '#0B0F1A'
   },
