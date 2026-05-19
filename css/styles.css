@@ -131,12 +131,15 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    overscroll-behavior: none;
+    overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch
 }
 
 #app {
     max-width: 480px;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
     margin: 0 auto;
     position: relative;
     padding-top: env(safe-area-inset-top);
@@ -194,6 +197,11 @@ body {
 }
 
 /* ─── Buttons ────────────────────────────────────────────────────────────── */
+.pq-btn, button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+}
 .btn {
     border: none;
     cursor: pointer;

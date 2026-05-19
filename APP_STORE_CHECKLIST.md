@@ -349,7 +349,7 @@ git add . && git commit -m "Step 7: Error boundaries, global error handlers, dev
 
 ## Step 8 — iOS UX Polish
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 
@@ -440,7 +440,7 @@ git add . && git commit -m "Step 9: App icon set and splash screen assets" && gi
 
 ## Step 10 — Privacy Policy & Privacy Manifest
 
-- [ ] **Status: Not Started**
+- [x] **Status: Completed**
 
 ### 💰 Cost: None
 

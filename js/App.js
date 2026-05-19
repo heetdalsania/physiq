@@ -99,6 +99,16 @@ function App() {
   const [history, setHistory] = useState([]);
 
   const [tab, setTab] = useState("dashboard");
+  const scrollPositions = useRef({});
+  const prevTab = useRef(tab);
+
+  useEffect(function() {
+    scrollPositions.current[prevTab.current] = window.scrollY;
+    const nextScroll = scrollPositions.current[tab] || 0;
+    window.scrollTo(0, nextScroll);
+    prevTab.current = tab;
+  }, [tab]);
+
   const [addMenuOpen, setAddMenuOpen] = useState(false);
   const [popupType, setPopupType] = useState(null);
   const [mealForm, setMealForm] = useState({ name: "", calories: "", protein: "", carbs: "", fats: "", fiber: "", sugar: "", sodium: "", potassium: "" });
