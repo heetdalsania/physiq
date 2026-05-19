@@ -248,12 +248,6 @@ export function ProfileTab(props) {
         </div>
       )}
 
-      <div className="label">Appearance</div>
-      <div className="flex-row" style={{ gap: 12, marginBottom: 20 }}>
-        <span style={{ fontSize: 14, color: "var(--text-dim)", flex: 1, fontWeight: 500 }}>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
-        <button className="theme-toggle" onClick={function() { setTheme(function(t) { return t === "dark" ? "light" : "dark"; }); }} />
-      </div>
-
       <div className="label">Data</div>
       <div className="flex-row" style={{ gap: 8, marginBottom: 8 }}>
         <button className="logout-btn" onClick={handleExport} style={{ flex: 1, padding: "10px 14px", fontSize: 12 }}>Export Data</button>
