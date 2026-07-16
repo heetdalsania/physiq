@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "dev": "node build.mjs --watch"
+    "dev": "node build.mjs --watch",
+    "test": "node --test \"test/*.test.js\""
   },
   "dependencies": {
     "@capacitor/barcode-scanner": "^3.0.2",

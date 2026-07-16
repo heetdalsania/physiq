@@ -7731,3 +7731,353 @@ body[data-theme="light"]::before {
     text-align: center;
     letter-spacing: 0.2px;
 }
+
+/* ─── Weekly Report ──────────────────────────────────────────────────────── */
+.wr-phase-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border: 1px solid;
+    border-radius: 6px;
+    flex-shrink: 0
+}
+
+.wr-win-card {
+    background: rgba(251, 191, 36, 0.07);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px
+}
+
+.wr-win-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--amber)
+}
+
+.wr-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 14px
+}
+
+.wr-tab {
+    flex: 1;
+    padding: 9px 0;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, color .2s
+}
+
+.wr-tab.active {
+    background: var(--option-active-bg);
+    border-color: var(--option-active-border);
+    color: var(--text-white)
+}
+
+.wr-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border-faint)
+}
+
+.wr-row:last-child {
+    border-bottom: none
+}
+
+.wr-empty {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 8px 0
+}
+
+.wr-vol-track {
+    position: relative;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--track);
+    overflow: hidden
+}
+
+.wr-vol-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width .4s
+}
+
+.wr-vol-tick {
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    width: 2px;
+    background: var(--text-dim);
+    opacity: 0.7
+}
+
+.wr-nudge-card {
+    background: var(--option-active-bg);
+    border: 1px solid var(--option-active-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px
+}
+
+.wr-nudge-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--blue-light)
+}
+
+.wr-entry-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 16px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .2s, border-color .2s
+}
+
+.wr-entry-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-active)
+}
+
+.wr-entry-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--option-active-bg);
+    border: 1px solid var(--option-active-border);
+    color: var(--blue-light);
+    flex-shrink: 0
+}
+
+/* ─── Plan a Day ─────────────────────────────────────────────────────────── */
+.pd-mode-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--amber);
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 6px;
+    padding: 5px 9px
+}
+
+.pd-focus-banner {
+    font-size: 13px;
+    color: var(--text-suggestion);
+    line-height: 1.5;
+    background: var(--option-active-bg);
+    border: 1px solid var(--option-active-border);
+    border-radius: 10px;
+    padding: 10px 13px;
+    margin-bottom: 14px
+}
+
+.pd-macro-chip {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 7px 9px;
+    background: var(--surface-alt)
+}
+
+.pd-add-btn {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue-light);
+    background: var(--option-active-bg);
+    border: 1px solid var(--option-active-border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    min-height: auto;
+    min-width: auto
+}
+
+.pd-add-btn:hover {
+    background: var(--surface-hover)
+}
+
+.pd-tool-btn {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    cursor: pointer;
+    min-height: auto;
+    min-width: auto
+}
+
+.pd-tool-btn:hover {
+    background: var(--surface-hover)
+}
+
+.pd-tool-btn:disabled {
+    opacity: 0.45;
+    cursor: default
+}
+
+.pd-log-btn {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green);
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    min-height: auto;
+    min-width: auto
+}
+
+.pd-remove-btn {
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--text-faint);
+    background: transparent;
+    border: none;
+    padding: 4px 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    min-height: auto;
+    min-width: auto
+}
+
+.pd-remove-btn:hover {
+    color: var(--red)
+}
+
+
+/* Weekly report nudge CTA */
+.wr-cta-btn {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-white);
+    background: var(--option-active-bg);
+    border: 1px solid var(--option-active-border);
+    border-radius: 9px;
+    padding: 11px 0;
+    cursor: pointer
+}
+
+.wr-cta-btn:hover {
+    background: var(--surface-hover)
+}
+
+.wr-cta-btn:disabled {
+    opacity: 0.55;
+    cursor: default
+}
+
+/* ─── Weekly Check-in ────────────────────────────────────────────────────── */
+.checkin-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px
+}
+
+.checkin-card {
+    width: 100%;
+    max-width: 360px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px
+}
+
+.checkin-goal-pill {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 12px;
+    cursor: pointer;
+    min-height: auto;
+    min-width: auto
+}
+
+.checkin-goal-pill.active {
+    color: var(--text-white);
+    background: var(--option-active-bg);
+    border-color: var(--option-active-border)
+}
+
+.checkin-skip-btn {
+    flex: 1;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 11px 0;
+    cursor: pointer
+}
+
+.checkin-save-btn {
+    flex: 2;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--blue);
+    border: 1px solid var(--blue);
+    border-radius: 9px;
+    padding: 11px 0;
+    cursor: pointer
+}
