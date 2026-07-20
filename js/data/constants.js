@@ -61,7 +61,10 @@ export const DEFAULT_PROFILE = {
   sex: "male", bodyfat: 18,
   goal: "build", activity: "moderate",
   gymDays: 5, steps: 8000,
-  todayMuscles: [], bmrOverride: null, name: ""
+  todayMuscles: [], bmrOverride: null, name: "",
+  // Adaptive coaching: cumulative kcal tweak applied on top of the
+  // formula targets, plus the date it last changed (cooldown).
+  calorieAdjustment: 0, calorieAdjustmentUpdatedAt: null
 };
 
 export const EXERCISE_CATEGORIES = [

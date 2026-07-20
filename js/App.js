@@ -13,6 +13,13 @@ import { FF_RESTAURANTS } from "./data/fastFoodMenu.js";
 
 import { AppTime } from "./utils/appTime.js";
 import {
+  buildWeightTrend,
+  buildAdjustmentSuggestion,
+  getWeekStart,
+  getPhase,
+  dayKey as wkDayKey
+} from "./utils/weeklyReport.js";
+import {
   loadUser,
   loadDaily,
   loadHistory,
@@ -43,6 +50,9 @@ import { HealthTab } from "./screens/HealthTab.js";
 import { CalendarTab } from "./screens/CalendarTab.js";
 import { ExerciseTab } from "./screens/ExerciseTab.js";
 import { ProfileTab } from "./screens/ProfileTab.js";
+import { WeeklyReportScreen } from "./screens/WeeklyReportScreen.js";
+import { PlanDayScreen } from "./screens/PlanDayScreen.js";
+import { WeeklyCheckin } from "./components/WeeklyCheckin.js";
 
 import { ErrorBoundary } from "./components/ErrorBoundary.js";
 import { isDevMode } from "./utils/devMode.js";
@@ -186,6 +196,14 @@ function App() {
   });
 
   const [activeMealPeriod, setActiveMealPeriod] = useState(getMealPeriod());
+
+  // Plan-a-Day: macro focus carried over from a weekly-report nudge CTA.
+  const [planFocusMacro, setPlanFocusMacro] = useState(null);
+
+  // Weekly check-in: due when a new Mon–Sun week starts. After saving,
+  // an off-pace weight trend can produce a one-tap coaching suggestion.
+  const [checkinDue, setCheckinDue] = useState(false);
+  const [checkinSuggestion, setCheckinSuggestion] = useState(null);
 
   const [recentFoods, setRecentFoods] = useState(function() {
     if (!email) return [];
@@ -423,6 +441,85 @@ function App() {
   }, [devMode, devDate, screen, email]);
 
   const up = function(k, v) { setProfile(function(p) { return Object.assign({}, p, { [k]: v }); }); };
+
+  // ── Weekly check-in (new week → confirm weight/goal) ──────────────
+  // First-ever load stamps the current week silently, so the prompt only
+  // starts appearing from the user's second week onward.
+  useEffect(function() {
+    if (screen !== "app" || !email) return;
+    const cur = getMondayKey(AppTime.now());
+    let last = null;
+    try { last = localStorage.getItem(uKey(email, "lastCheckin")); } catch (e) {}
+    if (!last) {
+      try { localStorage.setItem(uKey(email, "lastCheckin"), cur); } catch (e) {}
+      return;
+    }
+    if (last !== cur) setCheckinDue(true);
+  }, [screen, email]);
+
+  const stampCheckin = function() {
+    if (!AppTime.getDevMode()) {
+      try { localStorage.setItem(uKey(email, "lastCheckin"), getMondayKey(AppTime.now())); } catch (e) {}
+    }
+    setCheckinDue(false);
+  };
+
+  const saveCheckin = function(weight, goal) {
+    // Always log a valid weight — an unchanged number is still this
+    // week's data point, and the stall detection depends on it.
+    if (weight != null && weight > 0) logWeight(weight);
+    if (goal && goal !== profile.goal) up("goal", goal);
+    stampCheckin();
+
+    // Coaching step: score the trend INCLUDING the entry just saved
+    // (state updates haven't flushed yet, so build the log by hand).
+    if (weight != null && weight > 0) {
+      const todayKey = wkDayKey(AppTime.now());
+      const wl = (Array.isArray(profile.weightLog) ? profile.weightLog : [])
+        .filter(function(e) { return e && e.date !== todayKey; })
+        .concat([{ date: todayKey, weight: weight }]);
+      const nextProfile = Object.assign({}, profile, { weight: weight }, goal ? { goal: goal } : {});
+      const t = calcTargets(nextProfile, intake);
+      const trend = buildWeightTrend(wl, t, nextProfile.goal, getWeekStart(AppTime.now()));
+      const sug = buildAdjustmentSuggestion(
+        trend,
+        getPhase(nextProfile.goal),
+        nextProfile.calorieAdjustment || 0,
+        nextProfile.calorieAdjustmentUpdatedAt || null,
+        todayKey
+      );
+      if (sug) setCheckinSuggestion(sug);
+    }
+  };
+
+  const applyAdjustment = function(sug) {
+    setProfile(function(p) {
+      return Object.assign({}, p, {
+        calorieAdjustment: sug.next,
+        calorieAdjustmentUpdatedAt: wkDayKey(AppTime.now())
+      });
+    });
+    triggerHaptic("light");
+    showToast("Targets updated (" + (sug.next > 0 ? "+" : "") + sug.next + " kcal/day)");
+    setCheckinSuggestion(null);
+  };
+
+  // ── Plan-a-Day handlers ────────────────────────────────────────────
+  const openPlanDay = function(macroId) {
+    setPlanFocusMacro(macroId || null);
+    goToTab("planDay");
+    setAddMenuOpen(false);
+    setPopupType(null);
+  };
+
+  const logFromPlan = function(item) {
+    const nums = {};
+    ["calories", "protein", "carbs", "fats", "fiber", "sugar", "sodium", "potassium"].forEach(function(k) {
+      nums[k] = item[k] || 0;
+    });
+    logNutrients(item.name, nums);
+    showToast(item.name + " logged!");
+  };
 
   // Append-or-replace today's actual weight log entry. We replace the
   // entry for the current app date if one already exists (so users can
@@ -750,6 +847,15 @@ function App() {
 
       {toast && <div className="added-toast"><span className="toast-mark pq-icon pq-icon-check" aria-hidden="true"></span> {toast}</div>}
 
+      {(checkinDue || checkinSuggestion) && (
+        <WeeklyCheckin
+          profile={profile} onSave={saveCheckin} onSkip={stampCheckin}
+          suggestion={checkinSuggestion}
+          onApplyAdjustment={applyAdjustment}
+          onDismissAdjustment={function() { setCheckinSuggestion(null); }}
+        />
+      )}
+
       <PortionModal
         portionItem={portionItem} setPortionItem={setPortionItem}
         portionGrams={portionGrams} setPortionGrams={setPortionGrams}
@@ -787,6 +893,31 @@ function App() {
               onQuickNav={function(tabId) { goToTab(tabId); setAddMenuOpen(false); setPopupType(null); }}
               devMode={devMode} devDate={devDate}
               toggleDevMode={toggleDevMode} changeDevDate={changeDevDate} shiftDevDate={shiftDevDate}
+            />
+          </ErrorBoundary>
+        )}
+
+        {tab === "weeklyReport" && (
+          <ErrorBoundary>
+            <WeeklyReportScreen
+              profile={profile} targets={targets}
+              history={history} workoutLog={workoutLog}
+              routines={routines} setTargets={setTargets}
+              onBack={function() { goToTab("dashboard"); }}
+              onPlanDay={openPlanDay}
+              saveRoutine={saveRoutine}
+            />
+          </ErrorBoundary>
+        )}
+
+        {tab === "planDay" && (
+          <ErrorBoundary>
+            <PlanDayScreen
+              profile={profile} targets={targets} intake={intake}
+              recentFoods={recentFoods} email={email}
+              logFromPlan={logFromPlan}
+              focusMacro={planFocusMacro}
+              onBack={function() { setPlanFocusMacro(null); goToTab("dashboard"); }}
             />
           </ErrorBoundary>
         )}

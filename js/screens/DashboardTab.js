@@ -51,6 +51,24 @@ export function DashboardTab({ intake, targets, profile, suggestions, mealLog, a
         </div>
       </div>
 
+      <button className="wr-entry-card" onClick={function() { onQuickNav("planDay"); }}>
+        <span className="wr-entry-icon"><span className="pq-icon pq-icon-food" aria-hidden="true"></span></span>
+        <div style={{ flex: 1, textAlign: "left" }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-white)" }}>Plan a Day</div>
+          <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Sketch a day of eating that hits your targets</div>
+        </div>
+        <span className="new-routine-arrow">{"›"}</span>
+      </button>
+
+      <button className="wr-entry-card" onClick={function() { onQuickNav("weeklyReport"); }}>
+        <span className="wr-entry-icon"><span className="pq-icon pq-icon-calendar" aria-hidden="true"></span></span>
+        <div style={{ flex: 1, textAlign: "left" }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-white)" }}>Weekly Report</div>
+          <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Last week's wins, misses, and next moves</div>
+        </div>
+        <span className="new-routine-arrow">{"›"}</span>
+      </button>
+
       <div style={{ background: "var(--water-bg)", borderRadius: 12, padding: 14, border: "1px solid var(--water-border)", marginBottom: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: "var(--sky)" }}>Water</span>

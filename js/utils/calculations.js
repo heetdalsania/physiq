@@ -18,7 +18,12 @@ export function calcTargets(p, intake) {
   const gd = GOALS.find(function(g) { return g.id === p.goal; }) || GOALS[0];
   const tdee = bmr * aM;
   const surplus = Math.round(tdee * gd.pct);
-  const tCal = Math.round(tdee + surplus);
+  // Adaptive coaching adjustment (weekly check-in can nudge targets when
+  // the weight trend is off pace). Applied to calories only — protein
+  // stays g/kg-based, so carbs/fats absorb the change below.
+  const adj = typeof p.calorieAdjustment === "number" && isFinite(p.calorieAdjustment)
+    ? Math.round(p.calorieAdjustment) : 0;
+  const tCal = Math.round(tdee + surplus) + adj;
   const wKg = p.weight * 0.453592;
   const pr = Math.round(wKg * gd.proteinGKg);
   const fP = (p.goal === "cut" || p.goal === "debloat") ? 0.25 : 0.28;
@@ -55,7 +60,8 @@ export function calcTargets(p, intake) {
     calculatedBMR: Math.round(c),
     leanMass: Math.round(lm),
     isOverridden: p.bmrOverride != null,
-    surplus: surplus
+    surplus: surplus,
+    adjustment: adj
   };
 }
 
