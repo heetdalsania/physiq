@@ -1,5 +1,5 @@
 node_modules/
-dist/
+# dist/ is committed: GitHub Pages serves repo files directly (legacy build, no Actions)
 .claude/worktrees/
 .env
 .DS_Store
