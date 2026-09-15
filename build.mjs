@@ -9,6 +9,16 @@ const ROOT = __dirname;
 const DIST = resolve(ROOT, "dist");
 const watch = process.argv.includes("--watch");
 
+/* Development builds keep console output and additionally emit the dev-only
+   demo seeder as its OWN bundle (dist/dev-seed.js), referenced only by the
+   HTML those builds write. A production build never compiles js/dev/ and
+   never emits the script tag, so the seeder and its fixtures are absent
+   from the shipped app rather than merely disabled at runtime — nothing
+   about that depends on dead-code elimination succeeding. */
+const dev = watch || process.argv.includes("--dev");
+
+const DEV_SEED_TAG = '<script type="module" src="dev-seed.js"></script>\n';
+
 const HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +49,7 @@ async function copyAssets() {
   const css = await readFile(resolve(ROOT, "css/styles.css"), "utf8");
   await writeFile(resolve(DIST, "styles.min.css"), css);
 
-  await writeFile(resolve(DIST, "index.html"), HTML);
+  await writeFile(resolve(DIST, "index.html"), dev ? HTML.replace("</body>", DEV_SEED_TAG + "</body>") : HTML);
 }
 
 const esbuildOptions = {
@@ -53,7 +63,21 @@ const esbuildOptions = {
   outfile: resolve(DIST, "app.min.js"),
   legalComments: "none",
   logLevel: "info",
-  drop: watch ? [] : ["console"]
+  drop: dev ? [] : ["console"]
+};
+
+/* Second, dev-only bundle. Never built for production. */
+const devSeedOptions = {
+  entryPoints: [resolve(ROOT, "js/dev/seedEntry.js")],
+  bundle: true,
+  format: "esm",
+  target: ["es2018"],
+  minify: true,
+  jsx: "automatic",
+  loader: { ".js": "jsx" },
+  outfile: resolve(DIST, "dev-seed.js"),
+  legalComments: "none",
+  logLevel: "info"
 };
 
 async function build() {
@@ -63,10 +87,13 @@ async function build() {
   if (watch) {
     const ctx = await esbuild.context(esbuildOptions);
     await ctx.watch();
+    const devCtx = await esbuild.context(devSeedOptions);
+    await devCtx.watch();
     console.log("[build] watching for changes …");
   } else {
     await esbuild.build(esbuildOptions);
-    console.log("[build] dist/ ready");
+    if (dev) await esbuild.build(devSeedOptions);
+    console.log("[build] dist/ ready" + (dev ? " (dev build — includes demo seeder)" : ""));
   }
 }
 
