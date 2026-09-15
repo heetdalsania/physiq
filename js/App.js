@@ -28,7 +28,8 @@ import {
   loadTheme,
   getLastEmail,
   uKey,
-  runMigrations
+  runMigrations,
+  quarantineProfile
 } from "./utils/storage.js";
 import { subscribeToast } from "./utils/toast.js";
 import { calcTargets, getSuggestions } from "./utils/calculations.js";
@@ -85,6 +86,31 @@ function rolloverWeeklyMuscles(raw) {
     sets: raw.sets || {}
   };
 }
+/* The value each profile-scoped key falls back to IN MEMORY when its
+   stored value cannot be parsed — mirroring the literal defaults used by
+   the state initialisers, loadDaily() and loadHistory() below.
+
+   Handing these to quarantineProfile() lets the storage layer distinguish
+   the passive mount-time write-back (same value → suppressed, malformed
+   bytes survive) from a genuine user edit (different value → written).
+
+   `profile` is intentionally absent: a malformed profile makes loadUser()
+   return null, so the app never reaches the "app" screen and never
+   passively re-writes it — the next write is onboarding, which must land. */
+function passiveFallbacks() {
+  return {
+    intake: Object.assign({}, EMPTY_INTAKE),
+    meals: [],
+    history: [],
+    routines: [],
+    workoutLog: [],
+    weeklyMuscles: getEmptyWeeklyMuscles(),
+    setTargets: {},
+    recentFoods: [],
+    planDrafts: { training: [], rest: [] }
+  };
+}
+
 function musclesHitBySession(session) {
   const hit = {};
   if (!session || !session.exercises) return [];
@@ -299,6 +325,9 @@ function App() {
   useEffect(function() {
     const last = getLastEmail();
     if (last) {
+      // Preserve anything unreadable BEFORE the persistence effects below
+      // get a chance to write a fallback over it.
+      quarantineProfile(last, passiveFallbacks());
       const p = loadUser(last);
       if (p) {
         setEmail(last);
@@ -767,6 +796,7 @@ function App() {
     const e = loginEmail.trim().toLowerCase();
     localStorage.setItem("pq_last_email", e);
     setEmail(e);
+    quarantineProfile(e, passiveFallbacks());
     const p = loadUser(e);
     if (p) {
       setProfile(p);
