@@ -188,6 +188,8 @@ a, input, textarea, select, label {
 .routine-edit-btn,
 .set-del-btn,
 .set-done-checkbox,
+.set-details-toggle,
+.set-details-clear,
 .md-target-btn,
 .md-toggle-btn,
 .add-menu-card-icon,
@@ -4510,6 +4512,238 @@ a, input, textarea, select, label {
 .active-ex-card.active-ex-done {
     border-color: rgba(34, 197, 94, 0.5);
     background: rgba(34, 197, 94, 0.04)
+}
+
+/* ─── Active set rows — optional per-set metadata (Milestone 2) ───────── */
+/* The active view gains two narrow columns (RIR, details toggle). The set
+   number column is tightened and the reps/weight inputs flex so the row
+   still fits a 320px viewport. The routine builder rows are unchanged. */
+.active-set-header .draft-set-col-num,
+.active-set-row .draft-set-col-num {
+    width: 28px
+}
+
+.draft-set-col-rir {
+    width: 50px;
+    flex-shrink: 0;
+    text-align: center
+}
+
+.active-set-header .draft-set-col-done,
+.active-set-row .draft-set-col-done {
+    width: 40px
+}
+
+.draft-set-col-more {
+    width: 30px;
+    flex-shrink: 0;
+    text-align: center
+}
+
+.active-set-row .draft-set-col-reps,
+.active-set-row .draft-set-col-weight {
+    padding: 0 3px;
+    min-width: 0
+}
+
+.active-set-row .draft-set-col-reps .draft-set-input,
+.active-set-row .draft-set-col-weight .draft-set-input {
+    width: 100%;
+    max-width: 60px;
+    min-width: 40px
+}
+
+.set-rir-select {
+    width: 44px;
+    height: 32px;
+    margin: 0 auto;
+    display: block;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text-white);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    text-align-last: center;
+    padding: 0 2px;
+    outline: none;
+    transition: border-color .2s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none
+}
+
+.set-rir-select:focus,
+.set-rir-select:focus-visible {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px var(--blue-glow)
+}
+
+.set-details-toggle {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-faint);
+    font-size: 11px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+    transition: all .2s
+}
+
+.set-details-toggle:hover,
+.set-details-toggle.open {
+    color: var(--purple-light);
+    border-color: rgba(168, 85, 247, 0.4)
+}
+
+.set-details-toggle:focus-visible,
+.set-done-checkbox:focus-visible,
+.set-details-select:focus-visible,
+.set-details-clear:focus-visible,
+.set-tempo-input:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 1px
+}
+
+/* Dot marking a set that already carries side / tempo / ROM data. */
+.set-details-toggle.has-meta::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--purple-light)
+}
+
+.set-details {
+    margin: 0 4px 8px 4px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    background: var(--surface-alt)
+}
+
+.set-details-row {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.set-details-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--text-muted);
+    flex-shrink: 0
+}
+
+.set-details-hint {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-faint);
+    margin-top: 4px
+}
+
+.set-details-select {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text-white);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 8px;
+    outline: none
+}
+
+.set-details-select:focus {
+    border-color: var(--blue)
+}
+
+.set-tempo-grid {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px
+}
+
+.set-tempo-cell {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px
+}
+
+.set-tempo-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.2
+}
+
+.set-tempo-input {
+    width: 100%;
+    max-width: 64px
+}
+
+.set-tempo-input.invalid {
+    border-color: var(--red)
+}
+
+.set-details-error {
+    font-size: 10px;
+    color: var(--red);
+    text-align: center;
+    line-height: 1.25
+}
+
+.set-details-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px
+}
+
+.set-details-clear {
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s
+}
+
+.set-details-clear:hover:not(:disabled) {
+    color: var(--red);
+    border-color: var(--red)
+}
+
+.set-details-clear:disabled {
+    opacity: .4;
+    cursor: default
+}
+
+/* Calendar history recap — compact read-only metadata summary. */
+.cal-recap-set-meta {
+    color: var(--text-dim);
+    font-weight: 500
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

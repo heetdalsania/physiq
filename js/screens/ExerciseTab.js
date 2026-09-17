@@ -5,6 +5,31 @@ import { EXERCISE_CATEGORIES, EXERCISES_BY_CATEGORY } from "../data/constants.js
 import { AppTime } from "../utils/appTime.js";
 import { MuscleTracker } from "../components/MuscleTracker.js";
 import { RecoveryTracker } from "../components/RecoveryTracker.js";
+import {
+  startSessionFromRoutine,
+  updateSetNumberField,
+  toggleSetDone,
+  updateSetMetadataInput,
+  clearSessionSetDetails,
+  buildCompletedWorkoutRecord
+} from "../utils/workoutSession.js";
+import {
+  RIR_MIN, RIR_MAX,
+  SIDE_VALUES, SIDE_LABELS,
+  ROM_VALUES, ROM_LABELS, ROM_HINTS,
+  TEMPO_PHASES, TEMPO_PHASE_LABELS, TEMPO_MIN_SECONDS, TEMPO_MAX_SECONDS,
+  hasSetDetails,
+  metadataFieldInputValue,
+  readSetMetadata
+} from "../utils/setMetadata.js";
+
+const RIR_OPTIONS = [];
+for (let i = RIR_MIN; i <= RIR_MAX; i++) RIR_OPTIONS.push(i);
+
+/* Key for per-set UI state (expanded details, pending text, errors). */
+function setKey(exIdx, setIdx, field) {
+  return exIdx + ":" + setIdx + (field ? ":" + field : "");
+}
 
 const CATEGORIES = EXERCISE_CATEGORIES;
 const EXERCISES = EXERCISES_BY_CATEGORY;
@@ -25,6 +50,17 @@ export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompleted
   const [draft, setDraft] = useState(null);
   const [picker, setPicker] = useState({ selected: [], category: "chest" });
   const [active, setActive] = useState(null);
+  // Per-set UI state for the optional metadata controls. Keyed by
+  // setKey(); lives only as long as the active session.
+  const [openDetails, setOpenDetails] = useState({});
+  const [metaDrafts, setMetaDrafts] = useState({});   // text the user typed that did not validate yet
+  const [metaErrors, setMetaErrors] = useState({});   // matching validation messages
+
+  const resetSetUiState = function() {
+    setOpenDetails({});
+    setMetaDrafts({});
+    setMetaErrors({});
+  };
 
   const startNewRoutine = function() {
     setDraft({ id: Date.now(), title: "", exercises: [] });
@@ -158,70 +194,74 @@ export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompleted
   };
 
   const startRoutine = function(r) {
-    const logs = r.exercises.map(function(ex) {
-      return {
-        id: ex.id,
-        name: ex.name,
-        muscle: ex.muscle,
-        sets: ex.sets.map(function(s) {
-          return { reps: s.reps, weight: s.weight, done: false };
-        })
-      };
-    });
-    setActive({ routineId: r.id, title: r.title, startedAt: AppTime.nowMs(), exercises: logs });
+    resetSetUiState();
+    setActive(startSessionFromRoutine(r, AppTime.nowMs()));
     setView("active");
   };
 
   const updateActiveSet = function(exIdx, setIdx, field, value) {
-    const v = value < 0 ? 0 : value;
     setActive(function(a) {
       if (!a) return a;
-      const exs = a.exercises.slice();
-      const ex = Object.assign({}, exs[exIdx]);
-      ex.sets = ex.sets.slice();
-      ex.sets[setIdx] = Object.assign({}, ex.sets[setIdx]);
-      ex.sets[setIdx][field] = v;
-      exs[exIdx] = ex;
-      return Object.assign({}, a, { exercises: exs });
+      return updateSetNumberField(a, exIdx, setIdx, field, value);
     });
   };
 
   const toggleActiveSetDone = function(exIdx, setIdx) {
     setActive(function(a) {
       if (!a) return a;
-      const exs = a.exercises.slice();
-      const ex = Object.assign({}, exs[exIdx]);
-      ex.sets = ex.sets.slice();
-      ex.sets[setIdx] = Object.assign({}, ex.sets[setIdx]);
-      ex.sets[setIdx].done = !ex.sets[setIdx].done;
-      exs[exIdx] = ex;
-      return Object.assign({}, a, { exercises: exs });
+      return toggleSetDone(a, exIdx, setIdx);
     });
+  };
+
+  // Optional metadata (RIR / side / tempo / ROM). Raw input is validated
+  // first; a rejected entry is kept as pending text with a message and the
+  // set is left exactly as it was.
+  const updateActiveSetMetadata = function(exIdx, setIdx, field, raw) {
+    if (!active) return;
+    const key = setKey(exIdx, setIdx, field);
+    const r = updateSetMetadataInput(active, exIdx, setIdx, field, raw);
+    if (r.ok) {
+      setActive(r.session);
+      setMetaDrafts(function(d) { if (!(key in d)) return d; const n = Object.assign({}, d); delete n[key]; return n; });
+      setMetaErrors(function(e) { if (!(key in e)) return e; const n = Object.assign({}, e); delete n[key]; return n; });
+    } else {
+      setMetaDrafts(function(d) { return Object.assign({}, d, { [key]: raw }); });
+      setMetaErrors(function(e) { return Object.assign({}, e, { [key]: r.error }); });
+    }
+  };
+
+  // "Clear details" — side / tempo / ROM only; RIR is cleared from its own
+  // control in the row.
+  const clearActiveSetDetails = function(exIdx, setIdx) {
+    if (!active) return;
+    setActive(clearSessionSetDetails(active, exIdx, setIdx));
+    const prefix = setKey(exIdx, setIdx) + ":";
+    const dropPrefixed = function(obj) {
+      const n = {};
+      Object.keys(obj).forEach(function(k) { if (k.indexOf(prefix) !== 0 || k === prefix + "rir") n[k] = obj[k]; });
+      return n;
+    };
+    setMetaDrafts(dropPrefixed);
+    setMetaErrors(dropPrefixed);
+  };
+
+  const toggleSetDetails = function(exIdx, setIdx) {
+    const key = setKey(exIdx, setIdx);
+    setOpenDetails(function(o) { return Object.assign({}, o, { [key]: !o[key] }); });
   };
 
   const finishWorkout = function() {
     if (!active) return;
-    let completedSets = 0, totalSets = 0;
-    active.exercises.forEach(function(ex) {
-      ex.sets.forEach(function(s) { totalSets++; if (s.done) completedSets++; });
-    });
     if (logCompletedWorkout) {
-      logCompletedWorkout({
-        id: Date.now(),
-        routineId: active.routineId,
-        title: active.title,
-        startedAt: active.startedAt,
-        finishedAt: AppTime.nowMs(),
-        completedSets: completedSets,
-        totalSets: totalSets,
-        exercises: active.exercises
-      });
+      logCompletedWorkout(buildCompletedWorkoutRecord(active, { id: Date.now(), finishedAt: AppTime.nowMs() }));
     }
+    resetSetUiState();
     setActive(null);
     setView("main");
   };
 
   const cancelWorkout = function() {
+    resetSetUiState();
     setActive(null);
     setView("main");
   };
@@ -527,44 +567,159 @@ export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompleted
                   </div>
                 </div>
 
-                <div className="draft-set-header">
+                <div className="draft-set-header active-set-header">
                   <span className="draft-set-col-num">Set</span>
                   <span className="draft-set-col-reps">Reps</span>
                   <span className="draft-set-col-weight">Weight</span>
+                  <span className="draft-set-col-rir" title="Reps in reserve (optional)">RIR</span>
                   <span className="draft-set-col-done">Done</span>
+                  <span className="draft-set-col-more" />
                 </div>
                 {ex.sets.map(function(s, si) {
+                  const rowKey = setKey(exIdx, si);
+                  const isOpen = !!openDetails[rowKey];
+                  const hasDetails = hasSetDetails(s);
+                  const romValue = readSetMetadata(s).rom;
+                  const idBase = "set-" + exIdx + "-" + si;
+                  const detailsId = idBase + "-details";
+                  const inputValue = function(field) {
+                    const k = setKey(exIdx, si, field);
+                    return k in metaDrafts ? metaDrafts[k] : metadataFieldInputValue(s, field);
+                  };
+                  const errorFor = function(field) { return metaErrors[setKey(exIdx, si, field)] || null; };
                   return (
-                    <div key={si} className={"draft-set-row" + (s.done ? " set-done" : "")}>
-                      <span className="draft-set-col-num mono">{si + 1}</span>
-                      <div className="draft-set-col-reps">
-                        <input
-                          type="number"
-                          className="draft-set-input mono"
-                          min="0"
-                          value={s.reps || ""}
-                          onChange={function(e) { updateActiveSet(exIdx, si, "reps", parseInt(e.target.value) || 0); }}
-                        />
+                    <React.Fragment key={si}>
+                      <div className={"draft-set-row active-set-row" + (s.done ? " set-done" : "")}>
+                        <span className="draft-set-col-num mono">{si + 1}</span>
+                        <div className="draft-set-col-reps">
+                          <input
+                            type="number"
+                            className="draft-set-input mono"
+                            min="0"
+                            aria-label={"Set " + (si + 1) + " reps"}
+                            value={s.reps || ""}
+                            onChange={function(e) { updateActiveSet(exIdx, si, "reps", parseInt(e.target.value) || 0); }}
+                          />
+                        </div>
+                        <div className="draft-set-col-weight">
+                          <input
+                            type="number"
+                            className="draft-set-input mono"
+                            min="0"
+                            placeholder="0"
+                            aria-label={"Set " + (si + 1) + " weight"}
+                            value={s.weight || ""}
+                            onChange={function(e) { updateActiveSet(exIdx, si, "weight", parseInt(e.target.value) || 0); }}
+                          />
+                        </div>
+                        <div className="draft-set-col-rir">
+                          <select
+                            className="set-rir-select mono"
+                            aria-label={"Set " + (si + 1) + " reps in reserve (optional)"}
+                            value={inputValue("rir")}
+                            onChange={function(e) { updateActiveSetMetadata(exIdx, si, "rir", e.target.value); }}
+                          >
+                            <option value="">–</option>
+                            {RIR_OPTIONS.map(function(n) { return <option key={n} value={String(n)}>{n}</option>; })}
+                          </select>
+                        </div>
+                        <div className="draft-set-col-done">
+                          <button
+                            type="button"
+                            className={"set-done-checkbox" + (s.done ? " checked" : "")}
+                            aria-label={"Set " + (si + 1) + " done"}
+                            aria-pressed={!!s.done}
+                            onClick={function() { toggleActiveSetDone(exIdx, si); }}
+                          >
+                            {s.done ? "✓" : ""}
+                          </button>
+                        </div>
+                        <div className="draft-set-col-more">
+                          <button
+                            type="button"
+                            className={"set-details-toggle" + (isOpen ? " open" : "") + (hasDetails ? " has-meta" : "")}
+                            aria-label={"Set " + (si + 1) + " details (side, tempo, range of motion)"}
+                            aria-expanded={isOpen}
+                            aria-controls={detailsId}
+                            onClick={function() { toggleSetDetails(exIdx, si); }}
+                          >
+                            <span aria-hidden="true">{isOpen ? "▴" : "▾"}</span>
+                          </button>
+                        </div>
                       </div>
-                      <div className="draft-set-col-weight">
-                        <input
-                          type="number"
-                          className="draft-set-input mono"
-                          min="0"
-                          placeholder="0"
-                          value={s.weight || ""}
-                          onChange={function(e) { updateActiveSet(exIdx, si, "weight", parseInt(e.target.value) || 0); }}
-                        />
-                      </div>
-                      <div className="draft-set-col-done">
-                        <button
-                          className={"set-done-checkbox" + (s.done ? " checked" : "")}
-                          onClick={function() { toggleActiveSetDone(exIdx, si); }}
-                        >
-                          {s.done ? "✓" : ""}
-                        </button>
-                      </div>
-                    </div>
+                      {isOpen && (
+                        <div id={detailsId} className="set-details fade-in" role="group" aria-label={"Set " + (si + 1) + " optional details"}>
+                          <div className="set-details-row">
+                            <label className="set-details-label" htmlFor={idBase + "-side"}>Side</label>
+                            <select
+                              id={idBase + "-side"}
+                              className="set-details-select"
+                              value={inputValue("side")}
+                              onChange={function(e) { updateActiveSetMetadata(exIdx, si, "side", e.target.value); }}
+                            >
+                              <option value="">Not set</option>
+                              {SIDE_VALUES.map(function(v) { return <option key={v} value={v}>{SIDE_LABELS[v]}</option>; })}
+                            </select>
+                          </div>
+
+                          <div className="set-details-label" style={{ marginTop: 8 }}>
+                            Tempo <span className="set-details-hint">seconds per phase, {TEMPO_MIN_SECONDS}–{TEMPO_MAX_SECONDS}; leave blank if unknown</span>
+                          </div>
+                          <div className="set-tempo-grid">
+                            {TEMPO_PHASES.map(function(phase) {
+                              const field = "tempo." + phase;
+                              const err = errorFor(field);
+                              const inputId = idBase + "-" + phase;
+                              return (
+                                <div key={phase} className="set-tempo-cell">
+                                  <label className="set-tempo-label" htmlFor={inputId}>{TEMPO_PHASE_LABELS[phase]}</label>
+                                  <input
+                                    id={inputId}
+                                    type="text"
+                                    inputMode="numeric"
+                                    className={"draft-set-input mono set-tempo-input" + (err ? " invalid" : "")}
+                                    placeholder="–"
+                                    maxLength={3}
+                                    aria-invalid={err ? true : undefined}
+                                    aria-describedby={err ? inputId + "-err" : undefined}
+                                    value={inputValue(field)}
+                                    onChange={function(e) { updateActiveSetMetadata(exIdx, si, field, e.target.value); }}
+                                  />
+                                  {err && <div id={inputId + "-err"} className="set-details-error" role="alert">{err}</div>}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <div className="set-details-row" style={{ marginTop: 8 }}>
+                            <label className="set-details-label" htmlFor={idBase + "-rom"}>Range of motion</label>
+                            <select
+                              id={idBase + "-rom"}
+                              className="set-details-select"
+                              value={inputValue("rom")}
+                              onChange={function(e) { updateActiveSetMetadata(exIdx, si, "rom", e.target.value); }}
+                            >
+                              <option value="">Not set</option>
+                              {ROM_VALUES.map(function(v) { return <option key={v} value={v}>{ROM_LABELS[v]}</option>; })}
+                            </select>
+                          </div>
+                          <div className="set-details-hint">
+                            {romValue ? ROM_HINTS[romValue] + ". " : ""}Your own call, not a measured angle.
+                          </div>
+
+                          <div className="set-details-actions">
+                            <button
+                              type="button"
+                              className="set-details-clear"
+                              disabled={!hasDetails && !errorFor("tempo.eccentricSeconds") && !errorFor("tempo.pauseSeconds") && !errorFor("tempo.concentricSeconds")}
+                              onClick={function() { clearActiveSetDetails(exIdx, si); }}
+                            >
+                              Clear details
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </div>

@@ -252,7 +252,61 @@ export const DEMO_SESSION_B = {
   ]
 };
 
-export const DEMO_WORKOUT_LOG_B = [DEMO_SESSION_B];
+/* Sat 7 Mar — Profile B, Milestone 2 coverage. The OPTIONAL per-set
+   metadata (rir / side / tempo / rom, see js/utils/setMetadata.js) in the
+   exact mix the tests need:
+     - legacy sets with no metadata at all (never rewritten to add keys)
+     - RIR 0 and RIR 5 (both boundaries), and an RIR-only set
+     - every field at once
+     - explicit left and right entries (recorded, never inferred)
+     - partial tempo (one phase only) and an explicit 0-second pause,
+       which is a recorded zero — different from a blank phase
+     - an INCOMPLETE set that still carries metadata (done:false)
+   Absence is the only encoding of "not entered": no nulls, no 0, no {}. */
+export const DEMO_SESSION_METADATA_B = {
+  id: 8102,
+  routineId: 9102,
+  title: "Demo B Legs",
+  startedAt: at(5, 9, 0),
+  finishedAt: at(5, 9, 50),
+  completedSets: 8,
+  totalSets: 9,
+  exercises: [
+    {
+      id: 91103, name: "Squat", muscle: "Quads",
+      sets: [
+        { reps: 5, weight: 185, done: true },                                   // legacy shape
+        { reps: 5, weight: 185, done: true, rir: 0 },                           // RIR lower bound
+        { reps: 5, weight: 185, done: true, rir: 5, side: "bilateral",          // everything
+          tempo: { eccentricSeconds: 3, pauseSeconds: 1, concentricSeconds: 1 }, rom: "full" }
+      ]
+    },
+    {
+      id: 91104, name: "Lunge", muscle: "Quads",
+      sets: [
+        { reps: 10, weight: 30, done: true, side: "left" },
+        { reps: 10, weight: 30, done: true, side: "right" },
+        { reps: 10, weight: 30, done: false, side: "left", rir: 2 }             // incomplete, keeps metadata
+      ]
+    },
+    {
+      id: 91105, name: "Leg Extension", muscle: "Quads",
+      sets: [
+        { reps: 12, weight: 70, done: true, tempo: { eccentricSeconds: 4 } },   // partial tempo
+        { reps: 12, weight: 70, done: true, rom: "partial",
+          tempo: { eccentricSeconds: 2, pauseSeconds: 0, concentricSeconds: 1 } } // explicit zero pause
+      ]
+    },
+    {
+      id: 91106, name: "Standing Calf Raise", muscle: "Calves",
+      sets: [
+        { reps: 15, weight: 0, done: true, rir: 1 }                              // RIR only
+      ]
+    }
+  ]
+};
+
+export const DEMO_WORKOUT_LOG_B = [DEMO_SESSION_B, DEMO_SESSION_METADATA_B];
 
 /* ── In-progress session ─────────────────────────────────────────────────
  * NOTE: the app does NOT persist an in-flight workout — it lives in
@@ -358,9 +412,13 @@ export const DEMO_PROFILE_B_BUNDLE = {
     workoutLog: DEMO_WORKOUT_LOG_B,
     weeklyMuscles: {
       weekStart: fixtureDayKey(0),
-      dates: { back: [fixtureDayKey(1)], biceps: [fixtureDayKey(1)] },
-      sessions: { back: [{ id: 8101, title: "Demo B Pull", finishedAt: at(1, 12, 45) }] },
-      sets: { back: 2, biceps: 2 }
+      dates: { back: [fixtureDayKey(1)], biceps: [fixtureDayKey(1)], quads: [fixtureDayKey(5)], calves: [fixtureDayKey(5)] },
+      sessions: {
+        back: [{ id: 8101, title: "Demo B Pull", finishedAt: at(1, 12, 45) }],
+        quads: [{ id: 8102, title: "Demo B Legs", finishedAt: at(5, 9, 50) }],
+        calves: [{ id: 8102, title: "Demo B Legs", finishedAt: at(5, 9, 50) }]
+      },
+      sets: { back: 2, biceps: 2, quads: 7, calves: 1 }
     },
     setTargets: { back: 14 },
     history: [
