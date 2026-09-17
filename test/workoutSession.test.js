@@ -17,7 +17,8 @@ import {
   startSessionFromRoutine, updateSessionSet, updateSetNumberField, toggleSetDone,
   updateSetMetadataInput, clearSessionSetMetadata, clearSessionSetDetails, countSessionSets, buildCompletedWorkoutRecord
 } from "../js/utils/workoutSession.js";
-import { readSetMetadata, hasSetMetadata, formatSetMetadataSummary } from "../js/utils/setMetadata.js";
+import { readSetMetadata, hasSetMetadata, formatSetMetadataSummary, clearSetMetadata } from "../js/utils/setMetadata.js";
+import { estimateSessionTissueLoad } from "../js/tissue/loadEngine.js";
 import { bestDoneSet, buildLiftHistory } from "../js/utils/progression.js";
 import {
   DEMO_EMAIL_A, DEMO_EMAIL_B, DEMO_ROUTINE_LEGS, DEMO_ROUTINES_A,
@@ -301,6 +302,97 @@ test("export → import carries metadata across unchanged", function() {
   assert.equal(importAll(payload), true);
   assert.deepEqual(appReadWorkoutLog(DEMO_EMAIL_A)[0], clone(rec));
   assert.ok(ls2.getItem(uKey(DEMO_EMAIL_A, "workoutLog")));
+});
+
+// ── incomplete sets keep their metadata, end to end ─────────────────────
+
+test("a retained incomplete set with metadata: saves, reloads as done:false, keeps its values exactly, and is still ignored by the load model", function() {
+  const ls = fresh();
+
+  /* One completed set and one INCOMPLETE set that carries all four fields.
+     The incomplete one is the subject: the app keeps unfinished sets rather
+     than stripping them (STORAGE_CONTRACT.md, "done is the unit of truth"). */
+  let s = startSessionFromRoutine(DEMO_ROUTINE_LEGS, T0);
+  s = toggleSetDone(s, 0, 0);
+  s = updateSetMetadataInput(s, 0, 0, "rir", "1").session;
+  s = updateSetMetadataInput(s, 0, 1, "rir", "0").session;               // RIR 0, a recorded zero
+  s = updateSetMetadataInput(s, 0, 1, "side", "right").session;
+  s = updateSetMetadataInput(s, 0, 1, "tempo.eccentricSeconds", "4").session;
+  s = updateSetMetadataInput(s, 0, 1, "tempo.pauseSeconds", "0").session; // explicit zero, not blank
+  s = updateSetMetadataInput(s, 0, 1, "rom", "partial").session;
+  assert.equal(s.exercises[0].sets[1].done, false, "precondition: set 2 was never completed");
+
+  const expectedIncomplete = {
+    reps: 5, weight: 225, done: false,
+    rir: 0, side: "right", tempo: { eccentricSeconds: 4, pauseSeconds: 0 }, rom: "partial"
+  };
+
+  // 1. saved through the real write path
+  const record = buildCompletedWorkoutRecord(s, { id: 8800, finishedAt: T1 });
+  assert.equal(record.completedSets, 1);
+  assert.equal(record.totalSets, 5, "unfinished sets are retained, not dropped");
+  appLogAndPersist(DEMO_EMAIL_A, record);
+  assert.ok(ls.getItem(uKey(DEMO_EMAIL_A, "workoutLog")), "record reached storage");
+
+  // 2. reloads with the set still incomplete
+  const reloaded = appReadWorkoutLog(DEMO_EMAIL_A).filter(function(w) { return w.id === 8800; })[0];
+  const incomplete = reloaded.exercises[0].sets[1];
+  assert.equal(incomplete.done, false, "still incomplete after reload");
+  assert.equal(reloaded.completedSets, 1);
+  assert.equal(reloaded.totalSets, 5);
+
+  // 3. metadata preserved exactly — same keys, same values, nothing added
+  assert.deepEqual(incomplete, expectedIncomplete);
+  assert.deepEqual(Object.keys(incomplete).sort(), ["done", "reps", "rir", "rom", "side", "tempo", "weight"]);
+  assert.deepEqual(readSetMetadata(incomplete), {
+    rir: 0, side: "right", tempo: { eccentricSeconds: 4, pauseSeconds: 0 }, rom: "partial"
+  });
+  assert.equal(incomplete.rir, 0, "a recorded zero survives, it is not read as missing");
+  assert.equal(incomplete.tempo.pauseSeconds, 0);
+  assert.equal("concentricSeconds" in incomplete.tempo, false, "a phase never entered stays absent");
+
+  // 4. still invisible to tissue-load-v0.1
+  const withMeta = estimateSessionTissueLoad(reloaded, { bodyMass: 180 });
+  const strippedRecord = clone(reloaded);
+  strippedRecord.exercises.forEach(function(ex) { ex.sets = ex.sets.map(clearSetMetadata); });
+  assert.deepEqual(withMeta, estimateSessionTissueLoad(strippedRecord, { bodyMass: 180 }),
+    "metadata on an incomplete set changes no engine output");
+
+  const squat = withMeta.exercises[0];
+  assert.equal(squat.completedSets, 1);
+  assert.equal(squat.incompleteSets, 2);
+  const scoredSetIndexes = Array.from(new Set(withMeta.events
+    .filter(function(ev) { return ev.provenance.exerciseIndex === 0; })
+    .map(function(ev) { return ev.provenance.setIndex; })));
+  assert.deepEqual(scoredSetIndexes, [0], "only the completed set produced events");
+  withMeta.events.forEach(function(ev) {
+    assert.notEqual(ev.provenance.setIndex, 1, "the incomplete set contributes nothing");
+  });
+});
+
+test("the Calendar recap intentionally hides incomplete sets, so their metadata is stored but not displayed", function() {
+  /* Documented limitation, not a defect: CalendarTab has always listed
+     completed sets only (`sets.filter(s => s.done)`), and Milestone 2 did
+     not redesign that surface. The data is present and readable — it simply
+     has no display slot, exactly as before for reps and weight. */
+  fresh();
+  let s = startSessionFromRoutine(DEMO_ROUTINE_LEGS, T0);
+  s = toggleSetDone(s, 0, 0);
+  s = updateSetMetadataInput(s, 0, 0, "rir", "2").session;
+  s = updateSetMetadataInput(s, 0, 1, "rir", "5").session;   // incomplete
+  appLogAndPersist(DEMO_EMAIL_A, buildCompletedWorkoutRecord(s, { id: 8801, finishedAt: T1 }));
+
+  const reloaded = appReadWorkoutLog(DEMO_EMAIL_A)[0];
+  const sets = reloaded.exercises[0].sets;
+  const shown = sets.filter(function(x) { return x.done; });          // CalendarTab's predicate
+  assert.equal(shown.length, 1);
+  assert.equal(formatSetMetadataSummary(shown[0]), "RIR 2", "completed set renders its summary");
+
+  const hidden = sets[1];
+  assert.equal(hidden.done, false);
+  assert.equal(hidden.rir, 5, "the hidden set's metadata is still in storage");
+  assert.equal(formatSetMetadataSummary(hidden), "RIR 5", "and is renderable if a later surface wants it");
+  assert.equal(shown.indexOf(hidden), -1, "but the existing recap does not show it");
 });
 
 // ── profile isolation ───────────────────────────────────────────────────

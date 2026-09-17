@@ -1,5 +1,31 @@
-/* Captures tissue-load-v0.1 outputs from the CURRENT (pre-Milestone-2) engine
-   for fixed synthetic sessions. Written once, before any source edit. */
+/* ─── MAINTAINER TOOL — NOT PART OF THE TEST SUITE ────────────────────────
+ *
+ * Regenerates test/fixtures/tissueLoadBaseline.v0.1.json, the GOLDEN file
+ * that test/tissueLoadInvariance.test.js compares the live engine against.
+ * It was run ONCE, at commit 5f47e24, against the pre-Milestone-2 engine.
+ *
+ * ── Do not run this to make a failing test pass ──────────────────────────
+ * A failing invariance test means the TissueOS engine's output CHANGED.
+ * That is the signal the golden file exists to produce. Regenerating it
+ * silently destroys the only record of the previous model's numbers and
+ * makes old and new scores look comparable when they are not.
+ *
+ * Regenerate ONLY when all of the following hold:
+ *   1. the change to js/tissue/ is deliberate and reviewed;
+ *   2. the model/map/definitions version is being bumped per the rules in
+ *      js/tissue/modelVersion.js;
+ *   3. the new file is committed as a reviewed diff, with the version bump,
+ *      and this file's name/`generatedFrom` updated to match.
+ *
+ * ── Why the suite cannot run this by accident ────────────────────────────
+ * `npm test` is `node --test "test/*.test.js"`. This file is a `.mjs` one
+ * directory deeper, so the glob never matches it. It also refuses to do
+ * anything without an explicit output path argument. Both properties are
+ * asserted by test/tissueLoadInvariance.test.js.
+ *
+ *   node test/fixtures/captureTissueLoadBaseline.mjs <output-path>
+ * ───────────────────────────────────────────────────────────────────────── */
+
 import { writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { estimateSessionTissueLoad, estimateSetTissueLoad } from "../../js/tissue/loadEngine.js";
@@ -58,5 +84,16 @@ Object.keys(setCases).forEach(function(k) {
 });
 out.pinnedTimestamps = FIXED;
 out.syntheticMixedInput = SYNTHETIC_MIXED;
-writeFileSync(process.argv[2], JSON.stringify(out, null, 2) + "\n");
-console.log("wrote", process.argv[2], "from", out.generatedFrom, "sessions:", Object.keys(out.sessions).length, "sets:", Object.keys(out.sets).length);
+const target = process.argv[2];
+if (!target) {
+  console.error(
+    "captureTissueLoadBaseline.mjs is a maintainer tool and writes nothing without an\n" +
+    "explicit output path.\n\n" +
+    "  node test/fixtures/captureTissueLoadBaseline.mjs <output-path>\n\n" +
+    "Regenerating the golden file is only correct alongside a deliberate, reviewed\n" +
+    "TissueOS model-version bump. A failing invariance test is NOT a reason to run it."
+  );
+  process.exit(2);
+}
+writeFileSync(target, JSON.stringify(out, null, 2) + "\n");
+console.log("wrote", target, "from", out.generatedFrom, "sessions:", Object.keys(out.sessions).length, "sets:", Object.keys(out.sets).length);

@@ -131,13 +131,23 @@ a user who ignores metadata logs and finishes with no additional taps.
   details** (side / tempo / ROM). A dot on the toggle marks a set that
   already carries details. Details expand *below* the row, so
   the done button is never covered.
-- All controls are labelled, keyboard-reachable, with a visible focus ring.
+- All controls are native `<button>`, `<select>` and `<input>` elements with
+  an accessible name, `tabindex` 0, and a `:focus-visible` outline defined in
+  CSS. Nothing carries a positive `tabindex`, so tab order follows DOM order:
+  reps, weight, RIR, done, details toggle, then that set's details panel.
   There is no `<form>`, so Enter cannot submit anything.
 - **History**: the Calendar day panel's per-exercise recap appends a muted
   summary to each completed-set pill, e.g. `5×185lb · RIR 5 · Both sides ·
-  Tempo 3-1-1s · Full ROM`, hidden when the set has none. The recap lists
-  completed sets only, as before; metadata on incomplete sets is persisted
-  but not shown there.
+  Tempo 3-1-1s · Full ROM`, hidden when the set has none.
+
+**Known display limitation (intentional).** That recap has always listed
+**completed sets only** — `sets.filter(s => s.done)` — and Milestone 2 did not
+redesign it. Metadata entered on a set that was never completed is saved,
+reloaded and readable, but has no display slot, exactly as its reps and weight
+already had none. Surfacing incomplete sets would be a history-UI change this
+milestone deliberately does not make. Both halves are pinned by tests in
+[test/workoutSession.test.js](test/workoutSession.test.js): the data survives a
+storage round-trip unchanged, and the recap's own predicate excludes it.
 
 ## 8. Why the load model ignores these fields
 
@@ -151,6 +161,17 @@ compares the engine against a golden file captured **before** this milestone
 commit `5f47e24`) and checks that adding or changing only metadata leaves
 every output field identical, that events and provenance carry no metadata,
 and that no side-based splitting occurs.
+
+**The golden file is a static artifact and the suite cannot regenerate it.**
+`npm test` runs `node --test "test/*.test.js"`; the capture script is a `.mjs`
+one directory deeper, so the glob never reaches it, and it refuses to write
+without an explicit output path. A test asserts both of those properties and
+that no file in the suite calls a filesystem write API at all. Expected values
+are read from the JSON, never recomputed by the code under test, so any change
+to the engine's output fails the suite until a maintainer deliberately reviews
+it. Regenerating the file is correct **only** alongside a reviewed model-version
+bump per [js/tissue/modelVersion.js](js/tissue/modelVersion.js) — never to make a
+failing test pass.
 
 ## 9. Fixtures and tests
 
