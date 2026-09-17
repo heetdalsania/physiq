@@ -225,5 +225,5 @@ test("seeded demo profiles are isolated from each other", function () {
     get(uKey(DEMO_EMAIL_B, "workoutLog"), null)
   );
   assert.equal(get(uKey(DEMO_EMAIL_A, "workoutLog"), []).length, 3);
-  assert.equal(get(uKey(DEMO_EMAIL_B, "workoutLog"), []).length, 1);
+  assert.equal(get(uKey(DEMO_EMAIL_B, "workoutLog"), []).length, DEMO_WORKOUT_LOG_B.length);
 });

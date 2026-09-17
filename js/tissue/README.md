@@ -385,10 +385,16 @@ Consequences, contained in `resolveExerciseMapping()`:
 - The formula is linear in reps and load. It ignores intensity relative to
   maximum, proximity to failure, tempo, range of motion, eccentric emphasis,
   velocity, rest, fatigue and technique, some of which dominate real tissue
-  loading.
+  loading. Milestone 2 added optional **user-reported** `rir`, `side`,
+  `tempo` and `rom` fields to set records ([SET_METADATA.md](../../SET_METADATA.md));
+  v0.1 still ignores them by design, and
+  [test/tissueLoadInvariance.test.js](../../test/tissueLoadInvariance.test.js)
+  pins its outputs against a golden file captured before those fields existed.
 - Body-mass bands are five coarse values applied to whole movement patterns,
   not per-exercise biomechanics.
-- Unilateral exercises are scored as if bilateral; there is no side.
+- Unilateral exercises are scored as if bilateral. A `side` value on a set
+  is recorded for the user and not read by the engine; no per-side tissue
+  state or event splitting exists.
 - Tendon entries are relevance markers, not tendon-load models.
 - A lifter entering kilograms into Physiq's unlabelled weight field produces
   data the whole app mislabels; the engine inherits that.

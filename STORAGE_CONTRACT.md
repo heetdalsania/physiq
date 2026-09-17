@@ -183,6 +183,44 @@ Contract points that later work must not break:
 - `workoutLog` is **never trimmed**. It grows without bound; only `history` (90 days)
   and `recentFoods` (5) have caps.
 
+#### Optional per-set metadata (Milestone 2)
+
+A performed set may additionally carry any of four **optional, user-reported**
+fields. Full contract: [SET_METADATA.md](SET_METADATA.md); code:
+[js/utils/setMetadata.js](js/utils/setMetadata.js).
+
+```json
+{ "reps": 5, "weight": 185, "done": true,
+  "rir": 2,
+  "side": "bilateral",
+  "tempo": { "eccentricSeconds": 3, "pauseSeconds": 1, "concentricSeconds": 1 },
+  "rom": "full" }
+```
+
+| Field | Allowed | Notes |
+|---|---|---|
+| `rir` | integer `0`–`5` | subjective reps-in-reserve estimate |
+| `side` | `left` \| `right` \| `bilateral` | recorded from the user's choice, never inferred |
+| `tempo` | object; each phase optional; whole seconds `0`–`30` | phases in eccentric / pause-after-eccentric / concentric order |
+| `rom` | `partial` \| `standard` \| `full` | self-assessed category, not a measured angle |
+
+- **Absent means not entered.** New writes never encode "unknown" as `0`, `null`,
+  `""` or `{}`; clearing a field deletes the key, and clearing the last tempo phase
+  deletes `tempo`. `rir: 0` and `pauseSeconds: 0` are recorded zeros.
+- **Old sets are never rewritten** to add these keys, and no reader requires them.
+- **Writers:** only the active-workout view, via the helpers in
+  [js/utils/workoutSession.js](js/utils/workoutSession.js) → `finishWorkout()` →
+  `logCompletedWorkout()` → the existing `workoutLog` effect. Nothing else writes
+  them; routines (§4 `routines`) never carry them.
+- **Readers:** the Calendar day panel's set recap shows a compact summary
+  (`formatSetMetadataSummary`) and hides it when absent. Every other reader
+  (`weeklyMuscles` rollup, weekly report, progression, lift history, TissueOS)
+  ignores the fields. Malformed values are read as unavailable, not deleted.
+- **`completedSets`/`totalSets` and `done` semantics are unchanged.** An incomplete
+  set persists with `done: false` *and* whatever metadata was entered.
+- **No schema bump.** These are additive optional keys on an existing value that
+  older readers ignore; `SCHEMA_VERSION` stays `1` and no migration was added.
+
 ### `weeklyMuscles`
 
 Derived rollup for the muscle tracker, rebuilt each Monday.
@@ -235,7 +273,10 @@ Both are **cleared at day rollover** — see §5.
 ### `routines`
 
 Same shape as a session's `exercises`, but sets carry only `{ reps, weight }`; `done`
-appears when `startRoutine()` copies them into an active session.
+appears when `startRoutine()` copies them into an active session. Routine sets never
+carry the Milestone 2 metadata fields; `startSessionFromRoutine()` copies `reps` and
+`weight` only, so a new workout never inherits a previous session's RIR / side /
+tempo / ROM.
 
 ---
 
@@ -263,7 +304,8 @@ nothing clears them except the day-rollover (intake/meals) and the week-rollover
 **Not persisted at all** — lost on reload by design:
 
 - the **in-progress workout** (`active` in ExerciseTab: exercises, per-set `done`
-  toggles, `startedAt`). Only finished sessions reach storage.
+  toggles, `startedAt`, and — since Milestone 2 — any per-set RIR / side / tempo /
+  ROM typed so far). Only finished sessions reach storage; there is no draft autosave.
 - toast state, the selected tab, scroll positions, the weekly check-in prompt.
 
 ---
@@ -409,6 +451,12 @@ calls `runMigrations()`, so an older export is upgraded rather than over-stamped
 field, or version has been reserved for it. Tissue data should arrive as its own
 migration step when Milestone 1 actually needs it.
 
+**Milestone 2 did not bump the version.** The optional per-set fields (§4) are
+additive keys inside an existing value; readers that predate them ignore them and
+readers that know them treat absence as "not entered", so no transform exists for a
+migration to perform. A version bump is reserved for a change in how bytes are laid
+out, not for new optional keys.
+
 ---
 
 ## 8. Export / import
@@ -441,7 +489,17 @@ semantics, and nutrition data surviving migration. They run against an in-memory
 `localStorage` stub ([test/helpers/localStorageStub.js](test/helpers/localStorageStub.js)) and
 never touch real browser storage.
 
+[test/setMetadata.test.js](test/setMetadata.test.js),
+[test/workoutSession.test.js](test/workoutSession.test.js) and
+[test/tissueLoadInvariance.test.js](test/tissueLoadInvariance.test.js) (Milestone 2)
+cover the optional per-set metadata: parsing and validation, immutable updates,
+the production session lifecycle, the `workoutLog` round-trip through `sv()`/`get()`
+and export/import, profile isolation, legacy history, and that the tissue-load model's
+outputs are unchanged by the new fields.
+
 Deterministic fixtures live in [js/dev/demoFixtures.js](js/dev/demoFixtures.js).
+Profile B's log includes `DEMO_SESSION_METADATA_B`, the one fixture that carries
+per-set metadata; profile A's history is deliberately still metadata-free.
 
 **The seeder is not in the production bundle.** It is a separate esbuild entry point
 ([js/dev/seedEntry.js](js/dev/seedEntry.js)) that is only compiled — and only

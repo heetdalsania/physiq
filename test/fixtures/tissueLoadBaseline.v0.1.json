@@ -1,0 +1,4597 @@
+{
+  "generatedFrom": "5f47e24b3ed70179b6b14d28a2b57301851f8e99",
+  "note": "Golden outputs of js/tissue/loadEngine.js captured BEFORE Milestone 2 edits. Regenerate only on a deliberate model-version bump.",
+  "sessions": {
+    "DEMO_SESSION_COMPLETE": {
+      "explicit180": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8001,
+        "title": "Demo Push",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "chest",
+            "workload": 1080,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 432,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 648,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 1080,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 432,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 648,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 870,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 348,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 522,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 225,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 750,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 450,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 225,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 750,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 450,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 600,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91003,
+              "exerciseName": "Tricep Pushdown",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 600,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91003,
+              "exerciseName": "Tricep Pushdown",
+              "exerciseIndex": 2,
+              "setIndex": 1
+            }
+          }
+        ],
+        "tissues": {
+          "chest": {
+            "tissueId": "chest",
+            "totalWorkload": 3030,
+            "eventCount": 3,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 3030,
+                "setCount": 3
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 450,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 450,
+                "setCount": 2
+              }
+            ]
+          },
+          "shoulders": {
+            "tissueId": "shoulders",
+            "totalWorkload": 2712,
+            "eventCount": 5,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 1212,
+                "setCount": 3
+              },
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 1500,
+                "setCount": 2
+              }
+            ]
+          },
+          "triceps": {
+            "tissueId": "triceps",
+            "totalWorkload": 3918,
+            "eventCount": 7,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 1818,
+                "setCount": 3
+              },
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 900,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Tricep Pushdown",
+                "exerciseIndex": 2,
+                "workload": 1200,
+                "setCount": 2
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 91001,
+            "exerciseName": "Barbell Bench Press",
+            "mappedName": "Barbell Bench Press",
+            "status": "mapped",
+            "completedSets": 3,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 91002,
+            "exerciseName": "Overhead Press",
+            "mappedName": "Overhead Press",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 2,
+            "exerciseId": 91003,
+            "exerciseName": "Tricep Pushdown",
+            "mappedName": "Tricep Pushdown",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": []
+      },
+      "none": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8001,
+        "title": "Demo Push",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "chest",
+            "workload": 1080,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 432,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 648,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 1080,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 432,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 648,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 870,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 348,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 522,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 225,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 750,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 450,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 225,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 750,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 450,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 600,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91003,
+              "exerciseName": "Tricep Pushdown",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 600,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8001,
+              "exerciseId": 91003,
+              "exerciseName": "Tricep Pushdown",
+              "exerciseIndex": 2,
+              "setIndex": 1
+            }
+          }
+        ],
+        "tissues": {
+          "chest": {
+            "tissueId": "chest",
+            "totalWorkload": 3030,
+            "eventCount": 3,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 3030,
+                "setCount": 3
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 450,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 450,
+                "setCount": 2
+              }
+            ]
+          },
+          "shoulders": {
+            "tissueId": "shoulders",
+            "totalWorkload": 2712,
+            "eventCount": 5,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 1212,
+                "setCount": 3
+              },
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 1500,
+                "setCount": 2
+              }
+            ]
+          },
+          "triceps": {
+            "tissueId": "triceps",
+            "totalWorkload": 3918,
+            "eventCount": 7,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 1818,
+                "setCount": 3
+              },
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 900,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Tricep Pushdown",
+                "exerciseIndex": 2,
+                "workload": 1200,
+                "setCount": 2
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 91001,
+            "exerciseName": "Barbell Bench Press",
+            "mappedName": "Barbell Bench Press",
+            "status": "mapped",
+            "completedSets": 3,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 91002,
+            "exerciseName": "Overhead Press",
+            "mappedName": "Overhead Press",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 2,
+            "exerciseId": 91003,
+            "exerciseName": "Tricep Pushdown",
+            "mappedName": "Tricep Pushdown",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": []
+      }
+    },
+    "DEMO_SESSION_PARTIAL": {
+      "explicit180": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8002,
+        "title": "Demo Legs",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "back",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 720,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1800,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "back",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 720,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1800,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "back",
+            "workload": 1176,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92002,
+              "exerciseName": "Romanian Deadlift",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 588,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92002,
+              "exerciseName": "Romanian Deadlift",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1568,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92002,
+              "exerciseName": "Romanian Deadlift",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 1960,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92002,
+              "exerciseName": "Romanian Deadlift",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          }
+        ],
+        "tissues": {
+          "back": {
+            "tissueId": "back",
+            "totalWorkload": 2256,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Romanian Deadlift",
+                "exerciseIndex": 1,
+                "workload": 1176,
+                "setCount": 1
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 2028,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1440,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Romanian Deadlift",
+                "exerciseIndex": 1,
+                "workload": 588,
+                "setCount": 1
+              }
+            ]
+          },
+          "glutes": {
+            "tissueId": "glutes",
+            "totalWorkload": 4448,
+            "eventCount": 3,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 2880,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Romanian Deadlift",
+                "exerciseIndex": 1,
+                "workload": 1568,
+                "setCount": 1
+              }
+            ]
+          },
+          "hamstrings": {
+            "tissueId": "hamstrings",
+            "totalWorkload": 3040,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Romanian Deadlift",
+                "exerciseIndex": 1,
+                "workload": 1960,
+                "setCount": 1
+              }
+            ]
+          },
+          "patellar_tendon": {
+            "tissueId": "patellar_tendon",
+            "totalWorkload": 2880,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 2880,
+                "setCount": 2
+              }
+            ]
+          },
+          "quadriceps": {
+            "tissueId": "quadriceps",
+            "totalWorkload": 3600,
+            "eventCount": 2,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 3600,
+                "setCount": 2
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 92001,
+            "exerciseName": "Squat",
+            "mappedName": "Squat",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 1,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 92002,
+            "exerciseName": "Romanian Deadlift",
+            "mappedName": "Romanian Deadlift",
+            "status": "mapped",
+            "completedSets": 1,
+            "incompleteSets": 1,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": []
+      },
+      "none": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8002,
+        "title": "Demo Legs",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "back",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 720,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1800,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "back",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 720,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1800,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "back",
+            "workload": 1176,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92002,
+              "exerciseName": "Romanian Deadlift",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 588,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92002,
+              "exerciseName": "Romanian Deadlift",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1568,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92002,
+              "exerciseName": "Romanian Deadlift",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 1960,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8002,
+              "exerciseId": 92002,
+              "exerciseName": "Romanian Deadlift",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          }
+        ],
+        "tissues": {
+          "back": {
+            "tissueId": "back",
+            "totalWorkload": 2256,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Romanian Deadlift",
+                "exerciseIndex": 1,
+                "workload": 1176,
+                "setCount": 1
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 2028,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1440,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Romanian Deadlift",
+                "exerciseIndex": 1,
+                "workload": 588,
+                "setCount": 1
+              }
+            ]
+          },
+          "glutes": {
+            "tissueId": "glutes",
+            "totalWorkload": 4448,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 2880,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Romanian Deadlift",
+                "exerciseIndex": 1,
+                "workload": 1568,
+                "setCount": 1
+              }
+            ]
+          },
+          "hamstrings": {
+            "tissueId": "hamstrings",
+            "totalWorkload": 3040,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Romanian Deadlift",
+                "exerciseIndex": 1,
+                "workload": 1960,
+                "setCount": 1
+              }
+            ]
+          },
+          "patellar_tendon": {
+            "tissueId": "patellar_tendon",
+            "totalWorkload": 2880,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 2880,
+                "setCount": 2
+              }
+            ]
+          },
+          "quadriceps": {
+            "tissueId": "quadriceps",
+            "totalWorkload": 3600,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 3600,
+                "setCount": 2
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 92001,
+            "exerciseName": "Squat",
+            "mappedName": "Squat",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 1,
+            "warnings": [
+              "default_body_mass"
+            ]
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 92002,
+            "exerciseName": "Romanian Deadlift",
+            "mappedName": "Romanian Deadlift",
+            "status": "mapped",
+            "completedSets": 1,
+            "incompleteSets": 1,
+            "warnings": [
+              "default_body_mass"
+            ]
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": [
+          "default_body_mass"
+        ]
+      }
+    },
+    "DEMO_SESSION_LATER": {
+      "explicit180": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8003,
+        "title": "Demo Push",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "chest",
+            "workload": 1160,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 464,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 696,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 1160,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 464,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 696,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 930,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 372,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 558,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 240,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 800,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 480,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 240,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 800,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 480,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          }
+        ],
+        "tissues": {
+          "chest": {
+            "tissueId": "chest",
+            "totalWorkload": 3250,
+            "eventCount": 3,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 3250,
+                "setCount": 3
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 480,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 480,
+                "setCount": 2
+              }
+            ]
+          },
+          "shoulders": {
+            "tissueId": "shoulders",
+            "totalWorkload": 2900,
+            "eventCount": 5,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 1300,
+                "setCount": 3
+              },
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 1600,
+                "setCount": 2
+              }
+            ]
+          },
+          "triceps": {
+            "tissueId": "triceps",
+            "totalWorkload": 2910,
+            "eventCount": 5,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 1950,
+                "setCount": 3
+              },
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 960,
+                "setCount": 2
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 91001,
+            "exerciseName": "Barbell Bench Press",
+            "mappedName": "Barbell Bench Press",
+            "status": "mapped",
+            "completedSets": 3,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 91002,
+            "exerciseName": "Overhead Press",
+            "mappedName": "Overhead Press",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": []
+      },
+      "none": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8003,
+        "title": "Demo Push",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "chest",
+            "workload": 1160,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 464,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 696,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 1160,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 464,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 696,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 930,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 372,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 558,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91001,
+              "exerciseName": "Barbell Bench Press",
+              "exerciseIndex": 0,
+              "setIndex": 2
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 240,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 800,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 480,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 240,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 800,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 480,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8003,
+              "exerciseId": 91002,
+              "exerciseName": "Overhead Press",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          }
+        ],
+        "tissues": {
+          "chest": {
+            "tissueId": "chest",
+            "totalWorkload": 3250,
+            "eventCount": 3,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 3250,
+                "setCount": 3
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 480,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 480,
+                "setCount": 2
+              }
+            ]
+          },
+          "shoulders": {
+            "tissueId": "shoulders",
+            "totalWorkload": 2900,
+            "eventCount": 5,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 1300,
+                "setCount": 3
+              },
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 1600,
+                "setCount": 2
+              }
+            ]
+          },
+          "triceps": {
+            "tissueId": "triceps",
+            "totalWorkload": 2910,
+            "eventCount": 5,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Barbell Bench Press",
+                "exerciseIndex": 0,
+                "workload": 1950,
+                "setCount": 3
+              },
+              {
+                "exerciseName": "Overhead Press",
+                "exerciseIndex": 1,
+                "workload": 960,
+                "setCount": 2
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 91001,
+            "exerciseName": "Barbell Bench Press",
+            "mappedName": "Barbell Bench Press",
+            "status": "mapped",
+            "completedSets": 3,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 91002,
+            "exerciseName": "Overhead Press",
+            "mappedName": "Overhead Press",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": []
+      }
+    },
+    "DEMO_SESSION_B": {
+      "explicit180": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8101,
+        "title": "Demo B Pull",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "back",
+            "workload": 1080,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91101,
+              "exerciseName": "Lat Pulldown",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "biceps",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91101,
+              "exerciseName": "Lat Pulldown",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "back",
+            "workload": 1080,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91101,
+              "exerciseName": "Lat Pulldown",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "biceps",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91101,
+              "exerciseName": "Lat Pulldown",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "biceps",
+            "workload": 250,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91102,
+              "exerciseName": "Dumbbell Curl",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "biceps",
+            "workload": 250,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91102,
+              "exerciseName": "Dumbbell Curl",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          }
+        ],
+        "tissues": {
+          "back": {
+            "tissueId": "back",
+            "totalWorkload": 2160,
+            "eventCount": 2,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Lat Pulldown",
+                "exerciseIndex": 0,
+                "workload": 2160,
+                "setCount": 2
+              }
+            ]
+          },
+          "biceps": {
+            "tissueId": "biceps",
+            "totalWorkload": 1580,
+            "eventCount": 4,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Lat Pulldown",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Dumbbell Curl",
+                "exerciseIndex": 1,
+                "workload": 500,
+                "setCount": 2
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 91101,
+            "exerciseName": "Lat Pulldown",
+            "mappedName": "Lat Pulldown",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 91102,
+            "exerciseName": "Dumbbell Curl",
+            "mappedName": "Dumbbell Curl",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": []
+      },
+      "none": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8101,
+        "title": "Demo B Pull",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "back",
+            "workload": 1080,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91101,
+              "exerciseName": "Lat Pulldown",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "biceps",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91101,
+              "exerciseName": "Lat Pulldown",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "back",
+            "workload": 1080,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91101,
+              "exerciseName": "Lat Pulldown",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "biceps",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91101,
+              "exerciseName": "Lat Pulldown",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "biceps",
+            "workload": 250,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91102,
+              "exerciseName": "Dumbbell Curl",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "biceps",
+            "workload": 250,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8101,
+              "exerciseId": 91102,
+              "exerciseName": "Dumbbell Curl",
+              "exerciseIndex": 1,
+              "setIndex": 1
+            }
+          }
+        ],
+        "tissues": {
+          "back": {
+            "tissueId": "back",
+            "totalWorkload": 2160,
+            "eventCount": 2,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Lat Pulldown",
+                "exerciseIndex": 0,
+                "workload": 2160,
+                "setCount": 2
+              }
+            ]
+          },
+          "biceps": {
+            "tissueId": "biceps",
+            "totalWorkload": 1580,
+            "eventCount": 4,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Lat Pulldown",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Dumbbell Curl",
+                "exerciseIndex": 1,
+                "workload": 500,
+                "setCount": 2
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 91101,
+            "exerciseName": "Lat Pulldown",
+            "mappedName": "Lat Pulldown",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 91102,
+            "exerciseName": "Dumbbell Curl",
+            "mappedName": "Dumbbell Curl",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 0,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": []
+      }
+    },
+    "DEMO_ACTIVE_SESSION": {
+      "explicit180": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": null,
+        "title": "Demo Legs",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "back",
+            "workload": 555,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 740,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1480,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 555,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1480,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1850,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          }
+        ],
+        "tissues": {
+          "back": {
+            "tissueId": "back",
+            "totalWorkload": 555,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 555,
+                "setCount": 1
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 740,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 740,
+                "setCount": 1
+              }
+            ]
+          },
+          "glutes": {
+            "tissueId": "glutes",
+            "totalWorkload": 1480,
+            "eventCount": 1,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1480,
+                "setCount": 1
+              }
+            ]
+          },
+          "hamstrings": {
+            "tissueId": "hamstrings",
+            "totalWorkload": 555,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 555,
+                "setCount": 1
+              }
+            ]
+          },
+          "patellar_tendon": {
+            "tissueId": "patellar_tendon",
+            "totalWorkload": 1480,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1480,
+                "setCount": 1
+              }
+            ]
+          },
+          "quadriceps": {
+            "tissueId": "quadriceps",
+            "totalWorkload": 1850,
+            "eventCount": 1,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1850,
+                "setCount": 1
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 92001,
+            "exerciseName": "Squat",
+            "mappedName": "Squat",
+            "status": "mapped",
+            "completedSets": 1,
+            "incompleteSets": 2,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 92002,
+            "exerciseName": "Romanian Deadlift",
+            "mappedName": "Romanian Deadlift",
+            "status": "mapped",
+            "completedSets": 0,
+            "incompleteSets": 2,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": []
+      },
+      "none": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": null,
+        "title": "Demo Legs",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "back",
+            "workload": 555,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 740,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1480,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 555,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1480,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1850,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": null,
+              "exerciseId": 92001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          }
+        ],
+        "tissues": {
+          "back": {
+            "tissueId": "back",
+            "totalWorkload": 555,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 555,
+                "setCount": 1
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 740,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 740,
+                "setCount": 1
+              }
+            ]
+          },
+          "glutes": {
+            "tissueId": "glutes",
+            "totalWorkload": 1480,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1480,
+                "setCount": 1
+              }
+            ]
+          },
+          "hamstrings": {
+            "tissueId": "hamstrings",
+            "totalWorkload": 555,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 555,
+                "setCount": 1
+              }
+            ]
+          },
+          "patellar_tendon": {
+            "tissueId": "patellar_tendon",
+            "totalWorkload": 1480,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1480,
+                "setCount": 1
+              }
+            ]
+          },
+          "quadriceps": {
+            "tissueId": "quadriceps",
+            "totalWorkload": 1850,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1850,
+                "setCount": 1
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 92001,
+            "exerciseName": "Squat",
+            "mappedName": "Squat",
+            "status": "mapped",
+            "completedSets": 1,
+            "incompleteSets": 2,
+            "warnings": [
+              "default_body_mass"
+            ]
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 92002,
+            "exerciseName": "Romanian Deadlift",
+            "mappedName": "Romanian Deadlift",
+            "status": "mapped",
+            "completedSets": 0,
+            "incompleteSets": 2,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [],
+        "warnings": [
+          "default_body_mass"
+        ]
+      }
+    },
+    "SYNTHETIC_MIXED": {
+      "explicit180": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8500,
+        "title": "Synthetic Mixed",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "back",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 720,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1800,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "back",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 720,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1800,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 2025,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95002,
+              "exerciseName": "Push-Up",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 607.5,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95002,
+              "exerciseName": "Push-Up",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 810,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95002,
+              "exerciseName": "Push-Up",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 1215,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95002,
+              "exerciseName": "Push-Up",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1584,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95003,
+              "exerciseName": "Lunge",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 594,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95003,
+              "exerciseName": "Lunge",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1386,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95003,
+              "exerciseName": "Lunge",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1782,
+            "workloadUnit": "lb*rep",
+            "confidence": "medium",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95003,
+              "exerciseName": "Lunge",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          }
+        ],
+        "tissues": {
+          "back": {
+            "tissueId": "back",
+            "totalWorkload": 1080,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              }
+            ]
+          },
+          "chest": {
+            "tissueId": "chest",
+            "totalWorkload": 2025,
+            "eventCount": 1,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Push-Up",
+                "exerciseIndex": 1,
+                "workload": 2025,
+                "setCount": 1
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 2047.5,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1440,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Push-Up",
+                "exerciseIndex": 1,
+                "workload": 607.5,
+                "setCount": 1
+              }
+            ]
+          },
+          "glutes": {
+            "tissueId": "glutes",
+            "totalWorkload": 4464,
+            "eventCount": 3,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 2880,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Lunge",
+                "exerciseIndex": 2,
+                "workload": 1584,
+                "setCount": 1
+              }
+            ]
+          },
+          "hamstrings": {
+            "tissueId": "hamstrings",
+            "totalWorkload": 1674,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Lunge",
+                "exerciseIndex": 2,
+                "workload": 594,
+                "setCount": 1
+              }
+            ]
+          },
+          "patellar_tendon": {
+            "tissueId": "patellar_tendon",
+            "totalWorkload": 4266,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 2880,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Lunge",
+                "exerciseIndex": 2,
+                "workload": 1386,
+                "setCount": 1
+              }
+            ]
+          },
+          "quadriceps": {
+            "tissueId": "quadriceps",
+            "totalWorkload": 5382,
+            "eventCount": 3,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 3600,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Lunge",
+                "exerciseIndex": 2,
+                "workload": 1782,
+                "setCount": 1
+              }
+            ]
+          },
+          "shoulders": {
+            "tissueId": "shoulders",
+            "totalWorkload": 810,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Push-Up",
+                "exerciseIndex": 1,
+                "workload": 810,
+                "setCount": 1
+              }
+            ]
+          },
+          "triceps": {
+            "tissueId": "triceps",
+            "totalWorkload": 1215,
+            "eventCount": 1,
+            "confidence": "medium",
+            "contributors": [
+              {
+                "exerciseName": "Push-Up",
+                "exerciseIndex": 1,
+                "workload": 1215,
+                "setCount": 1
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 95001,
+            "exerciseName": "Squat",
+            "mappedName": "Squat",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 1,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 95002,
+            "exerciseName": "Push-Up",
+            "mappedName": "Push-Up",
+            "status": "mapped",
+            "completedSets": 1,
+            "incompleteSets": 0,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 2,
+            "exerciseId": 95003,
+            "exerciseName": "Lunge",
+            "mappedName": "Lunge",
+            "status": "mapped",
+            "completedSets": 1,
+            "incompleteSets": 1,
+            "warnings": []
+          },
+          {
+            "exerciseIndex": 3,
+            "exerciseId": 95004,
+            "exerciseName": "Treadmill Run",
+            "mappedName": null,
+            "status": "unmapped",
+            "completedSets": 1,
+            "incompleteSets": 0,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [
+          "Treadmill Run"
+        ],
+        "warnings": []
+      },
+      "none": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "sourceType": "workout_model",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "sessionId": 8500,
+        "title": "Synthetic Mixed",
+        "startedAt": 1772634600000,
+        "finishedAt": 1772637000000,
+        "events": [
+          {
+            "tissueId": "back",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 720,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1800,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "back",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 720,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 540,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1440,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1800,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95001,
+              "exerciseName": "Squat",
+              "exerciseIndex": 0,
+              "setIndex": 1
+            }
+          },
+          {
+            "tissueId": "chest",
+            "workload": 2025,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95002,
+              "exerciseName": "Push-Up",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "core",
+            "workload": 607.5,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95002,
+              "exerciseName": "Push-Up",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "shoulders",
+            "workload": 810,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95002,
+              "exerciseName": "Push-Up",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "triceps",
+            "workload": 1215,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95002,
+              "exerciseName": "Push-Up",
+              "exerciseIndex": 1,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "glutes",
+            "workload": 1584,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95003,
+              "exerciseName": "Lunge",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "hamstrings",
+            "workload": 594,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95003,
+              "exerciseName": "Lunge",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "workload": 1386,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95003,
+              "exerciseName": "Lunge",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          },
+          {
+            "tissueId": "quadriceps",
+            "workload": 1782,
+            "workloadUnit": "lb*rep",
+            "confidence": "low",
+            "modelVersion": "tissue-load-v0.1",
+            "sourceType": "workout_model",
+            "timestamp": 1772637000000,
+            "provenance": {
+              "sessionId": 8500,
+              "exerciseId": 95003,
+              "exerciseName": "Lunge",
+              "exerciseIndex": 2,
+              "setIndex": 0
+            }
+          }
+        ],
+        "tissues": {
+          "back": {
+            "tissueId": "back",
+            "totalWorkload": 1080,
+            "eventCount": 2,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              }
+            ]
+          },
+          "chest": {
+            "tissueId": "chest",
+            "totalWorkload": 2025,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Push-Up",
+                "exerciseIndex": 1,
+                "workload": 2025,
+                "setCount": 1
+              }
+            ]
+          },
+          "core": {
+            "tissueId": "core",
+            "totalWorkload": 2047.5,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1440,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Push-Up",
+                "exerciseIndex": 1,
+                "workload": 607.5,
+                "setCount": 1
+              }
+            ]
+          },
+          "glutes": {
+            "tissueId": "glutes",
+            "totalWorkload": 4464,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 2880,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Lunge",
+                "exerciseIndex": 2,
+                "workload": 1584,
+                "setCount": 1
+              }
+            ]
+          },
+          "hamstrings": {
+            "tissueId": "hamstrings",
+            "totalWorkload": 1674,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 1080,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Lunge",
+                "exerciseIndex": 2,
+                "workload": 594,
+                "setCount": 1
+              }
+            ]
+          },
+          "patellar_tendon": {
+            "tissueId": "patellar_tendon",
+            "totalWorkload": 4266,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 2880,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Lunge",
+                "exerciseIndex": 2,
+                "workload": 1386,
+                "setCount": 1
+              }
+            ]
+          },
+          "quadriceps": {
+            "tissueId": "quadriceps",
+            "totalWorkload": 5382,
+            "eventCount": 3,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Squat",
+                "exerciseIndex": 0,
+                "workload": 3600,
+                "setCount": 2
+              },
+              {
+                "exerciseName": "Lunge",
+                "exerciseIndex": 2,
+                "workload": 1782,
+                "setCount": 1
+              }
+            ]
+          },
+          "shoulders": {
+            "tissueId": "shoulders",
+            "totalWorkload": 810,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Push-Up",
+                "exerciseIndex": 1,
+                "workload": 810,
+                "setCount": 1
+              }
+            ]
+          },
+          "triceps": {
+            "tissueId": "triceps",
+            "totalWorkload": 1215,
+            "eventCount": 1,
+            "confidence": "low",
+            "contributors": [
+              {
+                "exerciseName": "Push-Up",
+                "exerciseIndex": 1,
+                "workload": 1215,
+                "setCount": 1
+              }
+            ]
+          }
+        },
+        "exercises": [
+          {
+            "exerciseIndex": 0,
+            "exerciseId": 95001,
+            "exerciseName": "Squat",
+            "mappedName": "Squat",
+            "status": "mapped",
+            "completedSets": 2,
+            "incompleteSets": 1,
+            "warnings": [
+              "default_body_mass"
+            ]
+          },
+          {
+            "exerciseIndex": 1,
+            "exerciseId": 95002,
+            "exerciseName": "Push-Up",
+            "mappedName": "Push-Up",
+            "status": "mapped",
+            "completedSets": 1,
+            "incompleteSets": 0,
+            "warnings": [
+              "default_body_mass"
+            ]
+          },
+          {
+            "exerciseIndex": 2,
+            "exerciseId": 95003,
+            "exerciseName": "Lunge",
+            "mappedName": "Lunge",
+            "status": "mapped",
+            "completedSets": 1,
+            "incompleteSets": 1,
+            "warnings": [
+              "default_body_mass"
+            ]
+          },
+          {
+            "exerciseIndex": 3,
+            "exerciseId": 95004,
+            "exerciseName": "Treadmill Run",
+            "mappedName": null,
+            "status": "unmapped",
+            "completedSets": 1,
+            "incompleteSets": 0,
+            "warnings": []
+          }
+        ],
+        "unmappedExercises": [
+          "Treadmill Run"
+        ],
+        "warnings": [
+          "default_body_mass"
+        ]
+      }
+    }
+  },
+  "sets": {
+    "squat_done": {
+      "input": {
+        "exercise": {
+          "name": "Squat"
+        },
+        "set": {
+          "reps": 5,
+          "weight": 225,
+          "done": true
+        },
+        "context": {
+          "bodyMass": 180
+        }
+      },
+      "output": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "exerciseName": "Squat",
+        "mappedName": "Squat",
+        "status": "mapped",
+        "completed": true,
+        "reps": 5,
+        "externalWeight": 225,
+        "bodyMassBand": "most",
+        "bodyMassFraction": 0.75,
+        "bodyMass": 180,
+        "effectiveLoad": 360,
+        "setWorkload": 1800,
+        "tissueWorkloads": [
+          {
+            "tissueId": "back",
+            "coefficient": 0.3,
+            "workload": 540,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "core",
+            "coefficient": 0.4,
+            "workload": 720,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "glutes",
+            "coefficient": 0.8,
+            "workload": 1440,
+            "confidence": "medium"
+          },
+          {
+            "tissueId": "hamstrings",
+            "coefficient": 0.3,
+            "workload": 540,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "coefficient": 0.8,
+            "workload": 1440,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "quadriceps",
+            "coefficient": 1,
+            "workload": 1800,
+            "confidence": "medium"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    "squat_incomplete": {
+      "input": {
+        "exercise": {
+          "name": "Squat"
+        },
+        "set": {
+          "reps": 5,
+          "weight": 225,
+          "done": false
+        },
+        "context": {
+          "bodyMass": 180
+        }
+      },
+      "output": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "exerciseName": "Squat",
+        "mappedName": "Squat",
+        "status": "mapped",
+        "completed": false,
+        "reps": 5,
+        "externalWeight": 225,
+        "bodyMassBand": "most",
+        "bodyMassFraction": 0.75,
+        "bodyMass": 180,
+        "effectiveLoad": 360,
+        "setWorkload": 1800,
+        "tissueWorkloads": [],
+        "warnings": []
+      }
+    },
+    "pushup_zero_weight": {
+      "input": {
+        "exercise": {
+          "name": "Push-Up"
+        },
+        "set": {
+          "reps": 15,
+          "weight": 0,
+          "done": true
+        },
+        "context": {
+          "bodyMass": 180
+        }
+      },
+      "output": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "exerciseName": "Push-Up",
+        "mappedName": "Push-Up",
+        "status": "mapped",
+        "completed": true,
+        "reps": 15,
+        "externalWeight": 0,
+        "bodyMassBand": "most",
+        "bodyMassFraction": 0.75,
+        "bodyMass": 180,
+        "effectiveLoad": 135,
+        "setWorkload": 2025,
+        "tissueWorkloads": [
+          {
+            "tissueId": "chest",
+            "coefficient": 1,
+            "workload": 2025,
+            "confidence": "medium"
+          },
+          {
+            "tissueId": "core",
+            "coefficient": 0.3,
+            "workload": 607.5,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "shoulders",
+            "coefficient": 0.4,
+            "workload": 810,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "triceps",
+            "coefficient": 0.6,
+            "workload": 1215,
+            "confidence": "medium"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    "bench_default_mass": {
+      "input": {
+        "exercise": {
+          "name": "Barbell Bench Press"
+        },
+        "set": {
+          "reps": 8,
+          "weight": 135,
+          "done": true
+        },
+        "context": null
+      },
+      "output": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "exerciseName": "Barbell Bench Press",
+        "mappedName": "Barbell Bench Press",
+        "status": "mapped",
+        "completed": true,
+        "reps": 8,
+        "externalWeight": 135,
+        "bodyMassBand": "none",
+        "bodyMassFraction": 0,
+        "bodyMass": null,
+        "effectiveLoad": 135,
+        "setWorkload": 1080,
+        "tissueWorkloads": [
+          {
+            "tissueId": "chest",
+            "coefficient": 1,
+            "workload": 1080,
+            "confidence": "medium"
+          },
+          {
+            "tissueId": "shoulders",
+            "coefficient": 0.4,
+            "workload": 432,
+            "confidence": "medium"
+          },
+          {
+            "tissueId": "triceps",
+            "coefficient": 0.6,
+            "workload": 648,
+            "confidence": "medium"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    "unmapped": {
+      "input": {
+        "exercise": {
+          "name": "Treadmill Run"
+        },
+        "set": {
+          "reps": 1,
+          "weight": 0,
+          "done": true
+        },
+        "context": {
+          "bodyMass": 180
+        }
+      },
+      "output": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "exerciseName": "Treadmill Run",
+        "mappedName": null,
+        "status": "unmapped",
+        "completed": true,
+        "reps": 1,
+        "externalWeight": 0,
+        "bodyMassBand": null,
+        "bodyMassFraction": 0,
+        "bodyMass": null,
+        "effectiveLoad": 0,
+        "setWorkload": 0,
+        "tissueWorkloads": [],
+        "warnings": []
+      }
+    },
+    "invalid_reps": {
+      "input": {
+        "exercise": {
+          "name": "Squat"
+        },
+        "set": {
+          "reps": "abc",
+          "weight": 225,
+          "done": true
+        },
+        "context": {
+          "bodyMass": 180
+        }
+      },
+      "output": {
+        "modelVersion": "tissue-load-v0.1",
+        "mapVersion": "exercise-tissue-map-v0.1",
+        "workloadUnit": "lb*rep",
+        "scale": "unbounded",
+        "weightUnit": "lb",
+        "exerciseName": "Squat",
+        "mappedName": "Squat",
+        "status": "mapped",
+        "completed": true,
+        "reps": 0,
+        "externalWeight": 225,
+        "bodyMassBand": "most",
+        "bodyMassFraction": 0.75,
+        "bodyMass": 180,
+        "effectiveLoad": 360,
+        "setWorkload": 0,
+        "tissueWorkloads": [
+          {
+            "tissueId": "back",
+            "coefficient": 0.3,
+            "workload": 0,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "core",
+            "coefficient": 0.4,
+            "workload": 0,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "glutes",
+            "coefficient": 0.8,
+            "workload": 0,
+            "confidence": "medium"
+          },
+          {
+            "tissueId": "hamstrings",
+            "coefficient": 0.3,
+            "workload": 0,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "patellar_tendon",
+            "coefficient": 0.8,
+            "workload": 0,
+            "confidence": "low"
+          },
+          {
+            "tissueId": "quadriceps",
+            "coefficient": 1,
+            "workload": 0,
+            "confidence": "medium"
+          }
+        ],
+        "warnings": [
+          "invalid_reps",
+          "zero_reps"
+        ]
+      }
+    }
+  },
+  "pinnedTimestamps": {
+    "startedAt": 1772634600000,
+    "finishedAt": 1772637000000
+  },
+  "syntheticMixedInput": {
+    "id": 8500,
+    "routineId": 9500,
+    "title": "Synthetic Mixed",
+    "startedAt": 1772634600000,
+    "finishedAt": 1772637000000,
+    "completedSets": 5,
+    "totalSets": 7,
+    "exercises": [
+      {
+        "id": 95001,
+        "name": "Squat",
+        "muscle": "Quads",
+        "sets": [
+          {
+            "reps": 5,
+            "weight": 225,
+            "done": true
+          },
+          {
+            "reps": 5,
+            "weight": 225,
+            "done": true
+          },
+          {
+            "reps": 5,
+            "weight": 225,
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": 95002,
+        "name": "Push-Up",
+        "muscle": "Chest",
+        "sets": [
+          {
+            "reps": 15,
+            "weight": 0,
+            "done": true
+          }
+        ]
+      },
+      {
+        "id": 95003,
+        "name": "Lunge",
+        "muscle": "Quads",
+        "sets": [
+          {
+            "reps": 12,
+            "weight": 30,
+            "done": true
+          },
+          {
+            "reps": 12,
+            "weight": 30,
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": 95004,
+        "name": "Treadmill Run",
+        "muscle": "Cardio",
+        "sets": [
+          {
+            "reps": 1,
+            "weight": 0,
+            "done": true
+          }
+        ]
+      }
+    ]
+  }
+}

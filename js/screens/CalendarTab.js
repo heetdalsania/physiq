@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { evaluateCalorieGoal, evaluateNutritionDay } from "../utils/calculations.js";
 import { AppTime } from "../utils/appTime.js";
+import { formatSetMetadataSummary } from "../utils/setMetadata.js";
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -422,9 +423,11 @@ export function CalendarTab({ history, workoutLog, intake, targets, profile, dev
                                 {doneSets.length > 0 ? (
                                   <div className="cal-recap-sets">
                                     {doneSets.map(function(s, i) {
+                                      const meta = formatSetMetadataSummary(s);
                                       return (
                                         <span key={i} className="cal-recap-set mono">
                                           {s.reps}{s.weight > 0 ? "×" + s.weight + "lb" : " reps"}
+                                          {meta && <span className="cal-recap-set-meta">{" · " + meta}</span>}
                                         </span>
                                       );
                                     })}
