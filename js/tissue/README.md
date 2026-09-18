@@ -4,9 +4,9 @@ Pure, framework-free computation that turns a Physiq workout session into a
 deterministic, versioned, uncertainty-tagged **tissue workload** breakdown.
 
 Nothing in this directory touches React, the DOM, `localStorage`, the network
-or the clock, and nothing in the rest of the app imports it yet (tests enforce
-both). Results are ephemeral: Milestone 1 persists nothing and adds no storage
-key, field or migration.
+or the clock (tests enforce this). Milestone 3 now consumes this unchanged engine
+through a pure presentation adapter; see [Tissue Load Map](../../TISSUE_LOAD_MAP.md).
+Results remain ephemeral: no TissueOS storage key, field or migration is added.
 
 All examples below are synthetic.
 
@@ -398,8 +398,9 @@ Consequences, contained in `resolveExerciseMapping()`:
 - Tendon entries are relevance markers, not tendon-load models.
 - A lifter entering kilograms into Physiq's unlabelled weight field produces
   data the whole app mislabels; the engine inherits that.
-- Nothing accumulates across sessions: no tissue state, no capacity, no
-  recovery, no baseline.
+- The domain has no cross-session tissue state, capacity, recovery or baseline.
+  Milestone 3 only sums existing events for the selected calendar period at
+  display time; it introduces no stored or longitudinal model.
 
 **This layer estimates a relative training workload per coarse tissue region
 for one session.** It cannot say what force a tissue experienced, how it is
