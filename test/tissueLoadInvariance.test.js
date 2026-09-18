@@ -16,7 +16,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, globSync } from "node:fs";
 
 import { estimateSessionTissueLoad, estimateSetTissueLoad } from "../js/tissue/loadEngine.js";
 import { TISSUE_LOAD_MODEL_VERSION, EXERCISE_TISSUE_MAP_VERSION } from "../js/tissue/modelVersion.js";
@@ -157,6 +157,48 @@ test("set-level: metadata on a single set leaves every output field identical", 
     const actual = estimateSetTissueLoad(c.input.exercise, decoratedSet, c.input.context === null ? undefined : c.input.context);
     assert.deepEqual(clone(actual), c.output, k);
   });
+});
+
+// ── the golden file cannot update itself ────────────────────────────────
+
+test("no file in the test suite can write to disk, so a run can never regenerate the golden file", function() {
+  /* `npm test` is node --test "test/*.test.js". If nothing the glob matches
+     can write a file, a failing invariance test can only be resolved by a
+     human deliberately running the maintainer tool. */
+  const suite = globSync("test/*.test.js");
+  assert.ok(suite.length >= 14, "glob resolved no suite files: " + suite.length);
+  assert.ok(suite.indexOf("test/tissueLoadInvariance.test.js") >= 0, "this file must be in the suite");
+  /* Call-shaped, so naming an API inside a string or a regex (as this very
+     test does) is not mistaken for using one. */
+  const WRITE_CALL = /\b(writeFileSync|appendFileSync|createWriteStream|copyFileSync|renameSync|rmSync|unlinkSync|mkdirSync|writeSync)\s*\(|\bpromises\s*\.\s*(writeFile|appendFile|rm|mkdir)\s*\(/;
+  suite.forEach(function(file) {
+    const src = readFileSync(new URL("../" + file, import.meta.url), "utf8");
+    const hit = src.match(WRITE_CALL);
+    assert.equal(hit, null, file + " must not write files, found: " + (hit && hit[0]));
+  });
+});
+
+test("the capture script is a maintainer tool: outside the suite glob, documented, and inert without an explicit path", function() {
+  const suite = globSync("test/*.test.js");
+  const CAPTURE = "test/fixtures/captureTissueLoadBaseline.mjs";
+  assert.equal(suite.indexOf(CAPTURE) < 0, true, "the capture script must never be run by npm test");
+  assert.equal(globSync(CAPTURE).length, 1, "the capture script should still exist for a deliberate regeneration");
+
+  const src = readFileSync(new URL("../" + CAPTURE, import.meta.url), "utf8");
+  assert.match(src, /MAINTAINER TOOL — NOT PART OF THE TEST SUITE/, "must announce itself as a maintainer tool");
+  assert.match(src, /Do not run this to make a failing test pass/i, "must warn against papering over a real change");
+  assert.match(src, /process\.argv\[2\]/, "must take an explicit output path");
+  assert.match(src, /process\.exit\(2\)/, "must refuse to write without one");
+});
+
+test("the golden file records the commit it came from and is consumed, never produced, here", function() {
+  assert.match(GOLDEN.generatedFrom, /^[0-9a-f]{40}$/);
+  assert.match(GOLDEN.note, /captured BEFORE Milestone 2/i);
+  const self = readFileSync(new URL("./tissueLoadInvariance.test.js", import.meta.url), "utf8");
+  assert.equal(/\bwriteFileSync\s*\(/.test(self), false, "this test must never write the file it asserts against");
+  /* Expected values are read from the file, never computed by the code under
+     test: every assertion above compares against GOLDEN.* */
+  assert.ok(Object.keys(GOLDEN.sessions).length > 0 && Object.keys(GOLDEN.sets).length > 0);
 });
 
 test("the engine source does not read the metadata fields (source guard)", function() {
