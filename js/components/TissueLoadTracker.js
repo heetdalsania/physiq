@@ -9,7 +9,7 @@ import { buildTissueLoadHistory } from "../utils/tissueLoadHistory.js";
 import { indexSourceKeys, isCurrentSeriesEntry } from "../utils/tissueHistorySnapshot.js";
 import { AppTime } from "../utils/appTime.js";
 
-const format = value => value.toLocaleString(undefined, { maximumFractionDigits: 6 });
+const format = value => Number.isFinite(value) ? value.toLocaleString(undefined, { maximumFractionDigits: 6 }) : "Not available";
 const confidenceLabel = value => value ? value[0].toUpperCase() + value.slice(1) : "Not available";
 const dateLabel = key => {
   const p = String(key).split("-").map(Number);
@@ -49,17 +49,23 @@ export function TissueBodyDiagram({ side, tissues, selected, onSelect, detailId 
    frozen v0.1 workload only; no thresholds, no colors, no advice. */
 export function TissueLongitudinalDetail({ history, tissueId, workloadUnit, storageState }) {
   const storageNote =
-    storageState === "malformed" ? "Saved modeled history could not be read. The original was kept, and this view is recomputed from your workouts." :
+    storageState === "malformed" || storageState === "unreadable" ? "Saved modeled history could not be read. The original was kept, and this view is recomputed from your workouts." :
     storageState === "unsupported" ? "Saved modeled history was written by a newer version of the app and has been left unchanged. This view is recomputed from your workouts." :
     storageState === "write_failed" ? "Modeled history could not be saved this time. It will be rebuilt automatically." :
     storageState === "source_unreadable" ? "Workout history could not be read, so previously saved modeled history is shown." : null;
   if (!history) return <><h4>Recent exposure</h4><p className="tl-muted">Modeled history is not loaded yet.</p></>;
   const t = history.tissues[tissueId];
   const w = history.windows;
+  const historyNotes = <>
+    {history.futureEntries > 0 && <p className="tl-muted">Future-dated workouts are kept but excluded from current exposure and logging coverage.</p>}
+    {history.invalidEntries > 0 && <p className="tl-muted">Some saved history entries have invalid values and are excluded.</p>}
+    {history.otherSeriesEntries > 0 && <p className="tl-muted">{plural(history.otherSeriesEntries, "history entry").replace("entrys", "entries")} from a different model version {history.otherSeriesEntries === 1 ? "is" : "are"} kept separately and not included.</p>}
+  </>;
   if (history.historyState === "no_history" || !t) {
     return <>
       <h4>Recent exposure</h4>
       <p>No modeled history yet. Recent exposure begins with the first saved workout that the model covers.</p>
+      {historyNotes}
       {storageNote && <p className="tl-muted">{storageNote}</p>}
     </>;
   }
@@ -80,19 +86,21 @@ export function TissueLongitudinalDetail({ history, tissueId, workloadUnit, stor
   return <>
     <h4>Recent exposure</h4>
     <dl className="tl-stats">
-      <div><dt>Last 7 days</dt><dd className="mono">{format(t.recent7)} {workloadUnit}{w.recent.state === "partial" && <small>{w.recent.observedDays} of 7 days observed</small>}</dd></div>
-      <div><dt>Last 28 days</dt><dd className="mono">{format(t.recent28)} {workloadUnit}{w.long.state === "partial" && <small>{w.long.observedDays} of 28 days observed</small>}</dd></div>
+      <div><dt>Last 7 days</dt><dd className="mono">{format(t.recent7)} {workloadUnit}{w.recent.state === "partial" && <small>{w.recent.observedDays} of 7 days since first log</small>}</dd></div>
+      <div><dt>Last 28 days</dt><dd className="mono">{format(t.recent28)} {workloadUnit}{w.long.state === "partial" && <small>{w.long.observedDays} of 28 days since first log</small>}</dd></div>
       <div><dt>Recent baseline</dt><dd className="mono">{b.state === "insufficient_history" ? "Not yet available" : <>{format(b.value)} {workloadUnit}<small>per 7 days, {baselineRange}</small></>}</dd></div>
       <div><dt>Change vs recent baseline</dt><dd className="mono">{b.state === "available" ? <>{percentText}<small>{directionText}</small></> : "Not comparable"}</dd></div>
     </dl>
     {b.state === "available" && <p className="tl-muted">{percentText} means the last 7 days' modeled workload is {Math.abs(b.percent).toLocaleString(undefined, { maximumFractionDigits: 0 })}% {b.direction === "below" ? "below" : "above"} the mean of the four 7-day periods before them ({format(b.value)} {workloadUnit}). It is a descriptive comparison with your own logged history, not injury risk, recovery or capacity.</p>}
     {b.state === "insufficient_history" && <p className="tl-muted">Baseline needs modeled history covering the 28 days before the last 7 days ({baselineRange}). History begins {dateLabel(history.firstObservedDate)}.</p>}
     {zeroReason && <p className="tl-muted">{zeroReason}</p>}
+    {(b.state === "numeric_unavailable" || t.recent7 === null || t.recent28 === null) && <p className="tl-muted">These saved values exceed the supported numeric range; the affected total or comparison is not available.</p>}
     <p className="tl-muted">Coverage: last 7 days {coverageText(w.recent)}; last 28 days {coverageText(w.long)}{w.baseline.state === "complete" && <>; baseline period {coverageText(w.baseline)}</>}.{unmappedAnywhere && <> Unmapped sets are excluded from every total above, so the comparison covers modeled exercises only.</>}</p>
     {approximate > 0 && <p className="tl-muted">Some older estimates use limited historical profile data: no dated weight measurement was available for {plural(approximate, "workout")} in these windows.</p>}
-    {history.otherSeriesEntries > 0 && <p className="tl-muted">{plural(history.otherSeriesEntries, "history entry").replace("entrys", "entries")} from a different model version {history.otherSeriesEntries === 1 ? "is" : "are"} kept separately and not included.</p>}
+    {historyNotes}
     {storageNote && <p className="tl-muted">{storageNote}</p>}
     <p className="tl-muted">Windows are local calendar days ending today; history begins {dateLabel(history.firstObservedDate)}. Baseline is this profile's own recent modeled exposure ({history.analyticsVersion}), not tissue capacity, and it makes no training recommendation.</p>
+    <p className="tl-muted">Days without entries after the first log count as zero logged workload. The app cannot distinguish unlogged training from no training; elapsed logging history does not establish complete training coverage.</p>
   </>;
 }
 
@@ -167,7 +175,7 @@ export function TissueLoadContent({ view, side, setSide, selected, setSelected, 
    `undefined`, which the adapter treats as "use the current profile weight"
    — the pre-Milestone-4 behaviour, and only ever a transient state. */
 function frozenBodyMassResolver(workoutLog, entries) {
-  const byKey = {};
+  const byKey = Object.create(null);
   entries.forEach(e => { if (isCurrentSeriesEntry(e) && !(e.sourceKey in byKey)) byKey[e.sourceKey] = e; });
   const bySession = new Map();
   const keys = indexSourceKeys(workoutLog);

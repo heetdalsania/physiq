@@ -90,6 +90,7 @@ async function seed() {
       put(email, "profile", profile);
       put(email, "intake", intake); put(email, "meals", meals);
       put(email, "workoutLog", []);
+      put(email, "recentFoods", [{ name: "Saved " + email, calories: 111, protein: 10, carbs: 10, fats: 3 }]);
       put(email, "routines", email === A ? [routine] : []);
       put(email, "weeklyMuscles", { weekStart: "2026-03-30", dates: {}, sessions: {}, sets: { chest: email === A ? 3 : 0 } });
       put(email, "setTargets", { chest: 8 });
@@ -209,11 +210,11 @@ try {
     await refuteDetail(/Infinity|NaN|∞/);
   });
 
-  await check("8. insufficient history is stated honestly, with observed-day counts", async () => {
+  await check("8. insufficient history is stated honestly, with elapsed logging-span counts", async () => {
     await setSource([bench(1000, 801, -2), bench(500, 802, -1)]);
     await selectTissue("chest");
-    await assertDetail(/Last 7 days\s+1,500 lb\*rep\s*3 of 7 days observed/);
-    await assertDetail(/Last 28 days\s+1,500 lb\*rep\s*3 of 28 days observed/);
+    await assertDetail(/Last 7 days\s+1,500 lb\*rep\s*3 of 7 days since first log/);
+    await assertDetail(/Last 28 days\s+1,500 lb\*rep\s*3 of 28 days since first log/);
     await assertDetail(/Recent baseline\s+Not yet available/);
     await assertDetail(/Change vs recent baseline\s+Not comparable/);
     await assertDetail(/Baseline needs modeled history covering the 28 days before the last 7 days \(Feb 25 – Mar 24\)\. History begins Mar 29\./);
@@ -241,7 +242,6 @@ try {
       const foreign = JSON.parse(JSON.stringify(env.entries[0]));
       foreign.modelVersion = "tissue-load-v0.2";
       foreign.mapVersion = "exercise-tissue-map-v0.2";
-      foreign.sourceKey = "synthetic-v02#0";
       foreign.tissues = { chest: { workload: 999999, eventCount: 1, confidence: "low" } };
       env.entries.push(foreign);
       localStorage.setItem(key, JSON.stringify(env));
@@ -419,6 +419,9 @@ try {
     after = JSON.parse((await storage())[`pq_${A}_intake`]);
     assert.equal(after.calories, before.calories + 200);
     assert.equal(after.protein, before.protein + 20);
+    const recent = JSON.parse((await storage())[`pq_${A}_recentFoods`]);
+    assert.ok(recent.some(food => food.name === "Saved " + A), "existing recent foods must survive reload, profile switches, and a new meal");
+    assert.ok(!recent.some(food => food.name === "Saved " + B), "another profile food leaked");
     await closePopup();
   });
 
@@ -522,7 +525,12 @@ try {
     const aBefore = await page.evaluate(A => JSON.stringify({
       workoutLog: localStorage.getItem(`pq_${A}_workoutLog`),
       routines: localStorage.getItem(`pq_${A}_routines`),
-      tissueHistory: localStorage.getItem(`pq_${A}_tissueHistory`)
+      tissueHistory: localStorage.getItem(`pq_${A}_tissueHistory`),
+      recentFoods: localStorage.getItem(`pq_${A}_recentFoods`),
+      intake: localStorage.getItem(`pq_${A}_intake`), meals: localStorage.getItem(`pq_${A}_meals`),
+      history: localStorage.getItem(`pq_${A}_history`), profile: localStorage.getItem(`pq_${A}_profile`),
+      setTargets: localStorage.getItem(`pq_${A}_setTargets`), weeklyMuscles: localStorage.getItem(`pq_${A}_weeklyMuscles`),
+      planDrafts: localStorage.getItem(`pq_${A}_planDrafts`)
     }), A);
     assert.ok(JSON.parse(aBefore).workoutLog.length > 100, "profile A must actually have workouts to leak");
 
@@ -541,7 +549,7 @@ try {
       const read = s => localStorage.getItem(`pq_${C}_${s}`);
       return { profile: read("profile"), workoutLog: read("workoutLog"), routines: read("routines"),
         weeklyMuscles: read("weeklyMuscles"), setTargets: read("setTargets"), meals: read("meals"),
-        intake: read("intake"), history: read("history"), tissueHistory: read("tissueHistory") };
+        intake: read("intake"), history: read("history"), recentFoods: read("recentFoods"), planDrafts: read("planDrafts"), tissueHistory: read("tissueHistory") };
     }, C);
     assert.deepEqual(JSON.parse(c.workoutLog), [], "the new account inherited workouts");
     assert.deepEqual(JSON.parse(c.routines), [], "the new account inherited routines");
@@ -549,6 +557,8 @@ try {
     assert.deepEqual(JSON.parse(c.meals), [], "the new account inherited meals");
     assert.deepEqual(JSON.parse(c.weeklyMuscles).sets, {}, "the new account inherited a weekly rollup");
     assert.equal(c.history, null, "the new account inherited nutrition history");
+    assert.equal(c.recentFoods, null, "the new account inherited recent foods");
+    assert.equal(c.planDrafts, null, "the new account inherited meal plans");
     assert.equal(JSON.parse(c.intake).calories, 0, "the new account inherited today's intake");
     assert.equal(JSON.parse(c.profile).name, "Demo C");
     assert.equal(JSON.parse(c.profile).weightLog, undefined, "the new account inherited a weight log");
@@ -559,7 +569,12 @@ try {
     assert.equal(await page.evaluate(A => JSON.stringify({
       workoutLog: localStorage.getItem(`pq_${A}_workoutLog`),
       routines: localStorage.getItem(`pq_${A}_routines`),
-      tissueHistory: localStorage.getItem(`pq_${A}_tissueHistory`)
+      tissueHistory: localStorage.getItem(`pq_${A}_tissueHistory`),
+      recentFoods: localStorage.getItem(`pq_${A}_recentFoods`),
+      intake: localStorage.getItem(`pq_${A}_intake`), meals: localStorage.getItem(`pq_${A}_meals`),
+      history: localStorage.getItem(`pq_${A}_history`), profile: localStorage.getItem(`pq_${A}_profile`),
+      setTargets: localStorage.getItem(`pq_${A}_setTargets`), weeklyMuscles: localStorage.getItem(`pq_${A}_weeklyMuscles`),
+      planDrafts: localStorage.getItem(`pq_${A}_planDrafts`)
     }), A), aBefore, "profile A changed while onboarding a new account");
 
     // And the new account's own first workout lands only under its own key.
@@ -587,13 +602,20 @@ try {
       put("profile", { name: "Demo R", weight: 190, age: 30, height: 70, sex: "male", bodyfat: 18,
         goal: "build", activity: "moderate", gymDays: 4, steps: 9000, todayMuscles: [], bmrOverride: null });
       put("workoutLog", log);
+      put("intake", { calories: 0, protein: 20, carbs: 10, fats: 5, sodium: 2, water: 8 });
+      put("meals", [{ id: 12, name: "Saved recovery meal", calories: 0 }]);
+      put("recentFoods", [{ name: "Saved recovery food", calories: 0 }]);
+      put("planDrafts", { training: [], rest: [] });
+      localStorage.setItem(`pq_${R}_date`, "Tue Mar 31 2026");
       put("routines", [routine]);
       put("setTargets", { chest: 14 });
       put("weeklyMuscles", { weekStart: "2026-03-30", dates: { chest: ["2026-03-30"] }, sessions: {}, sets: { chest: 5 } });
       put("history", [{ date: "Mon Mar 30 2026", calories: 2600, protein: 170, carbs: 300, fats: 80, sodium: 2200 }]);
       return { workoutLog: localStorage.getItem(`pq_${R}_workoutLog`), routines: localStorage.getItem(`pq_${R}_routines`),
         setTargets: localStorage.getItem(`pq_${R}_setTargets`), weeklyMuscles: localStorage.getItem(`pq_${R}_weeklyMuscles`),
-        history: localStorage.getItem(`pq_${R}_history`) };
+        history: localStorage.getItem(`pq_${R}_history`),
+        intake: localStorage.getItem(`pq_${R}_intake`), meals: localStorage.getItem(`pq_${R}_meals`),
+        recentFoods: localStorage.getItem(`pq_${R}_recentFoods`), planDrafts: localStorage.getItem(`pq_${R}_planDrafts`) };
     }, { R, log: [bench(2000, 970, -1)], routine: { id: 9301, title: "Demo R Push", exercises: [{ id: 1, name: "Barbell Bench Press", muscle: "Chest", sets: [{ reps: 8, weight: 135 }] }] } });
 
     // Log in once so the derived history materializes, then corrupt ONLY the profile.
@@ -622,13 +644,16 @@ try {
       corrupt: localStorage.getItem(`pq_${R}_profile__corrupt`),
       workoutLog: localStorage.getItem(`pq_${R}_workoutLog`), routines: localStorage.getItem(`pq_${R}_routines`),
       setTargets: localStorage.getItem(`pq_${R}_setTargets`), weeklyMuscles: localStorage.getItem(`pq_${R}_weeklyMuscles`),
-      history: localStorage.getItem(`pq_${R}_history`)
+      history: localStorage.getItem(`pq_${R}_history`),
+        intake: localStorage.getItem(`pq_${R}_intake`), meals: localStorage.getItem(`pq_${R}_meals`),
+        recentFoods: localStorage.getItem(`pq_${R}_recentFoods`), planDrafts: localStorage.getItem(`pq_${R}_planDrafts`)
     }), R);
     assert.equal(after.workoutLog, seeded.workoutLog, "the account's workouts were destroyed");
     assert.equal(after.routines, seeded.routines, "the account's routines were destroyed");
     assert.equal(after.setTargets, seeded.setTargets, "the account's set targets were destroyed");
     assert.equal(after.weeklyMuscles, seeded.weeklyMuscles, "the account's weekly rollup was destroyed");
     assert.equal(after.history, seeded.history, "the account's nutrition history was destroyed");
+    for (const suffix of ["intake", "meals", "recentFoods", "planDrafts"]) assert.equal(after[suffix], seeded[suffix], suffix + " destroyed during corrupt-profile recovery");
     // The new profile landed and the original bytes are recoverable.
     assert.equal(JSON.parse(after.profile).name, "Demo R Recovered");
     assert.equal(after.corrupt, '{"name":"Demo R","weight":190,');
@@ -636,9 +661,82 @@ try {
     const hist = await tissueHistoryOf(R);
     assert.equal(hist.entries.length, 1);
     assert.equal(hist.entries[0].sourceId, 970);
+    for (let i = 0; i < 2; i++) {
+      await page.reload(); await page.locator(".nav-add-btn").waitFor();
+      const preserved = await page.evaluate(({ R, keys }) => Object.fromEntries(keys.map(k => [k, localStorage.getItem(`pq_${R}_${k}`)])), { R, keys: Object.keys(seeded) });
+      assert.deepEqual(preserved, seeded, "repeated reload changed readable siblings");
+    }
     // And it is all visible in the UI.
     await openExercise(); await openTissue(); await selectTissue("chest");
     await assertDetail(/Last 7 days\s+2,000 lb\*rep/);
+  });
+
+  await check("review: frozen historical contributors agree with longitudinal totals", async () => {
+    await closePopup().catch(() => {});
+    await page.getByRole("button", { name: "Profile", exact: true }).click();
+    await page.getByRole("button", { name: "Log out", exact: true }).click();
+    await page.getByPlaceholder("you@example.com").fill(A);
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await page.locator(".nav-add-btn").waitFor();
+    await openExercise(); await openTissue();
+    await setSource([squatSession(1201, -1)]);
+    await page.getByRole("button", { name: "This week", exact: true }).click();
+    await selectTissue("quadriceps");
+    assert.equal((await tissueHistoryOf(A)).entries[0].inputs.bodyMass, 180);
+    assert.match(await page.locator(".tl-contributors").innerText(), /Squat\s+1,800/);
+    await assertDetail(/Last 7 days\s+1,800 lb\*rep/);
+  });
+
+  await check("review: duplicate-source reordering after a weight correction retains context", async () => {
+    const a = squatSession(1202, -1), b = structuredClone(a);
+    b.exercises[0].sets[0].weight = 100;
+    await setSource([a, b]);
+    const before = (await tissueHistoryOf(A)).entries;
+    await page.evaluate(({ A, log }) => {
+      const p = JSON.parse(localStorage.getItem(`pq_${A}_profile`));
+      p.weight = 90; p.weightLog = [{ date: "2026-02-01", weight: 90 }];
+      localStorage.setItem(`pq_${A}_profile`, JSON.stringify(p));
+      localStorage.setItem(`pq_${A}_workoutLog`, JSON.stringify(log));
+    }, { A, log: [b, a] });
+    await page.reload(); await openExercise(); await openTissue();
+    const after = (await tissueHistoryOf(A)).entries;
+    for (const e of before) {
+      const match = after.find(x => x.sourceFingerprint === e.sourceFingerprint);
+      assert.deepEqual({ ...match, sourceKey: e.sourceKey }, e);
+    }
+  });
+
+  await check("review: future-only history explains why no present exposure exists", async () => {
+    await setSource([bench(1000, 1300, 1)]);
+    await selectTissue("chest");
+    await assertDetail(/No modeled history yet/);
+    await assertDetail(/Future-dated workouts are kept but excluded/);
+    await refuteDetail(/Last 7 days\s+0/);
+    assert.equal((await tissueHistoryOf(A)).entries.length, 1);
+  });
+
+  await check("review: derived quota failure preserves source and other profiles", async () => {
+    await setSource([bench(1000, 1400, -1)]);
+    const before = await storage();
+    const siblingKey = `pq_${B}_history`;
+    const sibling = JSON.stringify([{ day: 1 }, { day: 2 }, { day: 3 }]);
+    await page.evaluate(({ siblingKey, sibling, A, log }) => {
+      localStorage.setItem(siblingKey, sibling);
+      localStorage.setItem(`pq_${A}_workoutLog`, JSON.stringify(log));
+    }, { siblingKey, sibling, A, log: [bench(1000, 1400, -1), bench(500, 1401, 0)] });
+    await page.addInitScript(() => {
+      const original = Storage.prototype.setItem;
+      Storage.prototype.setItem = function(k, v) {
+        if (k.endsWith("_tissueHistory")) throw new DOMException("Synthetic quota", "QuotaExceededError");
+        return original.call(this, k, v);
+      };
+    });
+    await page.reload(); await openExercise(); await openTissue(); await selectTissue("chest");
+    await assertDetail(/Modeled history could not be saved this time/);
+    const after = await storage();
+    assert.equal(after[siblingKey], sibling);
+    assert.equal(after[`pq_${A}_tissueHistory`], before[`pq_${A}_tissueHistory`]);
+    assert.equal(JSON.parse(after[`pq_${A}_workoutLog`]).length, 2);
   });
 
   await check("31+32. no runtime or console errors, and no schema drift", async () => {

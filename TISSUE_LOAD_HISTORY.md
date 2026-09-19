@@ -146,8 +146,17 @@ applied **once**, at materialization:
    applies its own documented 180 lb reference and its own
    `default_body_mass` warning. Milestone 4 invents nothing.
 
-**A measurement recorded after the workout is never back-applied**, however
-numerically close it is. A test pins this.
+**A measurement dated after the workout is never back-applied**, however
+numerically close it is. Equal-date ties use the last valid record in log order.
+Numeric strings, nonpositive/nonfinite weights and impossible dates are ignored.
+Bare numeric weights are pounds; there is no metadata to infer accidental kg.
+
+**Historical measurement corrections do not invalidate an existing snapshot.**
+Weight-log and profile changes are excluded from the workout fingerprint on
+purpose. Its inputs record what was used at materialization, not a continuously
+updated estimate. Rebuilding after a model-relevant workout edit resolves the
+context again. There is no dedicated historical-context correction workflow;
+adding one requires an explicit audited recomputation design.
 
 The engine's **confidence category is not touched** by input provenance. How
 much the model's authors trust a coefficient and how good the historical
@@ -172,12 +181,17 @@ moment it was materialized**. Window arithmetic then runs on those
 
 Consequences, chosen deliberately:
 
-- a workout keeps the training day it was performed on even if the athlete
+- a newly materialized workout keeps its frozen training day even if the athlete
   later travels to another timezone — history is stable rather than shifting
   under the viewer;
 - DST days are whole days: a 23-hour or 25-hour local day is one key;
 - only a finite, in-range `finishedAt` makes a record datable. `startedAt` is
   never a substitute, matching Milestone 3.
+
+For legacy backfill, the historical timezone is unknown. `localDate` and
+`utcOffsetMinutes` use the materializing device's timezone at the historical
+instant, not evidence of where the athlete trained. A source edit that causes
+rebuilding can also re-resolve this context. No original timezone is invented.
 
 Milestone 3's **Today** and **This week** (Monday–Sunday) periods and the rest
 of Physiq's calendar are untouched. The longitudinal windows are rolling
@@ -198,6 +212,12 @@ tissue `t`'s frozen workload over every entry on that day, in `lb*rep`.
 | Baseline period | `[D-34 … D-7]` — the 28 days immediately before the 7-day window | 28 |
 | **Recent baseline** | `(Σ w(t, d) over the baseline period) ÷ 4` | mean per 7-day block |
 | Change vs baseline | `(recent7 − baseline) ÷ baseline × 100 %` | — |
+
+Malformed entries with negative/nonfinite workloads or inconsistent, negative
+or fractional set counts are excluded. Finite numeric overflow is shown as
+unavailable, never an invented zero or infinite percentage; ordinary values
+retain six-decimal rounding. Tiny positive baselines that round to zero use
+the zero-baseline state.
 
 All are **sums**, boundary-inclusive at both ends, in `lb*rep`. Sums are taken
 in canonical sorted order at six decimal places, the same rule the engine and
@@ -233,39 +253,33 @@ score and not a probability.
 
 ---
 
-## 7. Observed history, sufficiency, sparse training
+## 7. Elapsed logging history, sufficiency, sparse training
 
-`firstObservedDate` is the earliest frozen day in the selected series.
+`firstObservedDate` is retained as an API field name, but means the earliest
+valid frozen date **on or before today** in the selected series. It is not
+telemetry proving app use or complete training observation.
 
-- a day **on or after** it with no entry is a **real zero** — the athlete
-  logged no modeled work that day;
-- a day **before** it is **unobserved** — the app does not know what happened —
-  and is never padded with zero.
+Days without entries after the first log contribute zero **logged modeled
+workload**. They may represent no training, unlogged training, or discontinued
+app use. A Jan 1 workout followed by an Apr 1 return makes the intervening
+windows eligible under this explicit logging assumption; it does not prove
+three months of rest. Before the first log, no baseline is offered.
 
-A window is `complete` only when every one of its days is observed, `partial`
-when some are, `none` when none are. The UI distinguishes four states:
+`observedDays` and `complete` are compatibility field names for the portion of
+a window lying within this elapsed logging span. UI copy says “days since
+first log” and explains that absent entries are zero logged workload. A
+baseline requires the earliest log to be on or before D-34, so it first becomes
+eligible on the 35th calendar day including the first log. Sparse training
+remains valid. No adherence or training-frequency threshold is invented.
 
-| State | Shown |
-|---|---|
-| No history | "No modeled history yet." |
-| Some history | 7-day and 28-day sums, annotated *n of 7 / n of 28 days observed* |
-| Enough for exposure | plain 7-day and 28-day sums |
-| Enough for baseline | baseline value and the percentage comparison |
-
-**The baseline requires a complete baseline period**: all 28 days of
-`[D-34 … D-7]` observed. So the earliest a comparison can appear is 35 calendar
-days after the first modeled workout. A brand-new athlete with one workout sees
-exposure, never a comparison.
-
-**Sparse training stays valid.** Sufficiency is about calendar coverage, not
-workout frequency: someone training twice a week has a complete window with
-real zeros on the other days. Nothing treats sparse history as malformed.
+Future-dated entries are preserved but excluded from today's coverage and
+exposure; the UI explains this, including when all history is future-dated.
 
 ---
 
 ## 8. Zero baseline
 
-If the baseline period is fully observed but its modeled workload for that
+If the baseline period lies within the elapsed logging span but its modeled workload for that
 tissue is exactly zero, the result is the `zero_baseline` state — never
 `Infinity`, `NaN`, `+∞%` or an invented number. The UI says which of the three
 reasons applies:
@@ -331,9 +345,13 @@ rest as `otherSeriesEntries`, surfaced in the UI as
 
 A synthetic `tissue-load-v0.2` entry is tested in both directions: it never
 contributes to a v0.1 total, and v0.1 history never serves as a v0.2 baseline.
-Entries from an unrecognised series are preserved untouched by reconciliation,
-so a future model can coexist, be selected explicitly, or trigger a deliberate
-whole-history recomputation. **No production v0.2 exists**; Milestone 4 does not
+Entries from an unrecognised series are preserved untouched by reconciliation.
+For a recognized v1 entry whose source key/fingerprint is gone or changed, the
+original object moves into the envelope's optional `detachedEntries` array.
+It is excluded from active analytics, exported for recovery, and reactivated
+if the exact source returns. Unknown entry schemas remain opaque and ignored.
+This preserves future data without treating deleted workouts as active history,
+and permits a future model to coexist or deliberately recompute history. **No production v0.2 exists**; Milestone 4 does not
 create one.
 
 ---

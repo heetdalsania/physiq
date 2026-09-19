@@ -31,14 +31,15 @@ function realTodayKey() { return toKey(new Date()); }
  * local time, which is the frame every one of these keys was written in
  * (App.logWeight, getMondayKey, weeklyMuscles.dates, the dev date).
  *
- * Returns an Invalid Date for anything that is not three numeric parts, so
+ * Returns an Invalid Date for malformed or impossible calendar keys, so
  * callers can guard with isNaN(d.getTime()). Never throws. */
 export function parseDayKey(key) {
-  const p = String(key == null ? "" : key).split("-");
-  if (p.length !== 3) return new Date(NaN);
-  const y = parseInt(p[0], 10), m = parseInt(p[1], 10), d = parseInt(p[2], 10);
-  if (isNaN(y) || isNaN(m) || isNaN(d)) return new Date(NaN);
-  return new Date(y, m - 1, d);
+  if (typeof key !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(key)) return new Date(NaN);
+  const [y, m, d] = key.split("-").map(Number);
+  const result = new Date(0);
+  result.setFullYear(y, m - 1, d);
+  result.setHours(0, 0, 0, 0);
+  return result.getFullYear() === y && result.getMonth() === m - 1 && result.getDate() === d ? result : new Date(NaN);
 }
 
 function parseKey(k) {

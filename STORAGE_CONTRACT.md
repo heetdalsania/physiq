@@ -355,8 +355,16 @@ unchanged sources are **kept byte-for-byte**, changed sources are rebuilt,
 vanished sources are dropped, undatable records are skipped, stored duplicates
 of one `sourceKey` are collapsed. Repeated initialization converges and, when
 nothing changed, performs **no write at all** (the payload is compared against
-the raw bytes on disk first). Entries from another model/map series and
-entries this build cannot parse are preserved verbatim and ignored.
+the raw bytes on disk first). Within a duplicate id/timestamp group, unchanged
+fingerprints are matched before edits; an ordinal change updates only
+`sourceKey`, preserving frozen context. Identical duplicate sources cannot be
+distinguished beyond their ordinal, so no stronger identity claim is made.
+
+Foreign v1 entries with deleted/changed sources move verbatim to optional
+`detachedEntries`, outside active analytics; exact source restoration can
+reactivate them. Opaque/invalid entries remain preserved and ignored. Unknown
+envelope fields survive. Non-array/missing `entries` makes an envelope malformed.
+A thrown storage read fails closed, as does a non-array workout source.
 
 **It never writes when:**
 
@@ -375,9 +383,11 @@ advanced ahead of the data: the envelope *is* the data and lands in one
 `setItem`. A failure is reported as `storageState: "write_failed"`, nothing
 partial is stored, the app keeps a complete in-memory history for the session,
 and the next successful reconciliation repairs the key. Writes go through
-`set()`, so the existing quota guard and toast apply unchanged.
+`set()` with `pruneOnQuota: false`: optional derived history must never evict
+source nutrition history, including another profile's data. The quota toast
+still applies; source workouts and existing history remain intact.
 
-**Losing this key is safe** — it is rebuilt from `workoutLog` on the next
+**Losing this key does not destroy source workouts** — it is rebuilt from `workoutLog` on the next
 reconciliation. What cannot be rebuilt identically is the *historical context*
 of a legacy entry whose body mass came from the then-current profile weight;
 that is why the resolved value and its provenance are frozen inside the entry

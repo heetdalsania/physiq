@@ -25,11 +25,9 @@
  *
  * ── Observed history vs. unknown pre-history ─────────────────────────────
  * `firstObservedDate` is the earliest frozen day in the selected series.
- * A day on or after it with no entry is a real zero (the athlete logged no
- * modeled work). A day before it is UNOBSERVED — the app has no idea what
- * happened — and is never padded with zero. A window is `complete` only
- * when every one of its days is observed; the baseline is only computed
- * from a complete baseline period.
+ * Days after the first log without entries contribute zero LOGGED workload.
+ * This is a logging assumption, not evidence of app usage or no training.
+ * `complete` means the window lies within the elapsed logging span only.
  *
  * ── Baseline ─────────────────────────────────────────────────────────────
  *   baseline(t) = Σ workload[t] over the baseline period ÷ 4
@@ -58,7 +56,8 @@ function pad(n) { return n < 10 ? "0" + n : "" + n; }
 export function addDays(key, n) {
   if (!isDateKey(key)) return null;
   const p = key.split("-").map(Number);
-  const d = new Date(Date.UTC(p[0], p[1] - 1, p[2] + n));
+  const d = new Date(0);
+  d.setUTCFullYear(p[0], p[1] - 1, p[2] + n);
   return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate());
 }
 
@@ -72,11 +71,20 @@ export function dayKeyOf(date) {
 /* Canonical (sorted) summation, the same precision rule the engine and the
    Milestone 3 adapter use, so a total never depends on entry order. */
 function sum(values) {
+  if (values.some(v => v === null)) return null;
   const sorted = values.slice().sort(function (a, b) { return a - b; });
   let t = 0;
   for (let i = 0; i < sorted.length; i++) t += sorted[i];
-  return Math.round(t * 1e6) / 1e6;
+  return round(t);
 }
+
+// Preserve large finite quantities without overflowing the rounding step.
+// Actual overflow is unavailable, never silently converted to zero.
+function round(n) {
+  if (!Number.isFinite(n)) return null;
+  return Math.abs(n) <= Number.MAX_VALUE / 1e6 ? Math.round(n * 1e6) / 1e6 : n;
+}
+const workloadValue = n => n === undefined ? 0 : n;
 
 function finite(n) { return typeof n === "number" && Number.isFinite(n) ? n : 0; }
 
@@ -85,7 +93,7 @@ function finite(n) { return typeof n === "number" && Number.isFinite(n) ? n : 0;
 export function selectSeries(entries, series) {
   const s = series || CURRENT_SERIES;
   const selected = [], other = [], invalid = [];
-  const seen = {};
+  const seen = Object.create(null);
   let duplicates = 0;
   (Array.isArray(entries) ? entries : []).forEach(function (e) {
     if (!isValidHistoryEntry(e)) { invalid.push(e); return; }
@@ -108,7 +116,7 @@ export function aggregateDaily(entries) {
   const byDay = {};
   entries.forEach(function (e) {
     const day = byDay[e.localDate] || (byDay[e.localDate] = {
-      date: e.localDate, sessionCount: 0, completedSets: 0, modeledSets: 0, approximateSessions: 0, _loads: {}
+      date: e.localDate, sessionCount: 0, completedSets: 0, modeledSets: 0, approximateSessions: 0, _loads: Object.create(null)
     });
     day.sessionCount++;
     day.completedSets += finite(e.coverage.completedSets);
@@ -143,7 +151,7 @@ export function dayRange(start, end) {
 function summarizeWindow(byDay, start, end, firstObserved, expectedDays) {
   const days = dayRange(start, end);
   let observedDays = 0, sessionCount = 0, completedSets = 0, modeledSets = 0, approximateSessions = 0;
-  const loads = {};
+  const loads = Object.create(null);
   days.forEach(function (date) {
     if (firstObserved !== null && date >= firstObserved) observedDays++;
     const day = byDay[date];
@@ -181,14 +189,17 @@ export function compareToBaseline(recent7, baselineWindow, tissueId) {
   if (!baselineWindow || baselineWindow.state !== "complete") {
     return { state: "insufficient_history", value: null, delta: null, ratio: null, percent: null, direction: null };
   }
-  const total = finite(baselineWindow.workload[tissueId]);
-  const value = Math.round((total / BASELINE_BLOCKS) * 1e6) / 1e6;
+  const unavailable = { state: "numeric_unavailable", value: null, delta: null, ratio: null, percent: null, direction: null };
+  const total = workloadValue(baselineWindow.workload[tissueId]);
+  if (!Number.isFinite(total) || total < 0 || !Number.isFinite(recent7) || recent7 < 0) return unavailable;
+  const value = round(total / BASELINE_BLOCKS);
   if (value <= 0) {
     return { state: "zero_baseline", value: 0, delta: null, ratio: null, percent: null, direction: null };
   }
-  const delta = Math.round((recent7 - value) * 1e6) / 1e6;
-  const ratio = Math.round((recent7 / value) * 1e6) / 1e6;
-  const percent = Math.round((delta / value) * 100 * 1e6) / 1e6;
+  const delta = round(recent7 - value);
+  const ratio = round(recent7 / value);
+  const percent = round((delta / value) * 100);
+  if (delta === null || ratio === null || percent === null) return unavailable;
   return {
     state: "available",
     value: value,
@@ -225,7 +236,9 @@ export function buildTissueLoadHistory(entries, options) {
   const series = opts.series || CURRENT_SERIES;
 
   const selection = selectSeries(entries, series);
-  const byDay = aggregateDaily(selection.entries);
+  const currentEntries = selection.entries.filter(e => e.localDate <= today);
+  const futureEntries = selection.entries.length - currentEntries.length;
+  const byDay = aggregateDaily(currentEntries);
   const dates = Object.keys(byDay).sort();
   const firstObserved = dates.length ? dates[0] : null;
 
@@ -240,12 +253,12 @@ export function buildTissueLoadHistory(entries, options) {
   const tissues = {};
   TISSUES.forEach(function (def) {
     const id = def.id;
-    const recent7 = finite(recent.workload[id]);
+    const recent7 = workloadValue(recent.workload[id]);
     tissues[id] = {
       tissueId: id,
-      today: byDay[today] ? finite(byDay[today].workload[id]) : 0,
+      today: byDay[today] ? workloadValue(byDay[today].workload[id]) : 0,
       recent7: recent7,
-      recent28: finite(long.workload[id]),
+      recent28: workloadValue(long.workload[id]),
       baseline: compareToBaseline(recent7, baseline, id)
     };
   });
@@ -254,6 +267,7 @@ export function buildTissueLoadHistory(entries, options) {
   if (span.approximateSessions > 0) warnings.push("approximate_historical_context");
   if (selection.otherSeriesEntries > 0) warnings.push("other_model_series");
   if (selection.invalidEntries > 0) warnings.push("invalid_entries");
+  if (futureEntries > 0) warnings.push("future_entries");
 
   return {
     analyticsVersion: LOAD_BASELINE_VERSION,
@@ -265,6 +279,7 @@ export function buildTissueLoadHistory(entries, options) {
     firstObservedDate: firstObserved,
     historyState: firstObserved === null ? "no_history" : "history",
     entryCount: selection.entries.length,
+    futureEntries: futureEntries,
     otherSeriesEntries: selection.otherSeriesEntries,
     invalidEntries: selection.invalidEntries,
     duplicateEntries: selection.duplicateEntries,
