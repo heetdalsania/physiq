@@ -25,6 +25,7 @@ import {
 } from "../data/constants.js";
 import { getWeeklyProgression, countMoved } from "./progression.js";
 import { buildActualSeries, CALORIES_PER_LB } from "./weightProjection.js";
+import { parseDayKey } from "./appTime.js";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const WEEKDAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -233,11 +234,6 @@ export function weeklySetTotals(workoutLog) {
 }
 
 // ── Weight trend ────────────────────────────────────────────────────────
-
-function parseDayKey(k) {
-  const p = String(k).split("-");
-  return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
-}
 
 // Actual weekly weight change vs the phase's expected rate (from the
 // calorie surplus/deficit). Needs a weight entry in the report week plus

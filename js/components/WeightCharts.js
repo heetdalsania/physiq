@@ -10,6 +10,7 @@
 
 import React from "react";
 import { WeightProjection as WP } from "../utils/weightProjection.js";
+import { parseDayKey } from "../utils/appTime.js";
 
 function fmtDate(d) {
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
@@ -111,7 +112,7 @@ export function ActualWeightChart(props) {
   const delta = last - first;
 
   const points = series.map(function(e, i) {
-    const d = new Date(e.date);
+    const d = parseDayKey(e.date);
     return {
       x: n === 1 ? 0.5 : i / (n - 1),
       y: e.weight,
@@ -208,15 +209,18 @@ export function EstimatedWeightChangeChart(props) {
     for (let j = 0; j < series.length; j++) {
       if (typeof series[j].cumulativeChange === "number") { firstWeekStart = series[j].weekStart; break; }
     }
-    function nearestWeight(targetISO, mode) {
-      const t = new Date(targetISO).getTime();
+    /* Every timestamp here comes from a day key, so all of them are parsed
+       in the same local frame. The comparisons were already self-consistent
+       under the old UTC parse; this keeps one convention in the file. */
+    function nearestWeight(targetKey, mode) {
+      const t = parseDayKey(targetKey).getTime();
       let best = null;
       for (let k = 0; k < actuals.length; k++) {
-        const et = new Date(actuals[k].date).getTime();
+        const et = parseDayKey(actuals[k].date).getTime();
         if (mode === "after" && et < t) continue;
         if (mode === "before" && et > t + 7 * 86400000) continue;
         if (best === null) { best = actuals[k]; continue; }
-        if (Math.abs(et - t) < Math.abs(new Date(best.date).getTime() - t)) best = actuals[k];
+        if (Math.abs(et - t) < Math.abs(parseDayKey(best.date).getTime() - t)) best = actuals[k];
       }
       return best;
     }
@@ -319,7 +323,7 @@ export function WeightTrackingChart(props) {
   let firstAnchorTime = null;
   if (hasEstimated && anchorWeight !== null) {
     const firstWeekStart = estSeries[0].weekStart;
-    firstAnchorTime = new Date(firstWeekStart).getTime();
+    firstAnchorTime = parseDayKey(firstWeekStart).getTime();
     estPoints.push({
       time: firstAnchorTime,
       y: anchorWeight,
@@ -329,7 +333,7 @@ export function WeightTrackingChart(props) {
     });
     let lastKnown = anchorWeight;
     estSeries.forEach(function(w) {
-      const t = new Date(w.weekStart).getTime() + 6 * 86400000;
+      const t = parseDayKey(w.weekStart).getTime() + 6 * 86400000;
       let y;
       if (typeof w.cumulativeChange === "number") {
         y = anchorWeight + w.cumulativeChange;
@@ -349,7 +353,7 @@ export function WeightTrackingChart(props) {
 
   const actPoints = actuals.map(function(e) {
     return {
-      time: new Date(e.date).getTime(),
+      time: parseDayKey(e.date).getTime(),
       y: e.weight,
       label: null,
       dim: false,

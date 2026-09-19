@@ -135,12 +135,22 @@ test("js/tissue/ never touches React, the DOM, storage, network or the clock", f
   });
 });
 
-test("Milestone 3 consumes the domain only through the pure presentation adapter", function() {
+test("only the pure adapters consume the domain: presentation (M3), history snapshot and longitudinal analytics (M4)", function() {
+  /* Milestone 3 allowed exactly one importer. Milestone 4 adds two more
+     PURE modules (no React, storage or clock — pinned by their own tests):
+     the per-session snapshot that freezes engine output, and the analytics
+     that reads the tissue vocabulary. React components, screens and the
+     storage layer still never import js/tissue/ directly. */
+  const allowed = [
+    "js/utils/tissueLoadView.js",
+    "js/utils/tissueHistorySnapshot.js",
+    "js/utils/tissueLoadHistory.js"
+  ].map(function(p) { return resolve(ROOT, p); });
   const files = walk(resolve(ROOT, "js")).filter(function(f) { return f.indexOf("/js/tissue/") < 0; });
   files.forEach(function(f) {
     const src = readFileSync(f, "utf8");
     if (/from\s+["'][^"']*tissue\//.test(src)) {
-      assert.equal(f, resolve(ROOT, "js/utils/tissueLoadView.js"), "Only the presentation adapter may import the domain");
+      assert.ok(allowed.indexOf(f) >= 0, f + " may not import the domain; only " + allowed.join(", "));
     }
   });
 });

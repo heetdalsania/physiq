@@ -21,9 +21,28 @@ function toKey(d) {
   return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
 }
 function realTodayKey() { return toKey(new Date()); }
+
+/* Parses a "YYYY-MM-DD" day key as a LOCAL calendar date.
+ *
+ * `new Date("2026-03-31")` must not be used for this. The ECMAScript
+ * date-only form is defined as UTC, so in any negative-UTC offset it lands
+ * on the previous local day — a weigh-in logged on Mar 31 in Phoenix
+ * renders as "Mar 30". Passing the components separately builds the date in
+ * local time, which is the frame every one of these keys was written in
+ * (App.logWeight, getMondayKey, weeklyMuscles.dates, the dev date).
+ *
+ * Returns an Invalid Date for anything that is not three numeric parts, so
+ * callers can guard with isNaN(d.getTime()). Never throws. */
+export function parseDayKey(key) {
+  const p = String(key == null ? "" : key).split("-");
+  if (p.length !== 3) return new Date(NaN);
+  const y = parseInt(p[0], 10), m = parseInt(p[1], 10), d = parseInt(p[2], 10);
+  if (isNaN(y) || isNaN(m) || isNaN(d)) return new Date(NaN);
+  return new Date(y, m - 1, d);
+}
+
 function parseKey(k) {
-  const p = (k || realTodayKey()).split("-");
-  return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+  return parseDayKey(k || realTodayKey());
 }
 
 function now() {

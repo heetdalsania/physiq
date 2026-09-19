@@ -46,7 +46,7 @@ function categoryLabel(catId) {
   return c ? c.label : catId;
 }
 
-export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout, weeklyMuscles, setTargets, updateSetTarget, workoutLog, bodyMass }) {
+export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout, weeklyMuscles, setTargets, updateSetTarget, workoutLog, bodyMass, tissueHistory }) {
   const [trackingMode, setTrackingMode] = useState("volume");
   const [view, setView] = useState("main");
   const [draft, setDraft] = useState(null);
@@ -341,7 +341,7 @@ export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompleted
               updateSetTarget={updateSetTarget}
             />
           </div>
-          {trackingMode === "tissue" && <TissueLoadTracker workoutLog={workoutLog} bodyMass={bodyMass} />}
+          {trackingMode === "tissue" && <TissueLoadTracker workoutLog={workoutLog} bodyMass={bodyMass} tissueHistory={tissueHistory} />}
         </div>
 
         <div style={{ marginTop: 18 }}>

@@ -89,7 +89,8 @@ export function get(key, defaultValue) {
    unreadable values at load time. */
 export const PROFILE_KEY_SUFFIXES = [
   "profile", "intake", "meals", "history", "routines",
-  "workoutLog", "weeklyMuscles", "setTargets", "recentFoods", "planDrafts"
+  "workoutLog", "weeklyMuscles", "setTargets", "recentFoods", "planDrafts",
+  "tissueHistory"   // Milestone 4 derived TissueOS history (js/utils/tissueHistoryStore.js)
 ];
 
 export const CORRUPT_SUFFIX = "__corrupt";
@@ -456,7 +457,10 @@ export function saveHistory(e, h) {
 }
 
 export function sv(e, k, v) {
-  set(uKey(e, k), v);
+  // Returns set()'s result so a caller that derives data from this write
+  // (Milestone 4 TissueOS history) can refuse to persist when it failed.
+  // Existing callers ignore the value; behaviour is otherwise unchanged.
+  return set(uKey(e, k), v);
 }
 
 export function loadTheme() {

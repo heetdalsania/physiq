@@ -7,6 +7,7 @@ import { shareText, triggerHaptic } from "../utils/native.js";
 import { exportAll, importAll, getUsageBytes } from "../utils/storage.js";
 import { emitToast } from "../utils/toast.js";
 import { GOALS } from "../data/constants.js";
+import { parseDayKey } from "../utils/appTime.js";
 
 export function ProfileTab(props) {
   const profile = props.profile, targets = props.targets, email = props.email, history = props.history;
@@ -141,8 +142,11 @@ export function ProfileTab(props) {
       {weightLog.length > 0 && (
         <div className="weight-log-recent">
           Latest: {weightLog[weightLog.length - 1].weight} lb on {(function() {
-            const d = new Date(weightLog[weightLog.length - 1].date);
-            return d.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
+            // parseDayKey, not new Date(key): the date-only form is UTC and
+            // would show the previous day west of Greenwich.
+            const d = parseDayKey(weightLog[weightLog.length - 1].date);
+            return isNaN(d.getTime()) ? String(weightLog[weightLog.length - 1].date)
+              : d.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
           })()}
         </div>
       )}

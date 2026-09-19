@@ -4,9 +4,13 @@ Pure, framework-free computation that turns a Physiq workout session into a
 deterministic, versioned, uncertainty-tagged **tissue workload** breakdown.
 
 Nothing in this directory touches React, the DOM, `localStorage`, the network
-or the clock (tests enforce this). Milestone 3 now consumes this unchanged engine
+or the clock (tests enforce this). Milestone 3 consumes this unchanged engine
 through a pure presentation adapter; see [Tissue Load Map](../../TISSUE_LOAD_MAP.md).
-Results remain ephemeral: no TissueOS storage key, field or migration is added.
+Milestone 4 adds a versioned history layer **around** the engine — per-session
+snapshots and longitudinal windows; see
+[Longitudinal Tissue Load](../../TISSUE_LOAD_HISTORY.md). The engine itself is
+unchanged by both: same versions, coefficients, bands, units and algorithm,
+pinned by a golden test and by a source-hash test.
 
 All examples below are synthetic.
 
@@ -175,12 +179,15 @@ The heuristics are the part designed to be thrown away. The contract is not.
 
 ### 10. What later milestone makes the output athlete-relative?
 
-**Milestone 4 (longitudinal baseline).** Rolling 7-day and 28-day exposure and
-an athlete-specific baseline are what turn a raw workload into something that
-can honestly be expressed as "elevated versus your own normal". Milestone 3
-may display raw workloads and their relative shares within a single session,
-but must not present them as a bounded score. Deliberately absent from v0.1:
-no baselines, no capacity, no recovery, no tissue state.
+**Milestone 4 (longitudinal baseline), now implemented outside this directory.**
+Rolling 7-day and 28-day exposure and an athlete-specific baseline are what turn
+a raw workload into something that can honestly be expressed as "above your own
+recent logged exposure". They live in
+[js/utils/tissueLoadHistory.js](../utils/tissueLoadHistory.js) over frozen
+per-session snapshots, never inside the model: v0.1 still has no baseline, no
+capacity, no recovery and no tissue state, and every number it returns means
+exactly what it meant before. A history entry records which model and map
+version produced it, so incomparable model outputs are never summed together.
 
 ---
 
@@ -399,8 +406,17 @@ Consequences, contained in `resolveExerciseMapping()`:
 - A lifter entering kilograms into Physiq's unlabelled weight field produces
   data the whole app mislabels; the engine inherits that.
 - The domain has no cross-session tissue state, capacity, recovery or baseline.
-  Milestone 3 only sums existing events for the selected calendar period at
-  display time; it introduces no stored or longitudinal model.
+  Milestone 3 sums existing events for the selected calendar period at display
+  time. Milestone 4 stores per-session snapshots and derives rolling calendar
+  exposure and an athlete-relative baseline from them — all outside this
+  directory, all plain sums and means of the numbers below. A baseline there
+  is *logged exposure history*, not capacity, and still supports no inference
+  about recovery or injury.
+- Body mass is a v0.1 input, so it is part of a result's meaning. Milestone 4
+  freezes the mass each stored session was computed with, preferring a dated
+  measurement at or before that session; a later measurement is never
+  back-applied. Historical context quality is recorded separately and never
+  alters the confidence category defined here.
 
 **This layer estimates a relative training workload per coarse tissue region
 for one session.** It cannot say what force a tissue experienced, how it is

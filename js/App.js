@@ -32,6 +32,7 @@ import {
   quarantineProfile
 } from "./utils/storage.js";
 import { subscribeToast } from "./utils/toast.js";
+import { reconcileTissueHistory } from "./utils/tissueHistoryStore.js";
 import { calcTargets, getSuggestions } from "./utils/calculations.js";
 import { getMealPeriod, MEAL_PERIODS } from "./utils/foodSearch.js";
 import {
@@ -108,6 +109,28 @@ function passiveFallbacks() {
     setTargets: {},
     recentFoods: [],
     planDrafts: { training: [], rest: [] }
+  };
+}
+
+/* What every profile-scoped React state holds when no profile data has been
+   loaded — i.e. exactly what a brand-new account starts from. These mirror
+   the literal defaults in the useState initialisers, loadDaily() and
+   loadHistory(), and are the values resetProfileState() applies.
+
+   This exists because the two are easy to get out of step: passiveFallbacks()
+   above answers "what did we substitute for an unreadable value", while this
+   answers "what does an empty profile look like". They agree on every key
+   they share, and a test pins that. */
+function emptyProfileState() {
+  return {
+    intake: Object.assign({}, EMPTY_INTAKE),
+    meals: [],
+    history: [],
+    routines: [],
+    workoutLog: [],
+    weeklyMuscles: getEmptyWeeklyMuscles(),
+    setTargets: {},
+    recentFoods: []
   };
 }
 
@@ -221,6 +244,12 @@ function App() {
     } catch (e) { return []; }
   });
 
+  // Milestone 4: the active profile's derived, versioned TissueOS history
+  // (pq_<email>_tissueHistory). Reconciled by the workoutLog persistence
+  // effect below — the source of truth's own write boundary — and consumed
+  // read-only by the Tissue Load view. Never written from a render.
+  const [tissueHistory, setTissueHistory] = useState(null);
+
   const [activeMealPeriod, setActiveMealPeriod] = useState(getMealPeriod());
 
   // Plan-a-Day: macro focus carried over from a weekly-report nudge CTA.
@@ -332,17 +361,12 @@ function App() {
       if (p) {
         setEmail(last);
         setProfile(p);
-        const d = loadDaily(last);
-        setIntake(d.intake);
-        setMealLog(d.meals);
-        setHistory(loadHistory(last));
-        try { setRoutines(JSON.parse(localStorage.getItem(uKey(last, "routines"))) || []); } catch (e) {}
-        try { setWorkoutLog(JSON.parse(localStorage.getItem(uKey(last, "workoutLog"))) || []); } catch (e) {}
-        try { setWeeklyMuscles(rolloverWeeklyMuscles(JSON.parse(localStorage.getItem(uKey(last, "weeklyMuscles"))))); } catch (e) { setWeeklyMuscles(getEmptyWeeklyMuscles()); }
-        try { setSetTargets(JSON.parse(localStorage.getItem(uKey(last, "setTargets"))) || {}); } catch (e) { setSetTargets({}); }
+        loadProfileScopedState(last);
         setScreen("app");
         return;
       }
+      /* An unreadable profile falls through to the login screen, where no
+         persistence effect runs. doLogin() then handles the recovery. */
     }
     setScreen("login");
   }, []);
@@ -387,8 +411,29 @@ function App() {
     if (screen === "app" && email && !AppTime.getDevMode()) sv(email, "routines", routines);
   }, [routines, screen, email]);
 
+  // Latest profile for the history reconciler without making it a dependency:
+  // a weight change must NOT re-materialize frozen history, only inform the
+  // next workout's snapshot.
+  const profileRef = useRef(profile);
+  profileRef.current = profile;
+
   useEffect(function() {
-    if (screen === "app" && email && !AppTime.getDevMode()) sv(email, "workoutLog", workoutLog);
+    if (screen !== "app" || !email) return;
+    const devMode = AppTime.getDevMode();
+    const saved = devMode ? false : sv(email, "workoutLog", workoutLog);
+    // Milestone 4: derived TissueOS history follows the source. It runs here
+    // (boot restore, login, and right after a completed workout lands) and
+    // only persists when the source write itself succeeded; in Dev Mode or
+    // after a failed write it is held in memory and repaired by the next
+    // successful reconciliation. See STORAGE_CONTRACT.md §10.
+    setTissueHistory(reconcileTissueHistory({
+      email: email,
+      workoutLog: workoutLog,
+      profile: profileRef.current,
+      now: AppTime.nowMs(),
+      persist: !devMode && saved === true,
+      inMemoryReason: devMode ? "dev_mode" : saved === true ? null : "source_not_saved"
+    }));
   }, [workoutLog, screen, email]);
 
   useEffect(function() {
@@ -791,25 +836,83 @@ function App() {
     setProfile(function(p) { return Object.assign({}, p, { todayMuscles: [] }); });
   };
 
+  /* Drop every profile-scoped value out of memory.
+   *
+   * Switching profiles is just "read a different key set" (STORAGE_CONTRACT
+   * §1), so nothing clears React state on its own. That is fine when the
+   * target profile exists, because every key is then overwritten by a read
+   * below. It is NOT fine for a brand-new account: the eager persistence
+   * effects fire the moment onboarding finishes and write whatever is still
+   * in memory under the new e-mail's keys — which would be the previous
+   * profile's workouts, routines, nutrition and weekly rollup. */
+  const resetProfileState = function() {
+    const empty = emptyProfileState();
+    setProfile(Object.assign({}, DEFAULT_PROFILE));
+    setIntake(empty.intake);
+    setMealLog(empty.meals);
+    setHistory(empty.history);
+    setRoutines(empty.routines);
+    setWorkoutLog(empty.workoutLog);
+    setWeeklyMuscles(empty.weeklyMuscles);
+    setSetTargets(empty.setTargets);
+    setRecentFoods(empty.recentFoods);
+    setTissueHistory(null);
+  };
+
+  /* Reads one profile's stored values into memory. The single copy of this
+     sequence — the boot restore, a normal login and the corrupt-profile
+     recovery below all use it, and three hand-kept copies is how they drift.
+
+     Each catch substitutes this key's OWN default. Leaving the setter
+     uncalled would keep the previously loaded profile's value, which the
+     write-back would then store under this e-mail — and, because that value
+     differs from the registered fallback, it would also release the write
+     protection guarding the unreadable bytes. */
+  const loadProfileScopedState = function(e) {
+    const d = loadDaily(e);
+    setIntake(d.intake);
+    setMealLog(d.meals);
+    setHistory(loadHistory(e));
+    setRecentFoods(emptyProfileState().recentFoods);
+    try { setRoutines(JSON.parse(localStorage.getItem(uKey(e, "routines"))) || []); } catch (err) { setRoutines([]); }
+    try { setWorkoutLog(JSON.parse(localStorage.getItem(uKey(e, "workoutLog"))) || []); } catch (err) { setWorkoutLog([]); }
+    try { setWeeklyMuscles(rolloverWeeklyMuscles(JSON.parse(localStorage.getItem(uKey(e, "weeklyMuscles"))))); } catch (err) { setWeeklyMuscles(getEmptyWeeklyMuscles()); }
+    try { setSetTargets(JSON.parse(localStorage.getItem(uKey(e, "setTargets"))) || {}); } catch (err) { setSetTargets({}); }
+  };
+
   const doLogin = function() {
     if (!loginEmail.trim() || !loginEmail.includes("@")) return;
     const e = loginEmail.trim().toLowerCase();
     localStorage.setItem("pq_last_email", e);
     setEmail(e);
-    quarantineProfile(e, passiveFallbacks());
+    setTissueHistory(null);   // never show the previous profile's derived history
+    // quarantineProfile() reports which of this profile's keys would not
+    // parse; it has already copied each of them to `<key>__corrupt`.
+    const unreadable = quarantineProfile(e, passiveFallbacks());
     const p = loadUser(e);
     if (p) {
       setProfile(p);
-      const d = loadDaily(e);
-      setIntake(d.intake);
-      setMealLog(d.meals);
-      setHistory(loadHistory(e));
-      try { setRoutines(JSON.parse(localStorage.getItem(uKey(e, "routines"))) || []); } catch (err) {}
-      try { setWorkoutLog(JSON.parse(localStorage.getItem(uKey(e, "workoutLog"))) || []); } catch (err) {}
-      try { setWeeklyMuscles(rolloverWeeklyMuscles(JSON.parse(localStorage.getItem(uKey(e, "weeklyMuscles"))))); } catch (err) { setWeeklyMuscles(getEmptyWeeklyMuscles()); }
-      try { setSetTargets(JSON.parse(localStorage.getItem(uKey(e, "setTargets"))) || {}); } catch (err) { setSetTargets({}); }
+      loadProfileScopedState(e);
       setScreen("app");
+    } else if (unreadable.indexOf(uKey(e, "profile")) >= 0) {
+      /* The profile itself is unreadable, so the app has to re-onboard — but
+         this is an EXISTING account, and an unreadable profile says nothing
+         about its workouts, routines or nutrition, which are usually still
+         perfectly readable. Load them. Onboarding then replaces only the
+         profile, and the eager write-back rewrites each other key with the
+         value it already holds instead of flattening it to empty.
+
+         `profile` is deliberately not write-protected (see
+         STORAGE_CONTRACT §6), precisely so the new profile can land; the
+         original bytes survive in the `__corrupt` sidecar. */
+      setProfile(Object.assign({}, DEFAULT_PROFILE));
+      loadProfileScopedState(e);
+      setScreen("onboard");
+      setOnboardStep(0);
     } else {
+      // Brand-new account: nothing will be read, so nothing would otherwise
+      // replace the previous profile's values before they are persisted.
+      resetProfileState();
       setScreen("onboard");
       setOnboardStep(0);
     }
@@ -998,6 +1101,7 @@ function App() {
               key={email}
               workoutLog={workoutLog}
               bodyMass={profile.weight}
+              tissueHistory={tissueHistory}
               routines={routines}
               saveRoutine={saveRoutine}
               deleteRoutine={deleteRoutine}
@@ -1153,6 +1257,7 @@ function App() {
               key={email}
               workoutLog={workoutLog}
               bodyMass={profile.weight}
+              tissueHistory={tissueHistory}
               routines={routines}
               saveRoutine={saveRoutine}
               deleteRoutine={deleteRoutine}
