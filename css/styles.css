@@ -8315,3 +8315,32 @@ body[data-theme="light"]::before {
     padding: 11px 0;
     cursor: pointer
 }
+
+/* Milestone 3 — descriptive tissue workload, isolated from volume/recovery. */
+.tl-segment { display: flex; gap: 4px; padding: 4px; margin-bottom: 12px; background: var(--input-bg); border-radius: 12px; }
+.tl-segment button { flex: 1; min-width: 0; min-height: 44px; padding: 8px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--text-dim); font: inherit; font-size: 13px; cursor: pointer; }
+.tl-segment button[aria-pressed="true"] { background: var(--surface-hover); color: var(--text); border-color: #9b81db; font-weight: 700; }
+.tl-card { color: var(--text); font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.tl-card h2 { font-size: 19px; margin: 0 0 6px; }
+.tl-card h3 { font-size: 15px; margin: 16px 0 6px; }
+.tl-card h4 { font-size: 13px; margin: 16px 0 6px; }
+.tl-card p { margin: 8px 0 12px; }
+.tl-muted { color: var(--text-dim); font-size: 12px; }
+.tl-coverage { margin-top: 14px; }
+.tl-card summary { cursor: pointer; padding: 12px 0; min-height: 44px; box-sizing: border-box; }
+.tl-card ul { padding-left: 20px; }
+.tl-empty, .tl-detail { background: var(--input-bg); padding: 12px; border: 1px solid var(--border); border-radius: 12px; margin: 12px 0; }
+.tl-detail h3 { margin-top: 0; }
+.tl-value { font-size: 19px; }
+.tl-contributors { list-style: none; padding: 0 !important; margin: 0; }
+.tl-contributors li { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; border-bottom: 1px solid var(--border); padding: 8px 0; }
+.tl-contributors li span { min-width: 0; max-width: 100%; }
+.tl-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; }
+.tl-gradient { display: inline-block; width: 72px; height: 10px; border-radius: 4px; background: linear-gradient(90deg, hsl(258,65%,84%), hsl(258,65%,44%)); }
+.tl-tissues { display: grid; gap: 6px; }
+.tl-tissues button { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; min-height: 48px; padding: 10px; border-radius: 9px; border: 1px solid var(--border); color: var(--text); background: var(--input-bg); font: inherit; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.tl-tissues button[aria-pressed="true"] { border-color: #9b81db; }
+.tl-region { cursor: pointer; }
+.tl-region:focus-visible path { stroke: #fff; stroke-width: 3; }
+.tl-card button:focus-visible, .tl-card summary:focus-visible, .tl-segment button:focus-visible { outline: 2px solid #9b81db; outline-offset: 3px; }
+.tl-about { margin-top: 16px; border-top: 1px solid var(--border); }

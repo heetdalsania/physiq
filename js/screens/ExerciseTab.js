@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { EXERCISE_CATEGORIES, EXERCISES_BY_CATEGORY } from "../data/constants.js";
 import { AppTime } from "../utils/appTime.js";
 import { MuscleTracker } from "../components/MuscleTracker.js";
+import { TissueLoadTracker } from "../components/TissueLoadTracker.js";
 import { RecoveryTracker } from "../components/RecoveryTracker.js";
 import {
   startSessionFromRoutine,
@@ -45,7 +46,8 @@ function categoryLabel(catId) {
   return c ? c.label : catId;
 }
 
-export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout, weeklyMuscles, setTargets, updateSetTarget }) {
+export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompletedWorkout, weeklyMuscles, setTargets, updateSetTarget, workoutLog, bodyMass }) {
+  const [trackingMode, setTrackingMode] = useState("volume");
   const [view, setView] = useState("main");
   const [draft, setDraft] = useState(null);
   const [picker, setPicker] = useState({ selected: [], category: "chest" });
@@ -328,11 +330,18 @@ export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompleted
         )}
 
         <div style={{ marginTop: 28 }}>
-          <MuscleTracker
-            weeklyMuscles={weeklyMuscles}
-            setTargets={setTargets}
-            updateSetTarget={updateSetTarget}
-          />
+          <div className="tl-segment" role="group" aria-label="Training view">
+            <button type="button" aria-pressed={trackingMode === "volume"} onClick={() => setTrackingMode("volume")}>Training Volume</button>
+            <button type="button" aria-pressed={trackingMode === "tissue"} onClick={() => setTrackingMode("tissue")}>Tissue Load</button>
+          </div>
+          <div hidden={trackingMode !== "volume"}>
+            <MuscleTracker
+              weeklyMuscles={weeklyMuscles}
+              setTargets={setTargets}
+              updateSetTarget={updateSetTarget}
+            />
+          </div>
+          {trackingMode === "tissue" && <TissueLoadTracker workoutLog={workoutLog} bodyMass={bodyMass} />}
         </div>
 
         <div style={{ marginTop: 18 }}>

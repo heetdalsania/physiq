@@ -38,6 +38,7 @@ A comprehensive nutrition and fitness optimizer — personalized to your body, y
 - **Gym Days Enforcer** — Automatically marks exercise target as "Met" for the rest of the week if you've already hit your weekly workout quota (e.g., 3x/week).
 
 ### 🏋️ Exercise Tracker
+- **Tissue Load** — A separate, read-only view of provisional tissue workload from completed sets, with relative shading, contributors, confidence and mapping coverage. [Model and display semantics](TISSUE_LOAD_MAP.md).
 - **Routine Builder** — Create preset routines (e.g., "Push Day", "Pull Day") with selected muscle groups and sets.
 - **Live Workout Mode** — Run the routine with a live timer and toggle off sets as you conquer them.
 - **Data Persistence** — Pushes completed workouts to your local database, powering the Calendar tab's logic and the Health tab's lifetime stats.

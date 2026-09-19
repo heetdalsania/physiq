@@ -995,6 +995,9 @@ function App() {
         {tab === "exercise" && (
           <ErrorBoundary>
             <ExerciseTab
+              key={email}
+              workoutLog={workoutLog}
+              bodyMass={profile.weight}
               routines={routines}
               saveRoutine={saveRoutine}
               deleteRoutine={deleteRoutine}
@@ -1147,6 +1150,9 @@ function App() {
           </div>
           <div className="popup-content">
             <ExerciseTab
+              key={email}
+              workoutLog={workoutLog}
+              bodyMass={profile.weight}
               routines={routines}
               saveRoutine={saveRoutine}
               deleteRoutine={deleteRoutine}

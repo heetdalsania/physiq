@@ -114,7 +114,7 @@ test("model versions follow the documented naming and are independent of the sch
                TISSUE_LOAD_MODEL_VERSION.indexOf("schema") === -1, true);
 });
 
-// ── Boundary: the domain layer is framework-free and not wired in yet ───
+// ── Boundary: the domain layer stays framework-free ─────────────────────
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -135,10 +135,12 @@ test("js/tissue/ never touches React, the DOM, storage, network or the clock", f
   });
 });
 
-test("Milestone 1 wires nothing into the app: no module outside js/tissue imports it", function() {
+test("Milestone 3 consumes the domain only through the pure presentation adapter", function() {
   const files = walk(resolve(ROOT, "js")).filter(function(f) { return f.indexOf("/js/tissue/") < 0; });
   files.forEach(function(f) {
     const src = readFileSync(f, "utf8");
-    assert.equal(/from\s+["'][^"']*tissue\//.test(src), false, f + " imports js/tissue — that is Milestone 3 work");
+    if (/from\s+["'][^"']*tissue\//.test(src)) {
+      assert.equal(f, resolve(ROOT, "js/utils/tissueLoadView.js"), "Only the presentation adapter may import the domain");
+    }
   });
 });
