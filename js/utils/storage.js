@@ -207,13 +207,15 @@ function pruneOldestEntry() {
 }
 
 /* Persists `value` under `key`.
+ * Optional derived caches use { pruneOnQuota: false } so a cache write
+ * cannot evict authoritative history from any profile.
  *
  * Returns true when the key holds the requested value afterwards. For a
  * write-protected key that includes the deliberate no-op: the caller asked
  * to store the same fallback the failed read produced, and storage is left
  * exactly as it was. Callers treat false as "could not store", so a
  * suppressed passive write must not report failure. */
-export function set(key, value) {
+export function set(key, value, options = {}) {
   let payload;
   try { payload = JSON.stringify(value); } catch (e) { return false; }
 
@@ -230,7 +232,7 @@ export function set(key, value) {
     return true;
   } catch (err) {
     if (err && err.name === "QuotaExceededError") {
-      if (pruneOldestEntry()) {
+      if (options.pruneOnQuota !== false && pruneOldestEntry()) {
         try {
           localStorage.setItem(key, payload);
           emitToast("Storage was full — pruned oldest history entry", { type: "warning" });

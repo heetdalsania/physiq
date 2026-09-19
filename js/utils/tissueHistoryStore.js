@@ -13,7 +13,8 @@
  * ── Guarantees (each pinned by test/tissueHistoryStore.test.js) ──────────
  *   - the source of truth stays `workoutLog`: an entry whose source is gone
  *     is dropped, an entry whose source changed is rebuilt, everything else
- *     is kept BYTE-FOR-BYTE (unknown fields and all);
+ *     is kept BYTE-FOR-BYTE (unknown fields and all), except ordinal-only
+ *     rekeys when duplicate source records move;
  *   - idempotent and duplicate-free: running twice writes nothing the
  *     second time; N runs converge on one entry per source record;
  *   - profile-scoped: only the given profile's key is read or written;
@@ -23,7 +24,8 @@
  *     schema this build does not understand, or when the SOURCE key itself
  *     is unreadable — the app still gets an in-memory history for the
  *     session, but nothing on disk is replaced or downgraded;
- *   - entries from another model/map series are preserved untouched;
+ *   - entries from another model/map series are preserved untouched, with
+ *     detached sources retained separately from active history;
  *   - a failed write is reported as such; there is no separate "migrated"
  *     marker that could be advanced ahead of the data, because the
  *     envelope IS the data and it is written in one setItem.
@@ -50,13 +52,13 @@ export function tissueHistoryKey(email) {
 export function readTissueHistory(email) {
   const key = tissueHistoryKey(email);
   let raw = null;
-  try { raw = localStorage.getItem(key); } catch (e) { raw = null; }
+  try { raw = localStorage.getItem(key); } catch (e) { return { state: "unreadable", envelope: null, raw: null }; }
   if (raw == null) return { state: "absent", envelope: null, raw: null };
   let parsed;
   try { parsed = JSON.parse(raw); } catch (e) { return { state: "malformed", envelope: null, raw: raw }; }
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return { state: "malformed", envelope: null, raw: raw };
   if (parsed.schemaVersion !== TISSUE_HISTORY_SCHEMA_VERSION) return { state: "unsupported", envelope: parsed, raw: raw };
-  if (parsed.entries !== undefined && !Array.isArray(parsed.entries)) return { state: "malformed", envelope: null, raw: raw };
+  if (!Array.isArray(parsed.entries) || (parsed.detachedEntries !== undefined && !Array.isArray(parsed.detachedEntries))) return { state: "malformed", envelope: null, raw: raw };
   return { state: "ok", envelope: parsed, raw: raw };
 }
 
@@ -65,9 +67,9 @@ export function readTissueHistory(email) {
    and "reconciling" against it would delete every entry. */
 function sourceIsReadable(email) {
   let raw = null;
-  try { raw = localStorage.getItem(uKey(email, "workoutLog")); } catch (e) { return true; }
+  try { raw = localStorage.getItem(uKey(email, "workoutLog")); } catch (e) { return false; }
   if (raw == null) return true;
-  try { JSON.parse(raw); return true; } catch (e) { return false; }
+  try { return Array.isArray(JSON.parse(raw)); } catch (e) { return false; }
 }
 
 function compareEntries(a, b) {
@@ -83,7 +85,7 @@ function compareEntries(a, b) {
    without storage. `now` is supplied by the caller. */
 export function planReconciliation(envelope, workoutLog, profile, now) {
   const stored = envelope && Array.isArray(envelope.entries) ? envelope.entries : [];
-  const owned = {};      // sourceKey → entry, current series only
+  const owned = Object.create(null); // sourceKey → entry, current series only
   const foreign = [];    // other model/map series: preserved verbatim
   const malformed = [];  // unrecognisable entries: preserved verbatim, ignored
   let deduplicated = 0;
@@ -99,6 +101,24 @@ export function planReconciliation(envelope, workoutLog, profile, now) {
 
   const log = Array.isArray(workoutLog) ? workoutLog : [];
   const keys = indexSourceKeys(log);
+  const fingerprints = log.map(session => sourceFingerprint(session));
+  // Ordinals distinguish duplicates, but are not identity across a reorder.
+  // Reserve unchanged matches for the entire log before rebuilding any edit.
+  const group = key => key.slice(0, key.lastIndexOf("#"));
+  const candidates = new Map();
+  Object.values(owned).forEach(entry => {
+    const id = JSON.stringify([group(entry.sourceKey), entry.sourceFingerprint]);
+    if (!candidates.has(id)) candidates.set(id, { entries: [], cursor: 0 });
+    candidates.get(id).entries.push(entry);
+  });
+  const used = new Set();
+  const matches = keys.map((key, i) => {
+    if (key === null) return null;
+    const bucket = candidates.get(JSON.stringify([group(key), fingerprints[i]]));
+    const match = bucket && bucket.entries[bucket.cursor++];
+    if (match) used.add(match);
+    return match || null;
+  });
   const p = profile && typeof profile === "object" ? profile : {};
   const report = { created: 0, kept: 0, rebuilt: 0, removed: 0, undatable: 0, foreign: foreign.length, malformed: malformed.length, deduplicated: deduplicated };
   const next = [];
@@ -108,10 +128,11 @@ export function planReconciliation(envelope, workoutLog, profile, now) {
     const key = keys[i];
     if (key === null) { report.undatable++; return; }
     seen[key] = true;
-    const existing = owned[key];
-    if (existing && existing.sourceFingerprint === sourceFingerprint(session)) {
+    const matched = matches[i];
+    const existing = owned[key] && !used.has(owned[key]) ? owned[key] : null;
+    if (matched) {
       report.kept++;
-      next.push(existing);
+      next.push(matched.sourceKey === key ? matched : { ...matched, sourceKey: key });
       return;
     }
     let ordinal = 0;
@@ -130,11 +151,22 @@ export function planReconciliation(envelope, workoutLog, profile, now) {
   Object.keys(owned).forEach(function (key) { if (!seen[key]) report.removed++; });
 
   next.sort(compareEntries);
+  // We understand v1 source identity even for an unsupported model. Retain
+  // stale foreign records verbatim for recovery, outside the active series.
+  const activeFingerprints = new Map(keys.map((key, i) => [key, fingerprints[i]]));
+  const detached = [];
+  const activeForeign = [];
+  const retained = foreign.concat(envelope && Array.isArray(envelope.detachedEntries) ? envelope.detachedEntries : []);
+  retained.forEach(entry => {
+    if (isValidHistoryEntry(entry) && activeFingerprints.get(entry.sourceKey) === entry.sourceFingerprint) activeForeign.push(entry);
+    else detached.push(entry);
+  });
   const base = envelope && typeof envelope === "object" && !Array.isArray(envelope) ? envelope : {};
   const out = Object.assign({}, base, {
     schemaVersion: TISSUE_HISTORY_SCHEMA_VERSION,
-    entries: next.concat(foreign, malformed)
+    entries: next.concat(activeForeign, malformed)
   });
+  if (detached.length || Object.prototype.hasOwnProperty.call(base, "detachedEntries")) out.detachedEntries = detached;
   return { envelope: out, entries: out.entries, report: report };
 }
 
@@ -169,13 +201,13 @@ export function reconcileTissueHistory(options) {
     const planned = planReconciliation(null, opts.workoutLog, opts.profile, now);
     return { schemaVersion: TISSUE_HISTORY_SCHEMA_VERSION, entries: planned.entries, persisted: false, storageState: "unsupported", report: planned.report };
   }
-  if (stored.state === "malformed") {
+  if (stored.state === "malformed" || stored.state === "unreadable") {
     // Unreadable bytes stay at their key (quarantineProfile() has already
     // copied them to <key>__corrupt). Nothing is written over them.
     const planned = planReconciliation(null, opts.workoutLog, opts.profile, now);
-    return { schemaVersion: TISSUE_HISTORY_SCHEMA_VERSION, entries: planned.entries, persisted: false, storageState: "malformed", report: planned.report };
+    return { schemaVersion: TISSUE_HISTORY_SCHEMA_VERSION, entries: planned.entries, persisted: false, storageState: stored.state, report: planned.report };
   }
-  if (!sourceIsReadable(email)) {
+  if (!Array.isArray(opts.workoutLog) || !sourceIsReadable(email)) {
     // The app is holding a fallback for workoutLog. Serve what was stored
     // and touch nothing.
     const entries = stored.envelope && Array.isArray(stored.envelope.entries) ? stored.envelope.entries : [];
@@ -198,7 +230,7 @@ export function reconcileTissueHistory(options) {
     result.storageState = "unchanged";
     return result;
   }
-  if (set(tissueHistoryKey(email), planned.envelope)) {
+  if (set(tissueHistoryKey(email), planned.envelope, { pruneOnQuota: false })) {
     result.persisted = true;
     result.storageState = "persisted";
   } else {

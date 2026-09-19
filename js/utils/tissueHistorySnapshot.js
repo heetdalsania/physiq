@@ -84,7 +84,11 @@ export function localUtcOffsetMinutes(ms) {
 }
 
 export function isDateKey(value) {
-  return typeof value === "string" && DATE_KEY.test(value);
+  if (typeof value !== "string" || !DATE_KEY.test(value)) return false;
+  const [y, m, d] = value.split("-").map(Number);
+  const date = new Date(0);
+  date.setUTCFullYear(y, m - 1, d);
+  return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
 }
 
 // ── Source identity and fingerprint ─────────────────────────────────────
@@ -247,7 +251,8 @@ export function resolveHistoricalBodyMass(input) {
 export function diffDayKeys(a, b) {
   if (!isDateKey(a) || !isDateKey(b)) return null;
   const pa = a.split("-").map(Number), pb = b.split("-").map(Number);
-  return Math.round((Date.UTC(pb[0], pb[1] - 1, pb[2]) - Date.UTC(pa[0], pa[1] - 1, pa[2])) / 86400000);
+  const epoch = p => { const d = new Date(0); d.setUTCFullYear(p[0], p[1] - 1, p[2]); return d.getTime(); };
+  return Math.round((epoch(pb) - epoch(pa)) / 86400000);
 }
 
 // ── Materialization ─────────────────────────────────────────────────────
@@ -329,9 +334,14 @@ export function isValidHistoryEntry(entry) {
     isDateKey(entry.localDate) &&
     typeof entry.modelVersion === "string" && typeof entry.mapVersion === "string" &&
     typeof entry.workloadUnit === "string" &&
-    !!entry.tissues && typeof entry.tissues === "object" &&
+    !!entry.inputs && (entry.inputs.bodyMass === null || (Number.isFinite(entry.inputs.bodyMass) && entry.inputs.bodyMass > 0)) &&
+    !!entry.inputs.bodyMassProvenance && typeof entry.inputs.bodyMassProvenance.approximate === "boolean" &&
+    !!entry.tissues && typeof entry.tissues === "object" && !Array.isArray(entry.tissues) &&
+    Object.values(entry.tissues).every(t => t && typeof t === "object" && Number.isFinite(t.workload) && t.workload >= 0) &&
     !!entry.coverage && typeof entry.coverage === "object" &&
-    Number.isFinite(entry.coverage.completedSets) && Number.isFinite(entry.coverage.modeledSets);
+    Number.isSafeInteger(entry.coverage.completedSets) && entry.coverage.completedSets >= 0 &&
+    Number.isSafeInteger(entry.coverage.modeledSets) && entry.coverage.modeledSets >= 0 &&
+    entry.coverage.modeledSets <= entry.coverage.completedSets;
 }
 
 /* Is an entry produced by THIS build's engine (same model + map)? Entries

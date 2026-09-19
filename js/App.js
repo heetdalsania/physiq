@@ -873,7 +873,7 @@ function App() {
     setIntake(d.intake);
     setMealLog(d.meals);
     setHistory(loadHistory(e));
-    setRecentFoods(emptyProfileState().recentFoods);
+    try { setRecentFoods(JSON.parse(localStorage.getItem(uKey(e, "recentFoods"))) || []); } catch (err) { setRecentFoods([]); }
     try { setRoutines(JSON.parse(localStorage.getItem(uKey(e, "routines"))) || []); } catch (err) { setRoutines([]); }
     try { setWorkoutLog(JSON.parse(localStorage.getItem(uKey(e, "workoutLog"))) || []); } catch (err) { setWorkoutLog([]); }
     try { setWeeklyMuscles(rolloverWeeklyMuscles(JSON.parse(localStorage.getItem(uKey(e, "weeklyMuscles"))))); } catch (err) { setWeeklyMuscles(getEmptyWeeklyMuscles()); }

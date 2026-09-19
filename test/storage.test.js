@@ -682,12 +682,12 @@ test("a failed parse substitutes that key's own default, never the previous prof
   const src = readFileSync(new URL("../js/App.js", import.meta.url), "utf8");
   /* One reader per line: `try { setX(… JSON.parse(…) …); } catch (e) { … }`.
      The weeklyMuscles reader wraps the parse in rolloverWeeklyMuscles(), so
-     match on the line shape rather than on `setX(JSON.parse`. All four live
+     match on the line shape rather than on `setX(JSON.parse`. All five live
      in loadProfileScopedState(), which every load path calls. */
   const calls = src.split("\n").filter(function (line) {
     return /^\s*try \{ set\w+\(/.test(line) && line.indexOf("JSON.parse") >= 0 && line.indexOf("} catch") >= 0;
   });
-  assert.equal(calls.length, 4, "expected the 4 direct-parse readers of the one shared loader, found " + calls.length);
+  assert.equal(calls.length, 5, "expected the 5 direct-parse readers of the one shared loader, found " + calls.length);
   calls.forEach(function (call) {
     const setter = /try \{ (set\w+)\(/.exec(call)[1];
     const body = /\} catch \(\w+\) \{([^}]*)\}/.exec(call)[1];

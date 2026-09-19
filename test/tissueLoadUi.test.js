@@ -162,8 +162,8 @@ test("insufficient history states are honest: no history, partial 7-day window, 
   assert.match(none, /No modeled history yet/);
   assert.doesNotMatch(none, /Last 7 days/);
   const young = detail([H(dayN(-2), 100), H(D, 50)]);
-  assert.match(young, /150 lb\*rep<small>3 of 7 days observed/);
-  assert.match(young, /150 lb\*rep<small>3 of 28 days observed/);
+  assert.match(young, /150 lb\*rep<small>3 of 7 days since first log/);
+  assert.match(young, /150 lb\*rep<small>3 of 28 days since first log/);
   assert.match(young, /Recent baseline<\/dt><dd class="mono">Not yet available/);
   assert.match(young, /Change vs recent baseline<\/dt><dd class="mono">Not comparable/);
   assert.match(young, /Baseline needs modeled history covering the 28 days before the last 7 days \(Feb 25 – Mar 24\)\. History begins Mar 29\./);
@@ -217,4 +217,36 @@ test("the Milestone 3 period value uses each workout's frozen body mass, and a l
     assert.match(html, /Body-mass bands are coarse assumptions\. Each saved workout(?:&#x27;|')s body mass is frozen with its history record/);
     assert.match(html, /saved with this profile as tissue-history-v1/);
   } finally { uninstallLocalStorageStub(); }
+});
+
+test("review: missing logging telemetry is disclosed instead of calling absent days observed", () => {
+  const html = detail([H('2026-01-01', 100)]);
+  assert.match(html, /zero logged workload/);
+  assert.match(html, /cannot distinguish unlogged training from no training/);
+  assert.doesNotMatch(html, /days observed/);
+});
+
+test("review: foreign-only, future-only and invalid histories remain visible in empty state", () => {
+  assert.match(detail([H(D, 999, { model: 'tissue-load-v0.2' })]), /different model version/);
+  assert.match(detail([H('2027-01-01', 100)]), /Future-dated workouts are kept but excluded/);
+  assert.match(detail([H(D, -100)]), /invalid values and are excluded/);
+});
+
+test("review: numeric overflow renders unavailable without Infinity or an invented zero", () => {
+  const html = detail(BASE_UI().concat(H(D, 1e308), H(D, 1e308)));
+  assert.match(html, /Last 7 days<\/dt><dd class="mono">Not available/);
+  assert.match(html, /exceed the supported numeric range/);
+  assert.doesNotMatch(html, /Infinity|NaN/);
+});
+
+test("review: asymmetric mapping coverage remains explicit in both comparison directions", () => {
+  for (const reverse of [false, true]) {
+    const baseline = H('2026-02-25', 400, { completed: 10, modeled: reverse ? 10 : 1 });
+    const recent = H(D, 200, { completed: 10, modeled: reverse ? 1 : 10 });
+    const html = detail([baseline, recent]);
+    assert.match(html, /\+100%/);
+    assert.match(html, new RegExp('last 7 days ' + (reverse ? 1 : 10) + ' of 10 completed sets modeled'));
+    assert.match(html, new RegExp('baseline period ' + (reverse ? 10 : 1) + ' of 10 completed sets modeled'));
+    assert.match(html, /comparison covers modeled exercises only/);
+  }
 });

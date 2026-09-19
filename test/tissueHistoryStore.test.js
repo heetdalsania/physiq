@@ -342,10 +342,11 @@ test("entries from another model/map version are preserved verbatim and never me
   const h = buildTissueLoadHistory(r.entries, { today: "2026-03-05" });
   assert.equal(h.otherSeriesEntries, 1);
   assert.equal(h.tissues.quadriceps.recent7, 2 * 5 * (225 + 0.75 * 178), "the 999999 never entered the v0.1 totals");
-  // and removing its source does not delete a foreign entry this build does not own
+  // Removing its source preserves the foreign entry outside active history.
   const shrunk = reconcileA([session(2, at(2026, 3, 5))], DEMO_PROFILE_A);
   assert.equal(shrunk.report.foreign, 1);
-  assert.equal(shrunk.entries.some(e => e.modelVersion === "tissue-load-v0.2"), true);
+  assert.equal(shrunk.entries.some(e => e.modelVersion === "tissue-load-v0.2"), false);
+  assert.deepEqual(stored().detachedEntries, [foreign]);
   assert.doesNotMatch(readFileSync(new URL("../js/tissue/modelVersion.js", import.meta.url), "utf8"), /v0\.2/, "no production v0.2 exists");
 });
 
