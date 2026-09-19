@@ -9,9 +9,9 @@ import { buildTissueLoadView } from "../js/utils/tissueLoadView.js";
 const bundle = await build({ stdin: { contents: `
   import React from 'react';
   import {renderToStaticMarkup} from 'react-dom/server';
-  import {TissueLoadContent, TissueLoadDetail, TissueBodyDiagram} from './js/components/TissueLoadTracker.js';
+  import {TissueLoadContent, TissueLoadDetail, TissueBodyDiagram, TissueLoadTracker} from './js/components/TissueLoadTracker.js';
   import {ExerciseTab} from './js/screens/ExerciseTab.js';
-  export const render = (kind, props) => renderToStaticMarkup(React.createElement({content:TissueLoadContent,detail:TissueLoadDetail,body:TissueBodyDiagram,exercise:ExerciseTab}[kind], props));
+  export const render = (kind, props) => renderToStaticMarkup(React.createElement({content:TissueLoadContent,detail:TissueLoadDetail,body:TissueBodyDiagram,exercise:ExerciseTab,tracker:TissueLoadTracker}[kind], props));
 `, resolveDir: process.cwd(), loader: "jsx" }, bundle: true, platform: "node", format: "cjs", write: false, loader: { ".js": "jsx" } });
 const mod = { exports: {} };
 new Function("require", "module", "exports", bundle.outputFiles[0].text)(createRequire(import.meta.url), mod, mod.exports);
@@ -98,4 +98,123 @@ test("both Exercise entry points consume the active profile history and body mas
     assert.match(entry, /workoutLog=\{workoutLog\}/);
     assert.match(entry, /bodyMass=\{profile.weight\}/);
   });
+});
+
+// ── Milestone 4: longitudinal detail ────────────────────────────────────
+// Rendered through the same in-memory bundle; `history` comes from the pure
+// analytics module over synthetic tissue-history-v1 entries.
+
+import { buildTissueLoadHistory, addDays } from "../js/utils/tissueLoadHistory.js";
+import { reconcileTissueHistory } from "../js/utils/tissueHistoryStore.js";
+import { installLocalStorageStub, uninstallLocalStorageStub } from "./helpers/localStorageStub.js";
+
+const D = "2026-03-31";
+const dayN = n => addDays(D, n);
+let seqUi = 0;
+const H = (localDate, workload, opts = {}) => ({
+  schemaVersion: "tissue-history-v1", sourceKey: localDate + "#ui" + (seqUi++), sourceId: 1, sourceFinishedAt: 0, sourceFingerprint: "fp1:0000000000000000:1",
+  localDate, utcOffsetMinutes: 0, modelVersion: opts.model || "tissue-load-v0.1", mapVersion: "exercise-tissue-map-v0.1", workloadUnit: "lb*rep",
+  inputs: { bodyMass: 180, weightUnit: "lb", bodyMassProvenance: { source: opts.approx ? "profile_weight" : "weight_log", measurementDate: null, daysBefore: null, contemporaneous: !opts.approx, approximate: !!opts.approx } },
+  tissues: { hamstrings: { workload, eventCount: 1, confidence: "low" } },
+  coverage: { completedSets: opts.completed == null ? 1 : opts.completed, modeledSets: opts.modeled == null ? 1 : opts.modeled, unmappedExercises: [] }, warnings: [], materializedAt: 0
+});
+const BASE_UI = () => [H(dayN(-34), 400), H(dayN(-20), 400), H(dayN(-8), 400), H(dayN(-7), 400)];
+const detail = (entries, extra = {}) => render("detail", { tissue: getView(input).tissues.find(t => t.id === "hamstrings"), workloadUnit: "lb*rep", modelVersion: "tissue-load-v0.1", history: buildTissueLoadHistory(entries, { today: D }), ...extra });
+const FORBIDDEN = /\b(capacity|recover(?:y|ed)?|ready|readiness|risk|injur\w*|safe|danger\w*|overload\w*|damage|stress|force|strain|optimal|should|rest)\b/i;
+/* No threshold vocabulary and no traffic-light semantics anywhere in the new block. */
+const STATUS_WORDS = /\b(normal|elevated|high|moderate|low load|red|amber|yellow|green|caution|warning)\b/i;
+const longitudinalBlock = html => html.slice(html.indexOf("Recent exposure"), html.indexOf("Derived from completed logged sets"));
+/* Only explicit negations are allowed in the longitudinal copy. Strip them, then nothing biological may remain. */
+const audit = html => {
+  const block = longitudinalBlock(html);
+  assert.equal(block.match(STATUS_WORDS), null, "threshold/status vocabulary in longitudinal UI: " + block);
+  const stripped = block
+    .replace(/It is a descriptive comparison with your own logged history, not injury risk, recovery or capacity\./g, "")
+    .replace(/not tissue capacity, and it makes no training recommendation\./g, "");
+  const hit = stripped.match(FORBIDDEN);
+  assert.equal(hit, null, "forbidden term in longitudinal UI: " + (hit && hit[0]) + "\n" + stripped);
+};
+
+test("above-baseline detail shows exact 7/28-day sums, the per-7-day baseline, a signed percentage and a literal descriptor", () => {
+  const html = detail(BASE_UI().concat(H(D, 480)));
+  assert.match(html, /Last 7 days<\/dt><dd class="mono">480 lb\*rep/);
+  assert.match(html, /Last 28 days<\/dt><dd class="mono">1,680 lb\*rep/);
+  assert.match(html, /Recent baseline<\/dt><dd class="mono">400 lb\*rep<small>per 7 days, Feb 25 – Mar 24/);
+  assert.match(html, /Change vs recent baseline<\/dt><dd class="mono">\+20%<small>above recent modeled baseline/);
+  assert.match(html, /20% above the mean of the four 7-day periods before them \(400 lb\*rep\)/);
+  assert.match(html, /Coverage: last 7 days 1 of 1 completed sets modeled; last 28 days 4 of 4 completed sets modeled; baseline period 4 of 4 completed sets modeled\./);
+  assert.match(html, /history begins Feb 25/);
+  assert.doesNotMatch(longitudinalBlock(html), /class="[^"]*(?:warn|danger|alert|success|status)/, "no status styling hooks");
+  audit(html);
+});
+
+test("below and equal comparisons are rendered as negative/zero percentages, never as a status", () => {
+  const below = detail(BASE_UI().concat(H(D, 300)));
+  assert.match(below, /−25%<small>below recent modeled baseline/);
+  assert.match(below, /25% below the mean/);
+  const equal = detail(BASE_UI().concat(H(dayN(-2), 400)));
+  assert.match(equal, /\+0%<small>equal to recent modeled baseline/);
+  audit(below); audit(equal);
+});
+
+test("insufficient history states are honest: no history, partial 7-day window, baseline not yet available", () => {
+  const none = detail([]);
+  assert.match(none, /No modeled history yet/);
+  assert.doesNotMatch(none, /Last 7 days/);
+  const young = detail([H(dayN(-2), 100), H(D, 50)]);
+  assert.match(young, /150 lb\*rep<small>3 of 7 days observed/);
+  assert.match(young, /150 lb\*rep<small>3 of 28 days observed/);
+  assert.match(young, /Recent baseline<\/dt><dd class="mono">Not yet available/);
+  assert.match(young, /Change vs recent baseline<\/dt><dd class="mono">Not comparable/);
+  assert.match(young, /Baseline needs modeled history covering the 28 days before the last 7 days \(Feb 25 – Mar 24\)\. History begins Mar 29\./);
+  audit(none); audit(young);
+});
+
+test("zero baselines explain themselves and never show Infinity, NaN or a percentage", () => {
+  const empty = detail([H(dayN(-40), 5), H(D, 100)]);
+  assert.match(empty, /Recent baseline<\/dt><dd class="mono">0 lb\*rep<small>per 7 days/);
+  assert.match(empty, /Not comparable/);
+  assert.match(empty, /No completed workouts in the baseline period \(Feb 25 – Mar 24\), so no percentage is shown\./);
+  const unmapped = detail([H(dayN(-40), 5), H(dayN(-20), 0, { completed: 4, modeled: 0 }), H(D, 100)]);
+  assert.match(unmapped, /Completed sets in the baseline period \(Feb 25 – Mar 24\) were not covered by the model, so no percentage is shown\./);
+  assert.match(unmapped, /Unmapped sets are excluded from every total above/);
+  for (const html of [empty, unmapped]) { assert.doesNotMatch(html, /Infinity|NaN|∞|%<small>(above|below)/); audit(html); }
+});
+
+test("partial coverage, approximate legacy context and foreign model series are visible, never merged", () => {
+  const entries = BASE_UI().map(e => ({ ...e, coverage: { completedSets: 10, modeledSets: 2, unmappedExercises: ["Rowing"] } })).concat(H(D, 480, { approx: true }), H(dayN(-1), 99999, { model: "tissue-load-v0.2" }));
+  const html = detail(entries);
+  assert.match(html, /last 7 days 1 of 1 completed sets modeled; last 28 days 7 of 31 completed sets modeled; baseline period 8 of 40 completed sets modeled\. Unmapped sets are excluded/);
+  assert.match(html, /Some older estimates use limited historical profile data: no dated weight measurement was available for 1 workout in these windows\./);
+  assert.match(html, /1 history entry from a different model version is kept separately and not included\./);
+  assert.match(html, /Last 7 days<\/dt><dd class="mono">480 lb\*rep/);
+  assert.doesNotMatch(html, /99,999/);
+  audit(html);
+});
+
+test("storage-state notices are shown for unreadable, unsupported, unsaved and source-unreadable history", () => {
+  const entries = BASE_UI().concat(H(D, 480));
+  assert.match(detail(entries, { storageState: "malformed" }), /Saved modeled history could not be read\. The original was kept/);
+  assert.match(detail(entries, { storageState: "unsupported" }), /written by a newer version of the app and has been left unchanged/);
+  assert.match(detail(entries, { storageState: "write_failed" }), /could not be saved this time\. It will be rebuilt automatically/);
+  assert.match(detail(entries, { storageState: "source_unreadable" }), /Workout history could not be read/);
+  assert.doesNotMatch(detail(entries, { storageState: "unchanged" }), /could not be|newer version/);
+  assert.match(render("detail", { tissue: getView(input).tissues[0], workloadUnit: "lb*rep", modelVersion: "tissue-load-v0.1", history: null }), /Modeled history is not loaded yet/);
+});
+
+test("the Milestone 3 period value uses each workout's frozen body mass, and a later current-weight change does not move it", () => {
+  installLocalStorageStub();
+  try {
+    const email = "ui-frozen@example.com";
+    // The tracker reads AppTime.now() (real clock outside Dev Mode), so date the workout "now".
+    const t = Date.now();
+    const log = [{ id: 1, finishedAt: t, exercises: [{ name: "Squat", sets: [{ done: true, weight: 225, reps: 5 }] }] }];
+    const history = reconcileTissueHistory({ email, workoutLog: log, profile: { weight: 180, weightLog: [] }, now: t, persist: true });
+    const html = render("tracker", { workoutLog: log, bodyMass: 150, tissueHistory: history });
+    assert.match(html, /Quadriceps, estimated workload 1,800 lb\*rep/, "5 × (225 + 0.75 × 180), not 0.75 × 150");
+    const without = render("tracker", { workoutLog: log, bodyMass: 150, tissueHistory: null });
+    assert.match(without, /Quadriceps, estimated workload 1,687.5 lb\*rep/, "without history the M3 fallback (current weight) still applies");
+    assert.match(html, /Body-mass bands are coarse assumptions\. Each saved workout(?:&#x27;|')s body mass is frozen with its history record/);
+    assert.match(html, /saved with this profile as tissue-history-v1/);
+  } finally { uninstallLocalStorageStub(); }
 });

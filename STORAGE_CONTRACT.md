@@ -37,8 +37,14 @@ Consequences worth knowing:
 - Nothing enumerates profiles. "Log out" just clears React state and returns to the
   login screen ([js/screens/ProfileTab.js:113](js/screens/ProfileTab.js:113)); the previous
   profile's keys stay on disk untouched.
-- Logging in with a different e-mail reads a different key set. That is the whole of
-  profile switching ([js/App.js:794](js/App.js:794)).
+- Logging in with a different e-mail reads a different key set. That is almost the
+  whole of profile switching ([js/App.js](js/App.js)) — with one exception. When the
+  e-mail has **no stored profile**, nothing is read, so nothing would replace the
+  previous profile's values in memory; the eager write-back (§6) would then persist
+  them under the new e-mail as soon as onboarding finished. `doLogin()` therefore
+  calls `resetProfileState()` on that branch, clearing every profile-scoped React
+  state to the defaults in `emptyProfileState()`. Three tests in
+  [test/storage.test.js](test/storage.test.js) and one browser check pin this.
 - There is no authentication. The e-mail is an identifier, not a credential.
 
 ---
@@ -82,6 +88,7 @@ All are `pq_<email>_<suffix>`. "JSON" means `JSON.stringify` of the value shown.
 | `setTargets` | JSON object | `{}` | [App.js:370](js/App.js:399) | direct `JSON.parse` |
 | `recentFoods` | JSON array, **≤ 5** | `[]` | [App.js:630](js/App.js:659) | direct `JSON.parse` |
 | `planDrafts` | JSON object | `{training:[],rest:[]}` | [PlanDayScreen.js:67](js/screens/PlanDayScreen.js:67) | `get()` |
+| `tissueHistory` | JSON object | `{schemaVersion,entries:[]}` in memory | `reconcileTissueHistory()` [App.js](js/App.js) | `readTissueHistory()` |
 | `lastCheckin` | **raw string** Monday key | — | [App.js:455](js/App.js:483) | direct `getItem` |
 | `<suffix>__corrupt` | raw string (unparseable original) | — | `quarantineProfile()` | nothing — recovery only |
 
@@ -92,9 +99,13 @@ Reads are split, for historical reasons, between the hardened helpers in
 `JSON.parse(localStorage.getItem(...))` calls inside App.js state initialisers**
 (`routines`, `workoutLog`, `weeklyMuscles`, `setTargets`, `recentFoods`).
 
-The direct readers are each individually wrapped in `try/catch` with a literal
-fallback, so malformed data degrades to an empty value rather than white-screening —
-but they bypass the toast and the corruption handling in `get()`. This is why
+The direct readers are each individually wrapped in `try/catch` that substitutes
+**that key's own default**, so malformed data degrades to an empty value rather than
+white-screening — but they bypass the toast and the corruption handling in `get()`.
+The catch must call its setter: leaving it empty would keep the value loaded for the
+*previous* profile, which the write-back would then store under this e-mail and
+which, differing from the registered fallback, would also release the write
+protection on the unreadable bytes. A test pins that no catch is empty. This is why
 migrations must run **before React mounts** ([js/App.js:1168](js/App.js:1168)): the direct
 readers never see a pre-migration shape.
 
@@ -270,6 +281,108 @@ day's log:
 
 Both are **cleared at day rollover** — see §5.
 
+### `tissueHistory` — derived TissueOS history (Milestone 4)
+
+**Derived data.** `workoutLog` remains the source of truth; this key holds one
+frozen, versioned snapshot per completed workout so longitudinal exposure does
+not silently change when the profile weight does. Full rationale and the
+longitudinal mathematics: [TISSUE_LOAD_HISTORY.md](TISSUE_LOAD_HISTORY.md).
+Code: [js/utils/tissueHistorySnapshot.js](js/utils/tissueHistorySnapshot.js)
+(pure) and [js/utils/tissueHistoryStore.js](js/utils/tissueHistoryStore.js)
+(the only writer).
+
+```json
+{
+  "schemaVersion": "tissue-history-v1",
+  "entries": [
+    {
+      "schemaVersion": "tissue-history-v1",
+      "sourceKey": "8002@1772634600000#0",
+      "sourceId": 8002,
+      "sourceFinishedAt": 1772634600000,
+      "sourceFingerprint": "fp1:e8387be02fa13992:415",
+      "localDate": "2026-03-04",
+      "utcOffsetMinutes": -420,
+      "modelVersion": "tissue-load-v0.1",
+      "mapVersion": "exercise-tissue-map-v0.1",
+      "workloadUnit": "lb*rep",
+      "inputs": {
+        "bodyMass": 178,
+        "weightUnit": "lb",
+        "bodyMassProvenance": {
+          "source": "weight_log",
+          "measurementDate": "2026-03-02",
+          "daysBefore": 2,
+          "contemporaneous": false,
+          "approximate": false
+        }
+      },
+      "tissues": { "quadriceps": { "workload": 1792.5, "eventCount": 1, "confidence": "medium" } },
+      "coverage": { "completedSets": 1, "modeledSets": 1, "unmappedExercises": [] },
+      "warnings": [],
+      "materializedAt": 1772650800000
+    }
+  ]
+}
+```
+
+**Versioning.** `schemaVersion` is a *string* naming the entry layout
+(`tissue-history-v1`), independent of the global integer `SCHEMA_VERSION` and
+of the model/map versions that travel **inside** each entry. Four different
+questions, four independent versions — see
+[TISSUE_LOAD_HISTORY.md](TISSUE_LOAD_HISTORY.md) §10.
+
+**Identity.** `sourceKey` is `id@finishedAt#ordinal`. The ordinal separates
+records that share an id and completion instant, which an import can produce,
+so derived history counts exactly what `workoutLog` counts.
+`sourceFingerprint` covers **only** the inputs `tissue-load-v0.1` reads:
+completion instant, exercise names, and each set's `reps` / `weight` / strict
+`done`. Titles, routine ids, display labels, the precomputed counters and the
+Milestone 2 metadata fields are deliberately excluded, so editing them never
+invalidates a snapshot.
+
+| Writer | When | Persists? |
+|---|---|---|
+| `reconcileTissueHistory()` | the `workoutLog` persistence effect: boot restore, login, and immediately after a completed workout is saved | only when that `workoutLog` write itself succeeded |
+
+| Reader | Use |
+|---|---|
+| `TissueLoadTracker` (via the `tissueHistory` prop) | longitudinal detail, and the frozen body mass for the Milestone 3 period view |
+| `readTissueHistory()` / `loadStoredTissueHistoryEntries()` | read-only inspection and tests |
+
+**Reconciliation.** Each run compares the stored entries against `workoutLog`:
+unchanged sources are **kept byte-for-byte**, changed sources are rebuilt,
+vanished sources are dropped, undatable records are skipped, stored duplicates
+of one `sourceKey` are collapsed. Repeated initialization converges and, when
+nothing changed, performs **no write at all** (the payload is compared against
+the raw bytes on disk first). Entries from another model/map series and
+entries this build cannot parse are preserved verbatim and ignored.
+
+**It never writes when:**
+
+- the stored value is unreadable → left in place, quarantined to
+  `<key>__corrupt` by the normal profile sweep, and the session runs from an
+  in-memory derivation;
+- the stored `schemaVersion` is one this build does not know → **never
+  downgraded**, left exactly as written;
+- the **source** `workoutLog` is unreadable → App.js is holding its `[]`
+  fallback, so reconciling would delete every entry. The stored history is
+  served untouched instead;
+- the `workoutLog` write that triggered it failed, or Dev Mode is on.
+
+**Failed writes.** There is no separate "materialized" marker that could be
+advanced ahead of the data: the envelope *is* the data and lands in one
+`setItem`. A failure is reported as `storageState: "write_failed"`, nothing
+partial is stored, the app keeps a complete in-memory history for the session,
+and the next successful reconciliation repairs the key. Writes go through
+`set()`, so the existing quota guard and toast apply unchanged.
+
+**Losing this key is safe** — it is rebuilt from `workoutLog` on the next
+reconciliation. What cannot be rebuilt identically is the *historical context*
+of a legacy entry whose body mass came from the then-current profile weight;
+that is why the resolved value and its provenance are frozen inside the entry
+and carried by export.
+
 ### `routines`
 
 Same shape as a session's `exercises`, but sets carry only `{ reps, weight }`; `done`
@@ -323,6 +436,8 @@ nothing clears them except the day-rollover (intake/meals) and the week-rollover
 | Unknown fields | Preserved. Nothing whitelists keys or rebuilds objects from a schema. |
 | Unrelated keys | Untouched. Migrations only address keys they explicitly own. |
 | **Newer** `pq_schema_version` than the build | Left alone. `runMigrations()` returns an error report and refuses to downgrade; `importAll()` rejects a newer payload outright. |
+| **Newer** `tissueHistory.schemaVersion` than the build | Left alone, byte-for-byte. The session runs from an in-memory derivation; nothing is written, so a newer build's history survives a round trip through this one. |
+| Malformed `tissueHistory` | Never rewritten. Quarantined to `<key>__corrupt` like any other profile key, and the reconciler refuses to write over it. |
 
 ### Malformed data is never destroyed
 
@@ -367,6 +482,25 @@ malformed profile makes `loadUser()` return `null`, the app routes to onboarding
 the app never reaches the screen where that effect runs. Protecting it would suppress
 the user's onboarding write, which must land.
 
+**An unreadable profile must not cost the account its other keys.** Routing to
+onboarding used to be indistinguishable from a brand-new account, so the eager
+write-back replaced that profile's readable `workoutLog`, `routines`,
+`weeklyMuscles`, `setTargets`, `intake` and `meals` with empty values — one
+corrupted byte in `profile` destroyed everything else. `doLogin()` now uses
+`quarantineProfile()`'s **return value** (the list of keys that would not parse) to
+tell the two cases apart:
+
+| `loadUser()` | `profile` in the unreadable list | Meaning | Action |
+|---|---|---|---|
+| a profile | — | normal login | load every key |
+| `null` | **yes** | existing account, corrupt profile | **load every other key**, then onboard |
+| `null` | no | brand-new account | reset state, then onboard |
+
+In the middle row onboarding replaces only the profile; each other key is rewritten
+with the value it already held, and the original profile bytes stay in
+`<key>__corrupt`. All three paths share one reader, `loadProfileScopedState()`, so
+they cannot drift.
+
 **The day rollover was the last hole.** `loadDaily()` used to `remove()` `intake` and
 `meals` unconditionally on a date change, which destroyed malformed values as routine
 housekeeping. It now uses `removeIfReadable()`, which declines to discard anything it
@@ -389,8 +523,11 @@ precisely:
 | Conditionally eager — gated on `intake.calories !== 0` | `history` | 1 |
 | Explicit action only | `recentFoods` (logging food), `planDrafts` (editing a plan) | 2 |
 
-`quarantineProfile()` sweeps all ten `PROFILE_KEY_SUFFIXES` regardless of class, so
-coverage does not depend on getting this classification right. The raw-string keys
+`quarantineProfile()` sweeps all eleven `PROFILE_KEY_SUFFIXES` regardless of class,
+so coverage does not depend on getting this classification right. (`tissueHistory`,
+added in Milestone 4, is swept but is **not** in the eager class and declares no
+passive fallback: its writer refuses to write at all over an unreadable value, which
+is stronger than write protection.) The raw-string keys
 (`date`, `lastCheckin`) are not JSON and cannot be malformed, so they are out of scope.
 
 **What is still not covered:** nothing repairs a quarantined key automatically, and
@@ -447,9 +584,17 @@ Installs sitting at v1 replay only the v2 step; a fresh install runs v1 then v2 
 order. `importAll()` stamps the version the *imported data* was written at and then
 calls `runMigrations()`, so an older export is upgraded rather than over-stamped.
 
-**Milestone 0 deliberately does not define a TissueOS storage format.** No key,
-field, or version has been reserved for it. Tissue data should arrive as its own
-migration step when Milestone 1 actually needs it.
+**Milestone 0 deliberately did not define a TissueOS storage format.** No key,
+field, or version was reserved for it. Milestones 1–3 persisted nothing.
+
+**Milestone 4 adds `tissueHistory` and still does not bump `SCHEMA_VERSION`.**
+It is a new optional profile-scoped key, not a change to how any existing value
+is laid out, so there is no transform for a migration step to perform — the
+same reasoning Milestone 2 applied to the optional per-set fields. A build that
+predates the key ignores it; this build treats its absence as "not materialized
+yet" and rebuilds it from `workoutLog`. The key carries its **own** string
+version (`tissue-history-v1`) precisely so its shape can evolve without
+touching the global integer.
 
 **Milestone 2 did not bump the version.** The optional per-set fields (§4) are
 additive keys inside an existing value; readers that predate them ignore them and
@@ -474,6 +619,19 @@ theme, dev-mode flags and the food-search cache. `importAll()` writes back any
 `pq_*` key, rejects a payload with a missing or newer `schemaVersion`, and merges
 rather than replaces — existing keys not present in the payload survive.
 
+**`tissueHistory` is included** — it is `pq_`-prefixed, so it travels with no
+change to `exportAll()`/`importAll()`. That is deliberate rather than
+incidental: although the key is derived and rebuildable, a legacy entry's
+frozen body mass and its provenance are **not** reproducible on another device
+whose current profile weight differs. Exporting the key preserves them; the
+importing device's reconciliation then sees matching fingerprints, keeps every
+entry unchanged, and reproduces the same baseline. Dropping the key would
+silently re-date legacy history to the new device's weight.
+
+Import safety is tested: a malformed imported `tissueHistory` does not damage
+the source `workoutLog` and is not overwritten, and an imported history from a
+newer `tissue-history-v*` is not downgraded.
+
 ---
 
 ## 9. Verifying this contract
@@ -488,6 +646,14 @@ data, profile isolation, unknown-field preservation, completed-vs-incomplete set
 semantics, and nutrition data surviving migration. They run against an in-memory
 `localStorage` stub ([test/helpers/localStorageStub.js](test/helpers/localStorageStub.js)) and
 never touch real browser storage.
+
+[test/tissueHistoryStore.test.js](test/tissueHistoryStore.test.js) and
+[test/tissueHistorySnapshot.test.js](test/tissueHistorySnapshot.test.js)
+(Milestone 4) cover the derived TissueOS history key: idempotent backfill,
+duplicate-free reconciliation, frozen body mass and its provenance, profile
+isolation, source-fingerprint rebuild and removal, malformed / future-version /
+failed-write / unreadable-source safety, model-series coexistence, and the
+export → import round trip.
 
 [test/setMetadata.test.js](test/setMetadata.test.js),
 [test/workoutSession.test.js](test/workoutSession.test.js) and

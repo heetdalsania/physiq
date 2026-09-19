@@ -39,6 +39,7 @@ A comprehensive nutrition and fitness optimizer — personalized to your body, y
 
 ### 🏋️ Exercise Tracker
 - **Tissue Load** — A separate, read-only view of provisional tissue workload from completed sets, with relative shading, contributors, confidence and mapping coverage. [Model and display semantics](TISSUE_LOAD_MAP.md).
+- **Longitudinal exposure** — Each saved workout is frozen into a versioned per-session record, so 7-day and 28-day modeled exposure and a comparison with your own recent baseline stay reproducible when your profile weight changes. Descriptive statistics only: no capacity, recovery, readiness or injury interpretation. [Contract and mathematics](TISSUE_LOAD_HISTORY.md).
 - **Routine Builder** — Create preset routines (e.g., "Push Day", "Pull Day") with selected muscle groups and sets.
 - **Live Workout Mode** — Run the routine with a live timer and toggle off sets as you conquer them.
 - **Data Persistence** — Pushes completed workouts to your local database, powering the Calendar tab's logic and the Health tab's lifetime stats.

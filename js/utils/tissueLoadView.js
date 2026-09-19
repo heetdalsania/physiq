@@ -1,4 +1,6 @@
-/* Milestone 3 presentation only: no storage, clock, React, or model changes. */
+/* Milestone 3 presentation only: no storage, clock, React, or model changes.
+   Milestone 4 adds one optional input, `resolveBodyMass`, so the selected
+   period can be computed with each workout's frozen historical body mass. */
 import { estimateSessionTissueLoad, WORKLOAD_UNIT } from "../tissue/loadEngine.js";
 import { TISSUE_LOAD_MODEL_VERSION, EXERCISE_TISSUE_MAP_VERSION } from "../tissue/modelVersion.js";
 import { TISSUES } from "../tissue/tissueDefinitions.js";
@@ -21,7 +23,11 @@ export function tissuePeriodBounds(now, period = "today") {
   return { start: start.getTime(), end: end.getTime() };
 }
 
-export function buildTissueLoadView(workoutLog, { now, period = "today", bodyMass } = {}) {
+/* `resolveBodyMass(session)` (Milestone 4) returns the body mass frozen in
+   that session's tissue-history entry: a number, `null` (the entry recorded
+   that the engine's default applied) or `undefined` (no entry — fall back to
+   `bodyMass`). Without it the adapter behaves exactly as in Milestone 3. */
+export function buildTissueLoadView(workoutLog, { now, period = "today", bodyMass, resolveBodyMass } = {}) {
   const bounds = tissuePeriodBounds(now, period);
   let excludedRecords = 0;
   const sessions = (Array.isArray(workoutLog) ? workoutLog : []).filter(session => {
@@ -40,7 +46,8 @@ export function buildTissueLoadView(workoutLog, { now, period = "today", bodyMas
   let completedSets = 0;
   let modeledSets = 0;
   sessions.forEach(session => {
-    const result = estimateSessionTissueLoad(session, { bodyMass });
+    const frozen = typeof resolveBodyMass === "function" ? resolveBodyMass(session) : undefined;
+    const result = estimateSessionTissueLoad(session, { bodyMass: frozen === undefined ? bodyMass : frozen });
     result.exercises.forEach(ex => {
       completedSets += ex.completedSets;
       if (ex.status === "mapped") modeledSets += ex.completedSets;

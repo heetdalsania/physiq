@@ -596,6 +596,196 @@ test("App.js declares a passive fallback for every eager writer it has", functio
   );
 });
 
+test("a brand-new account starts empty: doLogin resets every profile-scoped state before onboarding", function () {
+  /* Switching profiles is just "read a different key set", so nothing clears
+     React state on its own. For an EXISTING profile every value is replaced
+     by a read; for a NEW one nothing is read, and the eager persistence
+     effects would then write the previous profile's workouts, routines and
+     nutrition under the new e-mail. This guards the reset that prevents it.
+
+     Source-level because App.js cannot be imported: it calls createRoot() at
+     module scope. The behavioural proof is the browser harness
+     (test/browser/tissueHistory.browser.mjs). */
+  const src = readFileSync(new URL("../js/App.js", import.meta.url), "utf8");
+
+  // 1. The onboarding branch resets before it routes to the onboard screen.
+  const login = src.slice(src.indexOf("const doLogin = function"), src.indexOf("const finishOnboard"));
+  assert.ok(login.length > 0, "doLogin() not found in App.js");
+  const elseBranch = login.slice(login.lastIndexOf("} else {"));
+  assert.match(elseBranch, /resetProfileState\(\)/, "the new-account branch must reset profile state");
+  assert.ok(
+    elseBranch.indexOf("resetProfileState()") < elseBranch.indexOf('setScreen("onboard")'),
+    "reset must happen before routing to onboarding"
+  );
+
+  // 2. resetProfileState() covers every key emptyProfileState() declares,
+  //    plus profile itself and the derived tissue history.
+  const emptyBlock = src.slice(src.indexOf("function emptyProfileState() {"), src.indexOf("\nfunction musclesHitBySession"));
+  assert.ok(emptyBlock.length > 0, "emptyProfileState() not found in App.js");
+  const declared = [];
+  emptyBlock.split("\n").forEach(function (line) {
+    const m = /^\s{4}([A-Za-z]\w*):/.exec(line);
+    if (m) declared.push(m[1]);
+  });
+  assert.ok(declared.length >= 8, "parsed no keys from emptyProfileState() — the guard drifted");
+
+  const reset = src.slice(src.indexOf("const resetProfileState = function"), src.indexOf("const doLogin = function"));
+  assert.ok(reset.length > 0, "resetProfileState() not found in App.js");
+  const SETTER = { intake: "setIntake", meals: "setMealLog", history: "setHistory", routines: "setRoutines",
+    workoutLog: "setWorkoutLog", weeklyMuscles: "setWeeklyMuscles", setTargets: "setSetTargets", recentFoods: "setRecentFoods" };
+  declared.forEach(function (key) {
+    assert.ok(SETTER[key], 'emptyProfileState() declares "' + key + '" but this guard knows no setter for it');
+    assert.match(reset, new RegExp("\\b" + SETTER[key] + "\\("), "resetProfileState() must reset " + key);
+  });
+  assert.match(reset, /setProfile\(/, "resetProfileState() must reset the profile itself");
+  assert.match(reset, /setTissueHistory\(null\)/, "resetProfileState() must drop derived TissueOS history");
+
+  // 3. Every eagerly persisted key is covered, so none can survive the switch.
+  const eager = EAGER_WRITERS.filter(function (k) { return k !== "profile"; });
+  eager.forEach(function (suffix) {
+    assert.ok(declared.indexOf(suffix) >= 0, 'eagerly persisted "' + suffix + '" is not reset for a new account');
+  });
+});
+
+test("emptyProfileState() and passiveFallbacks() do not drift apart", function () {
+  /* Two different questions — "what does an empty profile look like" and
+     "what did we substitute for an unreadable value" — that must give the
+     same answer for every key they share. */
+  const src = readFileSync(new URL("../js/App.js", import.meta.url), "utf8");
+  function parseBlock(marker, end) {
+    const from = src.indexOf(marker);
+    assert.ok(from >= 0, marker + " not found");
+    const block = src.slice(from, src.indexOf(end, from));
+    const out = {};
+    block.split("\n").forEach(function (line) {
+      const m = /^\s{4}([A-Za-z]\w*):\s*(.+?),?\s*$/.exec(line);
+      if (m) out[m[1]] = m[2].replace(/,$/, "");
+    });
+    return out;
+  }
+  const empty = parseBlock("function emptyProfileState() {", "\nfunction musclesHitBySession");
+  const fallbacks = parseBlock("function passiveFallbacks() {", "\n}");
+  const shared = Object.keys(empty).filter(function (k) { return k in fallbacks; });
+  assert.ok(shared.length >= 8, "expected both blocks to share the profile-scoped keys, got " + shared.length);
+  shared.forEach(function (k) {
+    assert.equal(empty[k], fallbacks[k], 'emptyProfileState().' + k + " and passiveFallbacks()." + k + " disagree");
+  });
+  // planDrafts is not React state in App.js, so it is fallbacks-only.
+  assert.deepEqual(Object.keys(fallbacks).filter(function (k) { return !(k in empty); }), ["planDrafts"]);
+});
+
+test("a failed parse substitutes that key's own default, never the previous profile's value", function () {
+  /* Both profile-load paths wrap each direct JSON.parse in try/catch. An
+     empty catch would leave the setter uncalled, so the value loaded for the
+     PREVIOUS profile would stay in memory — and then be written under this
+     e-mail, releasing the write protection on the unreadable bytes. */
+  const src = readFileSync(new URL("../js/App.js", import.meta.url), "utf8");
+  /* One reader per line: `try { setX(… JSON.parse(…) …); } catch (e) { … }`.
+     The weeklyMuscles reader wraps the parse in rolloverWeeklyMuscles(), so
+     match on the line shape rather than on `setX(JSON.parse`. All four live
+     in loadProfileScopedState(), which every load path calls. */
+  const calls = src.split("\n").filter(function (line) {
+    return /^\s*try \{ set\w+\(/.test(line) && line.indexOf("JSON.parse") >= 0 && line.indexOf("} catch") >= 0;
+  });
+  assert.equal(calls.length, 4, "expected the 4 direct-parse readers of the one shared loader, found " + calls.length);
+  calls.forEach(function (call) {
+    const setter = /try \{ (set\w+)\(/.exec(call)[1];
+    const body = /\} catch \(\w+\) \{([^}]*)\}/.exec(call)[1];
+    assert.match(body, new RegExp("\\b" + setter + "\\("), "empty catch for " + setter + ": " + call.slice(0, 90));
+  });
+});
+
+test("a malformed profile sends the user to onboarding WITHOUT flattening that account's other keys", function () {
+  /* The failure this prevents: one corrupted byte in `profile` made
+     loadUser() return null, the app routed to onboarding as though the
+     account were new, and the eager write-back then replaced perfectly
+     readable workouts, routines, nutrition and targets with empty values.
+
+     Mirrors App.js's three-way login branch. `profile` is unreadable but
+     every sibling key parses, so the recovery path LOADS them rather than
+     resetting, and onboarding replaces only the profile. */
+  const stub = fresh();
+  DEMO_BUNDLES.forEach(seedBundle);          // both profiles, to prove isolation too
+  const email = DEMO_EMAIL_A;
+  stub.rawSet(uKey(email, "profile"), '{"weight":178,');      // truncated JSON
+  const before = stub.snapshot();
+
+  const fallbacks = passiveFallbacks();
+  const unreadable = quarantineProfile(email, fallbacks);
+  assert.deepEqual(unreadable, [uKey(email, "profile")], "only the profile is unreadable");
+  assert.equal(loadUser(email), null, "an unreadable profile must not load");
+
+  // Recovery branch: load every sibling key into memory.
+  const inMemory = {};
+  Object.keys(fallbacks).forEach(function (suffix) {
+    if (suffix === "planDrafts") return;
+    inMemory[suffix] = get(uKey(email, suffix), fallbacks[suffix]);
+  });
+
+  // Onboarding completes: the new profile lands, then the eager effects fire.
+  const newProfile = Object.assign({}, DEMO_PROFILE_A, { name: "Recovered" });
+  sv(email, "profile", newProfile);
+  EAGER_WRITERS.forEach(function (suffix) {
+    if (suffix === "profile") return;
+    sv(email, suffix, inMemory[suffix]);
+  });
+
+  // The account's real data is still there, byte-for-byte.
+  ["workoutLog", "routines", "weeklyMuscles", "setTargets", "history"].forEach(function (suffix) {
+    assert.equal(localStorage.getItem(uKey(email, suffix)), before[uKey(email, suffix)], suffix + " was flattened");
+  });
+  assert.deepEqual(get(uKey(email, "workoutLog"), []), DEMO_WORKOUT_LOG_A);
+  // The new profile landed, and the original bytes are recoverable.
+  assert.equal(loadUser(email).name, "Recovered");
+  assert.equal(localStorage.getItem(uKey(email, "profile") + CORRUPT_SUFFIX), '{"weight":178,');
+  // Profile B is untouched throughout.
+  assert.equal(localStorage.getItem(uKey(DEMO_EMAIL_B, "workoutLog")), before[uKey(DEMO_EMAIL_B, "workoutLog")]);
+});
+
+test("the recovery path is only for a malformed profile, never for a genuinely new account", function () {
+  /* The two cases reach the same screen and must behave oppositely: an
+     absent profile means a new account and MUST reset (§ the carry-over
+     fix); an unreadable one means an existing account and must load. */
+  const stub = fresh();
+  seedBundle(DEMO_BUNDLES[0]);
+  assert.deepEqual(quarantineProfile("brand-new@example.com", passiveFallbacks()), [],
+    "an account with no keys at all reports nothing unreadable");
+  assert.equal(loadUser("brand-new@example.com"), null);
+
+  stub.rawSet(uKey(DEMO_EMAIL_A, "profile"), "{oops");
+  assert.deepEqual(quarantineProfile(DEMO_EMAIL_A, passiveFallbacks()), [uKey(DEMO_EMAIL_A, "profile")]);
+
+  // A readable profile is never reported, so the recovery branch cannot fire.
+  seedBundle(DEMO_BUNDLES[1]);
+  assert.deepEqual(quarantineProfile(DEMO_EMAIL_B, passiveFallbacks()), []);
+  assert.ok(loadUser(DEMO_EMAIL_B));
+});
+
+test("App.js routes an unreadable profile to recovery and an absent one to a reset (source guard)", function () {
+  const src = readFileSync(new URL("../js/App.js", import.meta.url), "utf8");
+  const login = src.slice(src.indexOf("const doLogin = function"), src.indexOf("const finishOnboard"));
+  assert.ok(login.length > 0, "doLogin() not found");
+
+  // quarantineProfile()'s return value is what distinguishes the two cases.
+  assert.match(login, /const unreadable = quarantineProfile\(/, "the unreadable-key report must be captured, not discarded");
+  assert.match(login, /unreadable\.indexOf\(uKey\(e, "profile"\)\) >= 0/, "the recovery branch must test for an unreadable profile");
+
+  const recovery = login.slice(login.indexOf('unreadable.indexOf'), login.lastIndexOf("} else {"));
+  assert.match(recovery, /loadProfileScopedState\(e\)/, "recovery must LOAD the account's other keys");
+  assert.doesNotMatch(recovery, /resetProfileState\(\)/, "recovery must not reset — that is the data loss");
+
+  const newAccount = login.slice(login.lastIndexOf("} else {"));
+  assert.match(newAccount, /resetProfileState\(\)/, "a genuinely new account must still reset");
+  assert.doesNotMatch(newAccount, /loadProfileScopedState/, "there is nothing to load for a new account");
+
+  // Both onboarding branches route to the same screen.
+  assert.equal((login.match(/setScreen\("onboard"\)/g) || []).length, 2);
+  // And every load path shares one reader, so they cannot drift.
+  assert.match(src, /const loadProfileScopedState = function\(e\) \{/, "one definition");
+  assert.equal((src.match(/loadProfileScopedState\([a-z]/g) || []).length, 3,
+    "expected exactly 3 call sites: boot restore, normal login, corrupt-profile recovery");
+});
+
 // ── read-only guarantees ────────────────────────────────────────────────
 
 test("reads and inspection never mutate storage", function () {

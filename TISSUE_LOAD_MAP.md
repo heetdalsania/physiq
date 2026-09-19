@@ -16,11 +16,18 @@ Contributors are shown in the same unit, not as percentages.
 This is a heuristic based on provisional coefficients, not measured tissue force,
 stress, strain, damage, injury probability, recovery, readiness, capacity, medical
 status or safety. Nothing recommends what to train. The model is unvalidated,
-covers only 25 exercise names, and uses coarse body-mass assumptions. Current
-profile weight supplies body mass (not historical weight); the domain's 180 lb
-fallback and Low confidence are surfaced when used. RIR, side, tempo and ROM
-remain source metadata and do not affect v0.1. See the frozen
+covers only 25 exercise names, and uses coarse body-mass assumptions. RIR, side,
+tempo and ROM remain source metadata and do not affect v0.1. See the frozen
 [domain contract](js/tissue/README.md) and [metadata contract](SET_METADATA.md).
+
+**Body mass changed in Milestone 4.** Milestone 3 used the *current* profile
+weight for every historical workout, so old numbers moved whenever the athlete
+logged a new weight. Each workout now carries a frozen body mass in its
+[tissue-history-v1 record](TISSUE_LOAD_HISTORY.md): the latest logged weight on
+or before that day, else the profile weight at the time the record was made,
+else nothing — in which case the domain's 180 lb fallback and Low confidence
+apply exactly as before. The period view here consumes that frozen value, so
+this screen no longer drifts with the profile.
 
 ## Periods and dates
 
@@ -118,17 +125,26 @@ Distinct states:
 
 ## Persistence and milestone boundary
 
-The view reads the active profile's already-loaded `workoutLog` and current
-`profile.weight`. It never imports storage, writes records, or mutates inputs.
-Schema remains **1**; no TissueOS storage keys, events, or schema are introduced.
+The view reads the active profile's already-loaded `workoutLog`, the reconciled
+`tissueHistory`, and `profile.weight` as the fallback for any workout that has
+no history entry yet. It never imports storage, writes records, or mutates
+inputs — reconciliation happens in the application layer
+([js/utils/tissueHistoryStore.js](js/utils/tissueHistoryStore.js)), invoked from
+App.js at the `workoutLog` persistence boundary, never from a render.
+Schema remains **1**. Milestone 4 adds one profile-scoped derived key,
+`pq_<email>_tissueHistory`, with its own string version `tissue-history-v1`;
+no TissueOS event store and no model change are introduced.
 The two Exercise entry points receive active-profile state and are keyed by email.
 Opening/selecting the view does not trigger existing persistence effects; tests
 compare storage before/after. The app's existing boot/writeback behavior is unchanged.
 
-Personal baselines, stored/rolling exposure and longitudinal comparisons belong to
-**Milestone 4**. Recovery-model replacement belongs to **Milestone 5**. None starts
-here. The five domain JS files, golden JSON, metadata, workout lifecycle and
-storage implementation remain unchanged.
+Personal baselines, stored/rolling exposure and longitudinal comparisons arrived in
+**Milestone 4** — see [TISSUE_LOAD_HISTORY.md](TISSUE_LOAD_HISTORY.md). They live in
+the selected tissue's detail panel; the body map keeps its Milestone 3 meaning
+(relative concentration within the selected period) and is never recoloured by
+baseline deviation. Recovery-model replacement belongs to **Milestone 5** and has
+not started. The five domain JS files, golden JSON, metadata and workout lifecycle
+remain unchanged.
 
 The Milestone 1 test that prohibited *any* app import of TissueOS is intentionally
 updated for this milestone: only the pure presentation adapter may import the
