@@ -1,16 +1,16 @@
 /* ─── PHYSIQ ENGINE — Constants & Configuration ──────────────────────────── */
 
 export const MUSCLE_GROUPS = [
-  { id: "chest",     label: "Chest",     iconClass: "pq-icon-muscle", nutrients: ["protein", "creatine", "leucine"],  recovery: 48 },
-  { id: "back",      label: "Back",      iconClass: "pq-icon-muscle", nutrients: ["protein", "magnesium", "zinc"],    recovery: 48 },
-  { id: "shoulders", label: "Shoulders", iconClass: "pq-icon-muscle", nutrients: ["protein", "vitaminD", "calcium"],  recovery: 48 },
-  { id: "biceps",    label: "Biceps",    iconClass: "pq-icon-muscle", nutrients: ["protein", "potassium", "b12"],     recovery: 36 },
-  { id: "triceps",   label: "Triceps",   iconClass: "pq-icon-muscle", nutrients: ["protein", "potassium", "b12"],     recovery: 36 },
-  { id: "quads",      label: "Quads",      iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
-  { id: "hamstrings", label: "Hamstrings", iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 },
-  { id: "calves",     label: "Calves",     iconClass: "pq-icon-muscle", nutrients: ["protein", "magnesium", "potassium"], recovery: 48 },
-  { id: "core",       label: "Core",       iconClass: "pq-icon-muscle", nutrients: ["protein", "fiber", "omega3"],      recovery: 24 },
-  { id: "glutes",     label: "Glutes",     iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"],     recovery: 72 }
+  { id: "chest",     label: "Chest",     iconClass: "pq-icon-muscle", nutrients: ["protein", "creatine", "leucine"] },
+  { id: "back",      label: "Back",      iconClass: "pq-icon-muscle", nutrients: ["protein", "magnesium", "zinc"] },
+  { id: "shoulders", label: "Shoulders", iconClass: "pq-icon-muscle", nutrients: ["protein", "vitaminD", "calcium"] },
+  { id: "biceps",    label: "Biceps",    iconClass: "pq-icon-muscle", nutrients: ["protein", "potassium", "b12"] },
+  { id: "triceps",   label: "Triceps",   iconClass: "pq-icon-muscle", nutrients: ["protein", "potassium", "b12"] },
+  { id: "quads",      label: "Quads",      iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"] },
+  { id: "hamstrings", label: "Hamstrings", iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"] },
+  { id: "calves",     label: "Calves",     iconClass: "pq-icon-muscle", nutrients: ["protein", "magnesium", "potassium"] },
+  { id: "core",       label: "Core",       iconClass: "pq-icon-muscle", nutrients: ["protein", "fiber", "omega3"] },
+  { id: "glutes",     label: "Glutes",     iconClass: "pq-icon-muscle", nutrients: ["protein", "iron", "glycogen"] }
 ];
 
 export const GOALS = [

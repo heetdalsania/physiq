@@ -10,8 +10,9 @@ const bundle = await build({ stdin: { contents: `
   import React from 'react';
   import {renderToStaticMarkup} from 'react-dom/server';
   import {TissueLoadContent, TissueLoadDetail, TissueBodyDiagram, TissueLoadTracker} from './js/components/TissueLoadTracker.js';
+  import {RecoveryTracker} from './js/components/RecoveryTracker.js';
   import {ExerciseTab} from './js/screens/ExerciseTab.js';
-  export const render = (kind, props) => renderToStaticMarkup(React.createElement({content:TissueLoadContent,detail:TissueLoadDetail,body:TissueBodyDiagram,exercise:ExerciseTab,tracker:TissueLoadTracker}[kind], props));
+  export const render = (kind, props) => renderToStaticMarkup(React.createElement({content:TissueLoadContent,detail:TissueLoadDetail,body:TissueBodyDiagram,exercise:ExerciseTab,tracker:TissueLoadTracker,recovery:RecoveryTracker}[kind], props));
 `, resolveDir: process.cwd(), loader: "jsx" }, bundle: true, platform: "node", format: "cjs", write: false, loader: { ".js": "jsx" } });
 const mod = { exports: {} };
 new Function("require", "module", "exports", bundle.outputFiles[0].text)(createRequire(import.meta.url), mod, mod.exports);
@@ -79,13 +80,13 @@ test("empty, no completed sets, entirely unmapped and modeled-zero render distin
   assert.match(content(getView(zero), "chest"), /No modeled workload in this period/);
 });
 
-test("Training Volume stays default with original targets, colors and separate Recovery Tracker", () => {
+test("Training Volume stays default with original targets, colors and separate Recovery Guidance", () => {
   const html = render("exercise", { routines: [], weeklyMuscles: { dates: {}, sessions: {}, sets: { chest: 3 } }, setTargets: { chest: 8 } });
   assert.match(html, /aria-pressed="true">Training Volume/);
   assert.match(html, /aria-pressed="false">Tissue Load/);
   assert.match(html, /Weekly Muscle Tracker/);
   assert.match(html, /md-state-partial/);
-  assert.match(html, /Recovery/);
+  assert.match(html, /Recovery Guidance/);
   assert.doesNotMatch(html, /aria-label="Tissue Load"/);
 });
 
@@ -117,6 +118,60 @@ const H = (localDate, workload, opts = {}) => ({
   inputs: { bodyMass: 180, weightUnit: "lb", bodyMassProvenance: { source: opts.approx ? "profile_weight" : "weight_log", measurementDate: null, daysBefore: null, contemporaneous: !opts.approx, approximate: !!opts.approx } },
   tissues: { hamstrings: { workload, eventCount: 1, confidence: "low" } },
   coverage: { completedSets: opts.completed == null ? 1 : opts.completed, modeledSets: opts.modeled == null ? 1 : opts.modeled, unmappedExercises: [] }, warnings: [], materializedAt: 0
+});
+
+test("Recovery Guidance renders modeled context without readiness countdowns", () => {
+  const nowMs = Date.now();
+  const nowDate = new Date(nowMs);
+  const key = nowDate.getFullYear() + "-" + String(nowDate.getMonth() + 1).padStart(2, "0") + "-" + String(nowDate.getDate()).padStart(2, "0");
+  const entry = H(key, 320);
+  entry.sourceFinishedAt = nowMs;
+  const html = render("recovery", { tissueHistory: { entries: [entry], storageState: "unchanged" } });
+
+  assert.match(html, /Recovery Guidance/);
+  assert.match(html, /Modeled load in the last 7 days/);
+  assert.match(html, /Hamstrings/);
+  assert.match(html, /Last modeled load within 1h/);
+  assert.match(html, /1 modeled session/);
+  assert.match(html, /320 lb\*rep/);
+  assert.match(html, /not a measure of recovery, readiness, capacity or safety/);
+  assert.match(html, /recovery-guidance-v0\.1/);
+  assert.doesNotMatch(html, /Ready to Train|Ready in|resting|fair game|rec-progress/);
+});
+
+test("Recovery Guidance handles loading, empty history and partial mapping honestly", () => {
+  assert.match(render("recovery", {}), /Modeled history is loading/);
+  assert.match(render("recovery", { tissueHistory: { entries: [], storageState: "unchanged" } }), /No modeled tissue history yet/);
+
+  const nowMs = Date.now();
+  const nowDate = new Date(nowMs);
+  const key = nowDate.getFullYear() + "-" + String(nowDate.getMonth() + 1).padStart(2, "0") + "-" + String(nowDate.getDate()).padStart(2, "0");
+  const entry = H(key, 100, { completed: 3, modeled: 1 });
+  entry.sourceFinishedAt = nowMs;
+  const html = render("recovery", { tissueHistory: { entries: [entry], storageState: "write_failed" } });
+  assert.match(html, /Some completed sets are not covered by the model/);
+  assert.match(html, /could not be saved and will be rebuilt automatically/);
+});
+
+test("Recovery Guidance displays data-quality notices even without usable history", () => {
+  const foreign = H("2026-01-01", 100, { model: "tissue-load-v0.2" });
+  const future = H("2099-01-01", 100);
+  const invalid = H("2026-01-01", -100);
+  const html = render("recovery", { tissueHistory: { entries: [foreign, future, invalid], storageState: "source_not_saved" } });
+  assert.match(html, /History from other model versions is excluded/);
+  assert.match(html, /Future-dated workouts are excluded/);
+  assert.match(html, /Invalid history entries are excluded/);
+  assert.match(html, /latest workout could not be saved/);
+  assert.match(html, /Missing logs can mean unlogged training/);
+});
+
+test("Recovery Guidance explains approximate inputs and baseline-only mapping gaps", () => {
+  const date = new Date();
+  const today = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+  const entries = [H(addDays(today, -34), 400, { approx: true, completed: 10, modeled: 1 }), H(today, 150)];
+  const html = render("recovery", { tissueHistory: { entries, storageState: "unchanged" } });
+  assert.match(html, /approximate historical body mass/);
+  assert.match(html, /Coverage: last 7 days 1 of 1 sets; baseline period 1 of 10 sets/);
 });
 const BASE_UI = () => [H(dayN(-34), 400), H(dayN(-20), 400), H(dayN(-8), 400), H(dayN(-7), 400)];
 const detail = (entries, extra = {}) => render("detail", { tissue: getView(input).tissues.find(t => t.id === "hamstrings"), workloadUnit: "lb*rep", modelVersion: "tissue-load-v0.1", history: buildTissueLoadHistory(entries, { today: D }), ...extra });

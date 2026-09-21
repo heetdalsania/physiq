@@ -345,7 +345,7 @@ export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompleted
         </div>
 
         <div style={{ marginTop: 18 }}>
-          <RecoveryTracker weeklyMuscles={weeklyMuscles} />
+          <RecoveryTracker tissueHistory={tissueHistory} />
         </div>
       </div>
     );
