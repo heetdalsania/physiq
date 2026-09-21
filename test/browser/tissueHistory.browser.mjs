@@ -1,4 +1,5 @@
-/* Milestone 4 browser acceptance — longitudinal tissue load.
+/* Milestones 4-5 browser acceptance — longitudinal tissue load and
+ * descriptive recovery guidance.
  *
  * Outside npm test's no-write glob. Uses Playwright when supplied by the
  * environment, a fresh context, never a real browser profile, and only the
@@ -149,12 +150,39 @@ try {
     assert.equal(await page.locator('[data-muscle="chest"] path').first().getAttribute("fill"), "url(#md-grad-partial)");
     volumeBefore = await page.locator(".md-card:not(.tl-card)").innerHTML();
   });
-  await check("25. the existing Recovery feature is unchanged", async () => {
+  await check("25. Recovery Guidance retires fixed readiness timers", async () => {
     recoveryBefore = await page.locator(".rec-card").innerHTML();
-    assert.match(await page.locator(".rec-card").innerText(), /Recovery/);
+    const text = await page.locator(".rec-card").innerText();
+    assert.match(text, /Recovery Guidance/);
+    assert.match(text, /No modeled tissue history yet/);
+    assert.match(text, /not a measure of recovery, readiness, capacity or safety/);
+    assert.doesNotMatch(text, /Ready to Train|Ready in|resting|fair game/);
   });
 
   await setSource(historyWithRecent(1200));
+
+  await check("25a. Recovery Guidance uses frozen history, frequency and athlete-relative baseline", async () => {
+    const text = await page.locator(".rec-card").innerText();
+    assert.match(text, /Modeled load in the last 7 days/i);
+    assert.match(text, /Chest/);
+    assert.match(text, /Last modeled load 1d ago/);
+    assert.match(text, /1 modeled session/);
+    assert.match(text, /1,200 lb\*rep/);
+    assert.match(text, /20% above recent baseline/);
+    assert.match(text, /medium model confidence/i);
+    assert.match(text, /recovery-guidance-v0\.1/);
+    assert.doesNotMatch(text, /Ready to Train|Ready in|resting|fair game|% recovered/);
+    for (const width of [375, 320]) {
+      await page.setViewportSize({ width, height: 812 });
+      const measurements = await page.locator(".rec-card").evaluate(card => {
+        const nodes = [card, ...card.querySelectorAll(".rec-header, .rec-load-row, .rec-load-main, .rec-load-meta, .rec-pill-row")];
+        return nodes.map(node => ({ width: node.clientWidth, scrollWidth: node.scrollWidth }));
+      });
+      assert.ok(measurements.every(item => item.scrollWidth <= item.width + 1), width + "px Recovery Guidance overflow: " + JSON.stringify(measurements));
+      await page.locator(".rec-card").screenshot({ path: `${out}/recovery-${width}.png` });
+    }
+    await page.setViewportSize({ width: 375, height: 812 });
+  });
 
   await check("3. the Milestone 3 map keeps relative-concentration meaning and its legend", async () => {
     assert.match(await page.locator(".tl-legend").innerText(), /Less → more relative modeled workload/);
@@ -425,11 +453,11 @@ try {
     await closePopup();
   });
 
-  await check("2b+25b. switching to Tissue Load and back leaves Volume and Recovery byte-identical", async () => {
+  await check("2b+25b. switching views leaves Volume and Recovery Guidance byte-identical", async () => {
     /* Self-contained: capture, visit the longitudinal view, come back. The
        snapshots from check 2/25 are not reused here because the harness has
        since logged a real workout, which legitimately changes weekly volume
-       and recovery — that is the app working, not a Milestone 4 regression. */
+       and guidance — that is the app working, not a regression. */
     await openExercise();
     await page.locator('[data-muscle="chest"] path').first().click();
     const volumeNow = await page.locator(".md-card:not(.tl-card)").innerHTML();
@@ -439,14 +467,15 @@ try {
     assert.match(await detailText(), /Recent exposure/);
     await page.getByRole("button", { name: "Training Volume", exact: true }).click();
     assert.equal(await page.locator(".md-card:not(.tl-card)").innerHTML(), volumeNow, "Weekly Muscle Tracker DOM changed");
-    assert.equal(await page.locator(".rec-card").innerHTML(), recoveryNow, "Recovery DOM changed");
+    assert.equal(await page.locator(".rec-card").innerHTML(), recoveryNow, "Recovery Guidance DOM changed");
     /* The pre-milestone snapshots are not compared byte-for-byte here: the
        harness logged a real squat in between, which legitimately moves the
-       quads volume state and the recovery zones. What must hold is that
-       neither card carries any Milestone 4 markup or vocabulary. */
-    for (const [name, html] of [["Volume", volumeNow], ["Recovery", recoveryNow]]) {
-      assert.doesNotMatch(html, /tl-|Recent exposure|recent modeled baseline|Last 7 days|Last 28 days/, name + " leaked Milestone 4 markup");
-    }
+       quads volume state and the M5 guidance. The two views must remain
+       separate even though both consume the same frozen M4 history. */
+    assert.doesNotMatch(volumeNow, /tl-|Recent exposure|recent modeled baseline|Last 7 days|Last 28 days|recovery-guidance/, "Volume leaked TissueOS markup");
+    assert.doesNotMatch(recoveryNow, /tl-|Recent exposure|Last 28 days/, "Recovery Guidance leaked Tissue Load detail markup");
+    assert.match(recoveryNow, /Recovery Guidance/);
+    assert.match(recoveryNow, /recovery-guidance-v0\.1/);
     assert.ok(volumeBefore.length > 0 && recoveryBefore.length > 0);
   });
 

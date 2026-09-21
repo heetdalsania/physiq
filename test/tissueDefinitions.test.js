@@ -135,16 +135,18 @@ test("js/tissue/ never touches React, the DOM, storage, network or the clock", f
   });
 });
 
-test("only the pure adapters consume the domain: presentation (M3), history snapshot and longitudinal analytics (M4)", function() {
+test("only the pure adapters consume the domain: presentation (M3), history analytics (M4) and guidance (M5)", function() {
   /* Milestone 3 allowed exactly one importer. Milestone 4 adds two more
      PURE modules (no React, storage or clock — pinned by their own tests):
      the per-session snapshot that freezes engine output, and the analytics
      that reads the tissue vocabulary. React components, screens and the
-     storage layer still never import js/tissue/ directly. */
+     storage layer still never import js/tissue/ directly. Milestone 5 adds
+     one pure, read-only guidance adapter over those frozen records. */
   const allowed = [
     "js/utils/tissueLoadView.js",
     "js/utils/tissueHistorySnapshot.js",
-    "js/utils/tissueLoadHistory.js"
+    "js/utils/tissueLoadHistory.js",
+    "js/utils/tissueRecoveryGuidance.js"
   ].map(function(p) { return resolve(ROOT, p); });
   const files = walk(resolve(ROOT, "js")).filter(function(f) { return f.indexOf("/js/tissue/") < 0; });
   files.forEach(function(f) {
