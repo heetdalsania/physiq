@@ -94,7 +94,7 @@ The M3 `tissueLoad.browser.mjs` script fails on untouched `cc6dd4c`: it expects 
 
 ## 17. Fixes made
 
-Commit `446f315` on `claude/milestone-6-camera-capture-bd88ca` hardens person-identity handling, cached-model integrity and runtime loading; clarifies phase-time copy; bumps the kinematics version; and adds focused and browser coverage. The follow-on report update records the isolated staging mutation. Push state is recorded in the PR history.
+Commits `446f315` and `9017a9b` on `claude/milestone-6-camera-capture-bd88ca` harden person-identity handling, cached-model integrity and runtime loading; clarify phase-time copy; bump the kinematics version; add focused and browser coverage; and record the isolated staging mutation. Both were pushed to PR #28. The PR remains open and unmerged.
 
 ## 18. Remaining limitations
 
@@ -117,6 +117,6 @@ Commit `446f315` on `claude/milestone-6-camera-capture-bd88ca` hardens person-id
 | M0–M5 regressions clear | Yes, apart from the independently reproduced pre-existing M3 test drift |
 | Physical iPhone validated | No |
 | Blocking defects remaining | No known blocker |
-| Review fixes pushed to PR #28 | See PR commit history |
+| Review fixes pushed to PR #28 | Yes |
 | Ready to merge Milestone 6 | Yes for this review scope, with stated device gaps |
 | Ready to begin Milestone 7 | No; PR #28 remains unmerged and this review did not begin M7 |
