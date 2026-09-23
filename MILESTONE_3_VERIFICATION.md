@@ -219,6 +219,20 @@ clicks, typing/select controls and Enter/Space, not direct React-state injection
 | 24. Development errors | Pass, none |
 | 25. Production errors | Pass, none; production seeder absent |
 
+**Post-Milestone-4 update (2026-09-23).** The numbers above are the Milestone 3
+run, which used the current profile weight (180 lb). Milestone 4 freezes body
+mass per workout from the latest `weightLog` entry on or before the workout day
+([TISSUE_LOAD_HISTORY.md §4](TISSUE_LOAD_HISTORY.md)). Profile A keeps
+`DEMO_PROFILE_A.weightLog` (2026-03-02 → 178 lb), so the harness now expects,
+derived by hand: quadriceps 3,585; hamstrings 3,027.5 (Romanian Deadlift 1,952;
+Squat 1,075.5); patellar 2,868; Achilles 2,101.5. Band-`none` values (chest 1,080,
+biceps 200) are unchanged. The final storage check now allows exactly one TissueOS
+key per profile, the contracted `pq_<email>_tissueHistory`, and still fails on
+any other. The harness is kept, not retired:
+`test/browser/tissueHistory.browser.mjs` does not cover its Volume/Tissue toggle,
+no-write, unmapped/mapped-zero, nutrition and metadata-logging flows. Result:
+20/20 checks pass, alongside tissueHistory 35/35 and `npm test` 634/634.
+
 Additional browser checks distinguish mapped-zero from incomplete-only sessions,
 verify opening/selecting performs no storage writes, and exercise light theme.
 

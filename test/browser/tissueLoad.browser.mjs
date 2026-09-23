@@ -40,6 +40,16 @@ const at = (day, hour = 10) => new Date(`2026-03-${String(day).padStart(2, "0")}
 const completed = (weight, reps) => ({ done: true, weight, reps });
 const exercise = (name, sets) => ({ name, muscle: "Quads", sets });
 const longName = "Unmapped synthetic exercise with an exceptionally long descriptive name for checking narrow mobile layouts";
+// Milestone 4 freezes body mass per workout from the dated weight log
+// (TISSUE_LOAD_HISTORY.md §4, STORAGE_CONTRACT.md §10): the latest valid
+// profile.weightLog entry on or before the workout's local day wins over the
+// current profile weight. Profile A keeps DEMO_PROFILE_A.weightLog
+// (2026-02-23 -> 176, 2026-03-02 -> 178), so these 2026-03-04 workouts use
+// 178 lb, not the `weight: 180` override (which only applies without a log entry).
+// Squat ("most" = 0.75): 225 + 0.75*178 = 358.5 lb; x5 reps = 1,792.5 per set.
+//   Quadriceps 1.0 x 2 sets = 3,585; patellar 0.8 = 2,868; hamstrings 0.3 = 1,075.5
+// Romanian Deadlift ("half"): (155 + 0.5*178) x 8 = 1,952 -> hamstrings 3,027.5
+// Standing Calf Raise ("most"): (100 + 133.5) x 10 = 2,335 -> Achilles 0.9 = 2,101.5
 const logA = [
   { id: 301, title: "Synthetic mixed", startedAt: at(4, 9), finishedAt: at(4), exercises: [
     exercise("Squat", [completed(225, 5), { done: false, weight: 99999, reps: 99, rir: 0, side: "left" }]),
@@ -110,24 +120,24 @@ try {
   await check("mapped exercises and multiple sessions aggregate with honest partial coverage", async () => {
     await assertText(".tl-coverage", /4 of 5 completed sets modeled.*2 saved workouts/);
     await page.locator('.tl-region[data-tissue="quadriceps"] path').first().click();
-    await assertText(".tl-detail", /3,600 lb\*rep/);
+    await assertText(".tl-detail", /3,585 lb\*rep/);
     await assertText(".tl-detail", /Model confidence: Medium/);
   });
   await check("front/back selections, contributors and weakest confidence match fixture", async () => {
     await page.locator('.tl-card').getByRole("button", { name: "Back", exact: true }).click();
     await page.locator('.tl-region[data-tissue="hamstrings"]').focus(); await page.keyboard.press("Space");
-    await assertText(".tl-detail", /3,040 lb\*rep/);
-    assert.deepEqual(await page.locator(".tl-contributors li").allTextContents(), ["Romanian Deadlift1,960 lb*rep", "Squat1,080 lb*rep"]);
+    await assertText(".tl-detail", /3,027\.5 lb\*rep/);
+    assert.deepEqual(await page.locator(".tl-contributors li").allTextContents(), ["Romanian Deadlift1,952 lb*rep", "Squat1,075.5 lb*rep"]);
     await assertText(".tl-detail", /Model confidence: Low/);
     assert.equal(await page.locator('.tl-region[data-tissue="hamstrings"]').getAttribute("aria-pressed"), "true");
   });
   await check("both tendon workloads remain inspectable without fake geometry", async () => {
     assert.equal(await page.locator('svg [data-tissue$="tendon"]').count(), 0);
     await page.getByRole("button", { name: /^Patellar tendon/ }).click();
-    await assertText(".tl-detail", /2,880 lb\*rep/);
+    await assertText(".tl-detail", /2,868 lb\*rep/);
     await assertText(".tl-detail", /not an estimated tendon force or stress fraction/);
     await page.getByRole("button", { name: /^Achilles tendon/ }).click();
-    await assertText(".tl-detail", /2,115 lb\*rep/);
+    await assertText(".tl-detail", /2,101\.5 lb\*rep/);
   });
   await check("calendar-week selector includes yesterday without a rolling baseline", async () => {
     await page.getByRole("button", { name: "This week", exact: true }).click();
@@ -160,7 +170,7 @@ try {
     await page.reload(); await openExercise(); await openTissue();
     await page.locator('.tl-card').getByRole("button", { name: "Back", exact: true }).click();
     await page.locator('.tl-region[data-tissue="hamstrings"] path').first().click();
-    await assertText(".tl-detail", /3,040 lb\*rep/);
+    await assertText(".tl-detail", /3,027\.5 lb\*rep/);
     assert.equal((await storage())[`pq_${A}_workoutLog`], saved[`pq_${A}_workoutLog`]);
   });
   await check("incomplete sets and changed RIR/side/tempo/ROM do not alter displayed workload", async () => {
@@ -232,7 +242,7 @@ try {
     await switchTo(A);
     await assertText(".tl-coverage", /4 of 5 completed sets modeled/);
     await page.locator('.tl-region[data-tissue="quadriceps"] path').first().click();
-    await assertText(".tl-detail", /3,600 lb\*rep/);
+    await assertText(".tl-detail", /3,585 lb\*rep/);
   });
   await check("workout logging and optional metadata persist while only completed sets reach Tissue Load", async () => {
     const before = JSON.parse((await storage())[`pq_${A}_workoutLog`]);
@@ -267,10 +277,14 @@ try {
     await page.locator('.tl-detail').scrollIntoViewIfNeeded();
     await page.screenshot({ path: `${out}/light-detail-320.png` });
   });
-  await check("no runtime exceptions and no TissueOS storage keys", async () => {
+  await check("no runtime exceptions and only the contracted TissueOS storage key", async () => {
     assert.deepEqual(errors, []);
     assert.deepEqual(consoleErrors, []);
-    assert.ok(Object.keys(await storage()).every(k => !/tissue/i.test(k)));
+    // Milestone 3 wrote no TissueOS keys. Milestone 4 adds exactly one derived,
+    // per-profile key, pq_<email>_tissueHistory (STORAGE_CONTRACT.md); any other
+    // tissue-named key is still a contract violation.
+    const tissueKeys = Object.keys(await storage()).filter(k => /tissue/i.test(k));
+    assert.ok(tissueKeys.every(k => k === `pq_${A}_tissueHistory` || k === `pq_${B}_tissueHistory`), JSON.stringify(tissueKeys));
     assert.equal((await storage()).pq_schema_version, "1");
     if (label === "production") assert.equal(await page.evaluate(() => typeof window.__physiqSeed), "undefined");
   });
