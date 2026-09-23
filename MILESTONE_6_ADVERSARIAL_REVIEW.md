@@ -46,7 +46,7 @@ The model loads before camera permission is requested. The camera request uses `
 
 `@mediapipe/tasks-vision` is exactly `0.10.35` in `package.json` and the lockfile, with registry integrity pinned. The versioned Full model URL in [Google's MediaPipe sample](https://github.com/google-ai-edge/mediapipe-samples-web/blob/main/src/tasks/pose-landmarker.ts) matches the vendored bytes byte-for-byte: SHA-256 `5134a3aad27a58b93da0088d431f366da362b44e3ccfbe3462b3827a839011b1`, 9,398,198 bytes. The WASM loader and binary match their build-time SHA-256 constants. The build checks those hashes and scans the generated runtime for known telemetry markers. The model is checked again in the browser before inference and on cached reuse. The [Google model card](https://storage.googleapis.com/mediapipe-assets/Model%20Card%20BlazePose%20GHUM%203D.pdf) states Apache-2.0 licensing and lists multiple-person input as out of scope.
 
-MediaPipe received an `HTMLCanvasElement`, not the video element, in the real Chrome camera-path run. That path produced a 640×480 frame from the non-4:3 fixture and landmarks near the independent expected coordinates. The preview mirror is CSS-only; the staged analysis pixels are not mirrored. The runtime resolves assets beside `app.min.js`; browser tests cover path variants, and the Capacitor app bundle contains those paths. WASM SIMD is checked before model fetch and camera request; unsupported engines receive an error. The iOS 15–16.3 compatibility gap remains a disclosed feature-level limitation. The global iOS deployment target was not raised.
+MediaPipe received an `HTMLCanvasElement`, not the video element, in the real Chrome camera-path run. That path produced a 640×480 frame from the non-4:3 fixture and landmarks near the independent expected coordinates (mean normalized distance 0.0073). In an isolated temporary build, replacing the staging canvas with the video element made the real-engine smoke test fail: the observed source became `HTMLVideoElement`, and mean landmark distance rose to 0.272. No mutation was committed. The preview mirror is CSS-only; the staged analysis pixels are not mirrored. The runtime resolves assets beside `app.min.js`; browser tests cover path variants, and the Capacitor app bundle contains those paths. WASM SIMD is checked before model fetch and camera request; unsupported engines receive an error. The iOS 15–16.3 compatibility gap remains a disclosed feature-level limitation. The global iOS deployment target was not raised.
 
 Same-origin JavaScript compromise is outside this integrity boundary: malicious replacement of `app.min.js` could also remove client-side checks. The model hash does protect against an accidental or isolated model asset replacement.
 
@@ -73,7 +73,7 @@ Unmount on profile switch disposes the session and clears video, frames, provide
 ## 12. Browser verification
 
 - **Stubbed pose runtime, real app and fake camera:** production and development acceptance each passed 28 grouped checks with same-origin model fetch and on-device hash verification. Checks covered permission, retake, cancel, background, profile switch, no person, multiple people, orientation change, runtime 404, bad model bytes, responsiveness, storage and network.
-- **Real runtime and model:** the smoke fixture produced landmarks and a no-person response; the adapter used the staging canvas. Its published expected landmarks are an integration reference with a few-percent tolerance, not a scientific ground truth. The camera-path fixture would expose the earlier stretched-landmark bug.
+- **Real runtime and model:** the smoke fixture produced landmarks and a no-person response; the adapter used the staging canvas. Its published expected landmarks are an integration reference with a few-percent tolerance, not a scientific ground truth. A temporary direct-video mutation failed this test and materially distorted the landmark positions.
 - **Long real-engine run:** 65 seconds, 658 inferences, no movement-data upload or delayed telemetry request. Only same-origin app assets and the pre-existing Google Fonts request appeared.
 
 ## 13. Native verification
@@ -94,7 +94,7 @@ The M3 `tissueLoad.browser.mjs` script fails on untouched `cc6dd4c`: it expects 
 
 ## 17. Fixes made
 
-Additional commits on `claude/milestone-6-camera-capture-bd88ca` harden person-identity handling, cached-model integrity and runtime loading; clarify phase-time copy; bump the kinematics version; and add focused and browser coverage. Commit hashes and push state are recorded in the PR history.
+Commit `446f315` on `claude/milestone-6-camera-capture-bd88ca` hardens person-identity handling, cached-model integrity and runtime loading; clarifies phase-time copy; bumps the kinematics version; and adds focused and browser coverage. The follow-on report update records the isolated staging mutation. Push state is recorded in the PR history.
 
 ## 18. Remaining limitations
 
