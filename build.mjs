@@ -1,8 +1,10 @@
 import * as esbuild from "esbuild";
 import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { POSE_PROVIDER, RUNTIME_ASSETS, FORBIDDEN_RUNTIME_MARKERS } from "./js/movement/modelVersion.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
@@ -80,9 +82,63 @@ const devSeedOptions = {
   logLevel: "info"
 };
 
+/* Milestone 6 — Movement Assessment pose runtime.
+   The MediaPipe runtime is compiled into its OWN script (never part of
+   app.min.js) and loaded only when a user starts an assessment. Its WASM and
+   the vendored model are copied next to it. Every file is checked against
+   the SHA-256 pinned in js/movement/modelVersion.js, and the shipped
+   JavaScript is scanned for the telemetry endpoint that @mediapipe/tasks-vision
+   1.x added: a mismatch or a hit fails the build instead of shipping. */
+const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
+
+function assertNoTelemetry(label, text) {
+  FORBIDDEN_RUNTIME_MARKERS.forEach((marker) => {
+    if (text.includes(marker)) throw new Error(`[build] ${label} contains forbidden runtime marker "${marker}"`);
+  });
+}
+
+async function buildMovementRuntime() {
+  const pkg = JSON.parse(await readFile(resolve(ROOT, "node_modules/@mediapipe/tasks-vision/package.json"), "utf8"));
+  if (pkg.version !== POSE_PROVIDER.packageVersion) {
+    throw new Error(`[build] @mediapipe/tasks-vision ${pkg.version} installed; ${POSE_PROVIDER.packageVersion} is pinned`);
+  }
+
+  const out = await esbuild.build({
+    entryPoints: [resolve(ROOT, "js/movement/poseRuntimeEntry.js")],
+    bundle: true,
+    format: "iife",
+    globalName: "PhysiqPoseRuntime",
+    target: ["es2018"],
+    minify: true,
+    write: false,
+    legalComments: "none",
+    logLevel: "warning"
+  });
+  const runtimeText = out.outputFiles[0].text;
+  assertNoTelemetry("pose runtime bundle", runtimeText);
+  await mkdir(resolve(DIST, "movement/mediapipe"), { recursive: true });
+  await mkdir(resolve(DIST, "movement/models"), { recursive: true });
+  await writeFile(resolve(DIST, RUNTIME_ASSETS.runtimeBundle), runtimeText);
+
+  for (const asset of [RUNTIME_ASSETS.wasmLoader, RUNTIME_ASSETS.wasmBinary, RUNTIME_ASSETS.model]) {
+    const bytes = await readFile(resolve(ROOT, asset.from));
+    const digest = sha256(bytes);
+    if (digest !== asset.sha256) {
+      throw new Error(`[build] ${asset.from} has SHA-256 ${digest}; ${asset.sha256} is pinned`);
+    }
+    if (asset.path.endsWith(".js")) assertNoTelemetry(asset.from, bytes.toString("utf8"));
+    await writeFile(resolve(DIST, asset.path), bytes);
+  }
+
+  for (const notice of ["NOTICE.md", "LICENSE-2.0.txt"]) {
+    await writeFile(resolve(DIST, "movement", notice), await readFile(resolve(ROOT, "vendor/mediapipe", notice)));
+  }
+}
+
 async function build() {
   await prepareDist();
   await copyAssets();
+  await buildMovementRuntime();
 
   if (watch) {
     const ctx = await esbuild.context(esbuildOptions);
