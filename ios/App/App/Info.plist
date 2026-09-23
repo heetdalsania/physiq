@@ -48,7 +48,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Used to scan food barcodes for nutrition lookup.</string>
+	<string>PhysiQ Engine uses the camera only when you choose to scan a food barcode or run a Movement Assessment. Movement Assessment video is processed on this device and is not saved or uploaded.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Used to find nearby restaurants for menu lookup. Your location is sent only to OpenStreetMap and never stored.</string>
 </dict>

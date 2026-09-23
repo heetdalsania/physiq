@@ -6,6 +6,7 @@ import { AppTime } from "../utils/appTime.js";
 import { MuscleTracker } from "../components/MuscleTracker.js";
 import { TissueLoadTracker } from "../components/TissueLoadTracker.js";
 import { RecoveryTracker } from "../components/RecoveryTracker.js";
+import { MovementAssessment } from "../components/MovementAssessment.js";
 import {
   startSessionFromRoutine,
   updateSetNumberField,
@@ -268,6 +269,13 @@ export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompleted
     setView("main");
   };
 
+  // Milestone 6: standalone prototype. It receives no workout, profile or
+  // TissueOS data and returns nothing — leaving it simply unmounts it, which
+  // stops the camera and discards the in-memory result.
+  if (view === "movement") {
+    return <MovementAssessment onExit={function() { setView("main"); }} />;
+  }
+
   if (view === "main") {
     return (
       <div className="fade-in" style={{ paddingTop: 16 }}>
@@ -328,6 +336,14 @@ export function ExerciseTab({ routines, saveRoutine, deleteRoutine, logCompleted
             })}
           </div>
         )}
+
+        <button type="button" className="ma-entry" onClick={function() { setView("movement"); }}>
+          <div style={{ flex: 1, textAlign: "left" }}>
+            <div className="ma-entry-title">Movement Assessment <span className="ma-badge">Prototype</span></div>
+            <div className="ma-entry-sub">Video-estimated 2D squat mechanics from your camera. Separate from Tissue Load and Recovery Guidance.</div>
+          </div>
+          <span className="new-routine-arrow" aria-hidden="true">{"›"}</span>
+        </button>
 
         <div style={{ marginTop: 28 }}>
           <div className="tl-segment" role="group" aria-label="Training view">

@@ -1,0 +1,8 @@
+# Milestone 6 — third-party pose runtime and model files are byte-for-byte
+# copies pinned by SHA-256 (js/movement/modelVersion.js, build.mjs). Keep git
+# from normalising or whitespace-checking them.
+vendor/mediapipe/*.task binary
+dist/movement/models/** binary
+dist/movement/mediapipe/*.wasm binary
+dist/movement/mediapipe/*.js -text -diff -whitespace linguist-vendored
+dist/movement/pose-runtime.js -text -diff -whitespace linguist-generated
