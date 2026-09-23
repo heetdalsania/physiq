@@ -217,6 +217,22 @@ test("cancel during capture stops the camera, closes the model and returns to id
   assert.equal(h.session.getState().result, null);
 });
 
+test("a second person during capture stops immediately and cannot produce metrics", async () => {
+  const h = harness();
+  await h.session.start();
+  await h.run(2600);
+  assert.equal(h.session.getState().phase, "capturing");
+  h.prov.state.scenario = "two";
+  await h.run(100);
+  const s = h.session.getState();
+  assert.equal(s.phase, "insufficient");
+  assert.equal(s.result.insufficientReason, "multiple_people_during_capture");
+  assert.equal(s.result.metrics.kneeRom.state, "unavailable");
+  assert.ok(allStopped(h.md));
+  assert.equal(h.prov.state.closed, 1);
+  assert.equal(h.queue.length, 0);
+});
+
 test("dispose (unmount) mid-capture releases everything and emits nothing afterwards", async () => {
   const h = harness();
   await h.session.start();

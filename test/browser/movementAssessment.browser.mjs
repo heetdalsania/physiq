@@ -233,7 +233,7 @@ try {
     const secs = (re) => parseFloat(t.match(re)[1]);
     assert.ok(Math.abs(secs(/Descent time\s+([\d.]+) s/) - 1.08) <= 0.12, t);
     assert.ok(Math.abs(secs(/Ascent time\s+([\d.]+) s/) - 1.48) <= 0.12, t);
-    assert.ok(Math.abs(secs(/Total repetition time\s+([\d.]+) s/) - 2.56) <= 0.12, t);
+    assert.ok(Math.abs(secs(/Detected repetition time\s+([\d.]+) s/) - 2.56) <= 0.12, t);
     assert.match(t, /Apparent 2D trunk–thigh angle change\s+75°/);
     assert.match(t, /Symmetry\s+Not estimated for this capture mode/);
     assert.match(t, /Left\/right symmetry is not estimated from a single sagittal capture in this prototype\./);
@@ -271,6 +271,17 @@ try {
     const t = await text(page);
     assert.equal(t.match(/Apparent 2D knee ROM\s+\d+°/)[0], first.match(/Apparent 2D knee ROM\s+\d+°/)[0]);
     assert.equal(await liveTracks(page), 0);
+  });
+
+  await check("a second person during capture ends it without displaying measurements", async () => {
+    await page.getByRole("button", { name: "Retake", exact: true }).click();
+    await waitPhase(page, "capturing");
+    await setScenario(page, "two");
+    await waitPhase(page, "insufficient");
+    assert.match(await text(page), /More than one person entered the camera view during capture/);
+    assert.doesNotMatch(await text(page), /Apparent 2D knee ROM\s+\d+°/);
+    assert.equal(await liveTracks(page), 0);
+    await setScenario(page, "squat");
   });
 
   await check("6. Cancel during capture stops every track and releases the runtime", async () => {
@@ -487,6 +498,48 @@ try {
     await d.page.screenshot({ path: `${out}/denied-375.png` });
   });
   await deny.close();
+
+  for (const [name, asset, body, message] of [
+    ["runtime script failure", /\/movement\/pose-runtime\.js$/, "", /pose model could not be loaded/],
+    ["model integrity failure", /\/movement\/models\/pose_landmarker_full\.task$/, "tampered model", /failed its integrity check/]
+  ]) {
+    const ctx = await browser.newContext({ viewport: { width: 375, height: 812 }, permissions: ["camera"] });
+    const x = await newAppPage(ctx);
+    await x.page.route(asset, r => r.fulfill({ status: name === "runtime script failure" ? 404 : 200, body }));
+    await check(name + " stops before requesting the camera", async () => {
+      await x.page.goto(url + "/");
+      await seed(x.page);
+      await openExercise(x.page);
+      await openAssessment(x.page);
+      await x.page.getByRole("button", { name: "Start Camera", exact: true }).click();
+      await waitPhase(x.page, "error");
+      assert.match(await x.page.locator("[role=alert]").innerText(), message);
+      assert.equal(await x.page.evaluate(() => window.__gum.calls.length), 0);
+      assert.equal(await liveTracks(x.page), 0);
+    });
+    await ctx.close();
+  }
+
+  const orientationContext = await browser.newContext({ viewport: { width: 375, height: 812 }, permissions: ["camera"] });
+  const orientation = await newAppPage(orientationContext);
+  await check("camera dimensions changing during capture stop without a mixed result", async () => {
+    await orientation.page.goto(url + "/");
+    await seed(orientation.page);
+    await openExercise(orientation.page);
+    await openAssessment(orientation.page);
+    await orientation.page.getByRole("button", { name: "Start Camera", exact: true }).click();
+    await waitPhase(orientation.page, "capturing");
+    await orientation.page.evaluate(() => {
+      const v = document.querySelector("video.ma-video");
+      Object.defineProperty(v, "videoWidth", { value: 480, configurable: true });
+      Object.defineProperty(v, "videoHeight", { value: 640, configurable: true });
+    });
+    await waitPhase(orientation.page, "error");
+    assert.match(await orientation.page.locator("[role=alert]").innerText(), /camera orientation changed/);
+    assert.equal(await liveTracks(orientation.page), 0);
+    assert.doesNotMatch(await text(orientation.page), /Apparent 2D knee ROM\s+\d+°/);
+  });
+  await orientationContext.close();
 
   results.checks = checks;
   results.errors = { errors, consoleErrors };

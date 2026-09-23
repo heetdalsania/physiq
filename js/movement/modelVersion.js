@@ -29,7 +29,7 @@
  * ───────────────────────────────────────────────────────────────────────── */
 
 export const MOVEMENT_ASSESSMENT_VERSION = "movement-assessment-v0.1";
-export const SQUAT_KINEMATICS_VERSION = "squat-kinematics-v0.1";
+export const SQUAT_KINEMATICS_VERSION = "squat-kinematics-v0.2";
 export const POSE_FRAME_CONTRACT_VERSION = "pose-frame-v1";
 
 export const ASSESSMENT_ID = "bodyweight_squat_sagittal";

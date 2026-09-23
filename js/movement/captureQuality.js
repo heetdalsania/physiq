@@ -16,7 +16,7 @@
  *   landmark_confidence median, over valid samples, of the lowest provider
  *                      visibility among hip/knee/ankle (limited < 0.75)
  *   single_person      frames where the provider returned two poses
- *                      (limited if any)
+ *                      (insufficient if any: subject identity is ambiguous)
  *   body_in_frame      share of pose frames with head and the analysed
  *                      leg/foot in the image (limited < 0.9)
  *   foot_stability     90th-percentile displacement of the analysed ankle
@@ -111,7 +111,7 @@ export function assessCaptureQuality(input, options) {
     },
     {
       id: "single_person",
-      state: counts.multiple_poses > 0 ? "limited" : "pass",
+      state: counts.multiple_poses > 0 ? "insufficient" : "pass",
       value: counts.multiple_poses
     },
     {

@@ -69,7 +69,7 @@ export function resolveAssetBase(doc) {
 let runtimePromise = null;
 
 /* Injects movement/pose-runtime.js once and resolves with its global. */
-export function loadPoseRuntime(url, doc, win) {
+export function loadPoseRuntime(url, doc, win, timeoutMs = 30000) {
   const w = win || (typeof window !== "undefined" ? window : null);
   const d = doc || (typeof document !== "undefined" ? document : null);
   if (w && w[RUNTIME_GLOBAL]) return Promise.resolve(w[RUNTIME_GLOBAL]);
@@ -79,12 +79,27 @@ export function loadPoseRuntime(url, doc, win) {
     const script = d.createElement("script");
     script.src = url;
     script.async = true;
+    let settled = false;
+    const timer = setTimeout(function () {
+      finish(new PoseProviderError("runtime_unavailable", "runtime script timed out"));
+    }, timeoutMs);
+    function finish(err, value) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      script.onload = script.onerror = null;
+      if (err) {
+        try { if (typeof script.remove === "function") script.remove(); } catch (e) { /* best effort */ }
+        reject(err);
+      } else resolve(value);
+    }
     script.onload = function () {
-      if (w[RUNTIME_GLOBAL]) resolve(w[RUNTIME_GLOBAL]);
-      else reject(new PoseProviderError("runtime_unavailable", "runtime global missing"));
+      if (w[RUNTIME_GLOBAL]) finish(null, w[RUNTIME_GLOBAL]);
+      else finish(new PoseProviderError("runtime_unavailable", "runtime global missing"));
     };
-    script.onerror = function () { reject(new PoseProviderError("runtime_unavailable", "runtime script failed to load")); };
-    (d.head || d.body).appendChild(script);
+    script.onerror = function () { finish(new PoseProviderError("runtime_unavailable", "runtime script failed to load")); };
+    try { (d.head || d.body).appendChild(script); }
+    catch (err) { finish(new PoseProviderError("runtime_unavailable", err && err.message)); }
   }).catch(function (err) {
     runtimePromise = null;   // allow a later, user-initiated retry
     throw err;
@@ -104,8 +119,12 @@ export async function loadVerifiedModel(url, fetchImpl, subtle) {
   } catch (err) {
     throw new PoseProviderError("model_unavailable", err && err.message);
   }
-  if (bytes.length !== POSE_MODEL.bytes) {
-    throw new PoseProviderError("model_integrity", "size " + bytes.length);
+  return verifyModelBytes(bytes, subtle);
+}
+
+async function verifyModelBytes(bytes, subtle) {
+  if (!(bytes instanceof Uint8Array) || bytes.length !== POSE_MODEL.bytes) {
+    throw new PoseProviderError("model_integrity", "unexpected model bytes");
   }
   const digest = await sha256Hex(bytes, subtle);
   if (digest !== POSE_MODEL.sha256) throw new PoseProviderError("model_integrity", "sha256 " + digest);
@@ -126,7 +145,10 @@ export async function createMediaPipePoseProvider(deps) {
   try { simd = await runtime.FilesetResolver.isSimdSupported(); } catch (e) { simd = false; }
   if (!simd) throw new PoseProviderError("unsupported_runtime", "WebAssembly SIMD unavailable");
 
-  const modelBytes = o.modelBytes || await loadVerifiedModel(base + RUNTIME_ASSETS.model.path, o.fetchImpl, o.subtle);
+  // Cached bytes are mutable, so verify them again on every provider creation.
+  const modelBytes = o.modelBytes
+    ? await verifyModelBytes(o.modelBytes, o.subtle)
+    : await loadVerifiedModel(base + RUNTIME_ASSETS.model.path, o.fetchImpl, o.subtle);
 
   let landmarker;
   try {

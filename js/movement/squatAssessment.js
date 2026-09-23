@@ -38,7 +38,7 @@ import { SEGMENTATION, segmentSingleSquat } from "./squatSegmentation.js";
 import { CALIBRATION } from "./calibration.js";
 import { QUALITY, assessCaptureQuality } from "./captureQuality.js";
 
-/* Capture protocol. Algorithmic parameters, part of squat-kinematics-v0.1. */
+/* Capture protocol. Algorithmic parameters, part of squat-kinematics-v0.2. */
 export const CAPTURE = Object.freeze({
   maxDurationMs: 10000,          // capture ends after 10 s regardless
   postRepetitionHoldMs: 1000,    // …or 1 s after a complete repetition
@@ -148,7 +148,9 @@ export function analyzeSquatCapture(input) {
 
   const segmented = segmentation.state === "segmented";
   if (!segmented || quality.state === "insufficient") {
-    const reason = segmented ? "insufficient_capture_quality" : segmentation.reason;
+    const reason = quality.frameStatusCounts.multiple_poses > 0
+      ? "multiple_people_during_capture"
+      : segmented ? "insufficient_capture_quality" : segmentation.reason;
     return Object.assign(base, {
       status: "insufficient_data",
       insufficientReason: reason,

@@ -67,6 +67,7 @@ const INSUFFICIENT = {
   repetition_started_before_capture: "The squat appeared to start before the capture began. Stand upright and still until “Squat now” appears.",
   did_not_return_to_standing: "The capture ended before you returned to standing.",
   multiple_repetitions: "More than one squat was detected. This prototype measures exactly one repetition.",
+  multiple_people_during_capture: "More than one person entered the camera view during capture, so the pose could not be attributed reliably. Make sure only you are visible and retake.",
   data_gap_during_repetition: "Tracking was lost during the squat.",
   too_few_samples_in_repetition: "Too few frames were analysed during the squat. A slower squat or brighter lighting may help.",
   insufficient_capture_quality: "Too much of the capture was unusable.",
@@ -338,7 +339,7 @@ function Results({ result, onRetake, onExit, headingRef }) {
         <div><dt>Apparent 2D knee ROM</dt><dd className="mono">{formatDegrees(m.kneeRom.valueDeg)}<small>standing {formatDegrees(m.kneeRom.referenceDeg)} → minimum {formatDegrees(m.kneeRom.minimumDeg)}</small></dd></div>
         <div><dt>Descent time</dt><dd className="mono">{formatSeconds(m.timing.descentMs)}</dd></div>
         <div><dt>Ascent time</dt><dd className="mono">{formatSeconds(m.timing.ascentMs)}</dd></div>
-        <div><dt>Total repetition time</dt><dd className="mono">{formatSeconds(m.timing.totalMs)}</dd></div>
+        <div><dt>Detected repetition time</dt><dd className="mono">{formatSeconds(m.timing.totalMs)}</dd></div>
         <div>
           <dt>Apparent 2D trunk–thigh angle change</dt>
           <dd className="mono">{m.trunkThighChange.state === "available"
@@ -348,7 +349,7 @@ function Results({ result, onRetake, onExit, headingRef }) {
         <div><dt>Symmetry</dt><dd>Not estimated for this capture mode<small>{SYMMETRY_TEXT}</small></dd></div>
         <div><dt>Analysed side</dt><dd>{result.analysisSide === "left" ? "Left" : "Right"} side<small>the side most visible to the camera</small></dd></div>
       </dl>
-      <p className="ma-note">Video-estimated 2D angles. Timing is descriptive only.</p>
+      <p className="ma-note">Video-estimated 2D angles. Times run between the detected 10% knee-angle crossings, so they exclude the start and end of the full movement.</p>
       <AngleTraceChart result={result} />
       <CaptureQuality quality={result.quality} />
       <ModelDetails result={result} />

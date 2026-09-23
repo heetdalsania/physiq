@@ -99,7 +99,8 @@ test("results: ROM, timing, trace, symmetry-unavailable, capture quality, identi
   assert.match(t, /standing 175° → minimum 95°/);
   assert.match(t, /Descent time 1\.1 s/);
   assert.match(t, /Ascent time 1\.5 s/);
-  assert.match(t, /Total repetition time 2\.6 s/);
+  assert.match(t, /Detected repetition time 2\.6 s/);
+  assert.match(t, /Times run between the detected 10% knee-angle crossings/);
   assert.match(t, /Apparent 2D trunk–thigh angle change 75°/);
   assert.match(t, /Symmetry Not estimated for this capture mode/);
   assert.match(t, /Left\/right symmetry is not estimated from a single sagittal capture in this prototype\./);
@@ -110,7 +111,7 @@ test("results: ROM, timing, trace, symmetry-unavailable, capture quality, identi
   assert.match(t, /Median landmark visibility reported by the pose model: 0\.95/);
   assert.match(t, /Analysed about 10 frames per second/);
   assert.match(t, /pose_landmarker_full/);
-  assert.match(t, /movement-assessment-v0\.1 · squat-kinematics-v0\.1/);
+  assert.match(t, /movement-assessment-v0\.1 · squat-kinematics-v0\.2/);
   assert.match(t, /verified on this device/);
   assert.match(t, /This prototype estimates 2D movement mechanics from a single camera view\. It does not measure force, tissue load, injury risk, or recovery\./);
   assert.match(html, />Retake<\/button>/);
@@ -133,6 +134,9 @@ test("insufficient data shows the reason and no measurement values", () => {
   const pos = text(renderView(S({ phase: "insufficient", result: null, positioningReason: "not_side_on" })));
   assert.match(pos, /not established within 45 seconds/);
   assert.match(pos, /Turn so that your side faces the camera/);
+  const ambiguous = text(renderView(S({ phase: "insufficient", result: { ...insufficient, insufficientReason: "multiple_people_during_capture" } })));
+  assert.match(ambiguous, /More than one person entered the camera view during capture/);
+  assert.doesNotMatch(ambiguous, /Apparent 2D knee ROM\s+\d+°/);
 });
 
 test("errors are announced (role=alert) with concise recovery guidance and an explicit retry", () => {

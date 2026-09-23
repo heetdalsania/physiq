@@ -305,6 +305,9 @@ export function createAssessmentSession(deps) {
 
     if (state.phase === "capturing") {
       captureFrames.push(frame);
+      // A second person makes subject identity ambiguous even if earlier
+      // frames were usable. Stop immediately and show no measurements.
+      if (frame.status === "multiple_poses") { finishCapture(); return; }
       if (repetitionFinished(captureFrames, calibration)) { finishCapture(); return; }
       const elapsed = d.now() - captureStartedAt;
       set({ progress: Math.round(Math.min(1, elapsed / CAPTURE.maxDurationMs) * 10) / 10 });

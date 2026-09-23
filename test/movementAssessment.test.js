@@ -188,14 +188,18 @@ test("quality: low model confidence (visibility 0.6, above the 0.5 gate) → lim
   assert.ok(r.quality.medianLandmarkVisibility < QUALITY.minMedianVisibility);
 });
 
-test("quality: a second person or moved feet/camera → limited; measurement values are unchanged", () => {
-  const clean = analyzeSquatCapture({ calibration: calibrated(), captureFrames: capFrames(squatFrame), modelVerified: true });
+test("a second person during capture makes subject identity ambiguous and suppresses metrics", () => {
   const withSecond = capFrames((t) => (t === 7900 ? frame(providerResultAt(t, "two"), t) : squatFrame(t)));
   const r = analyzeSquatCapture({ calibration: calibrated(), captureFrames: withSecond, modelVerified: true });
-  assert.equal(r.quality.state, "limited");
+  assert.equal(r.status, "insufficient_data");
+  assert.equal(r.insufficientReason, "multiple_people_during_capture");
+  assert.equal(r.quality.state, "insufficient");
   assert.equal(r.quality.factors.find((f) => f.id === "single_person").value, 1);
-  assert.deepEqual(r.metrics, clean.metrics, "quality must not alter the measurement");
+  assert.equal(r.metrics.kneeRom.state, "unavailable");
+  assert.equal(r.events, null);
+});
 
+test("moved feet or camera limit measurement quality without changing the angle", () => {
   const drift = analyzeSquatCapture({ calibration: calibrated(), captureFrames: capFrames((t) => squatFrame(t, { pose: { shiftX: 60 } })), modelVerified: true });
   assert.equal(drift.quality.factors.find((f) => f.id === "foot_stability").state, "limited");
   assert.equal(drift.metrics.kneeRom.valueDeg, 80);

@@ -131,27 +131,32 @@ test("typed failures: no WebAssembly, no SIMD, runtime missing, model tampered, 
   await assert.rejects(makeProvider({ behaviour: { createThrows: true } }), (e) => e.code === "model_init_failed" && !/RuntimeError/.test(e.message));
 });
 
-test("already-verified bytes are reused without refetching", async () => {
+test("cached bytes are reused without refetching but verified again", async () => {
   let fetched = 0;
   const { log } = await makeProvider({ deps: { modelBytes: MODEL, fetchImpl: async () => { fetched += 1; throw new Error("no"); } } });
   assert.equal(fetched, 0);
   assert.equal(log.options.baseOptions.modelAssetBuffer, MODEL);
+  const tampered = new Uint8Array(MODEL);
+  tampered[12345] ^= 1;
+  await assert.rejects(makeProvider({ deps: { modelBytes: tampered } }), (e) => e.code === "model_integrity");
 });
 
 test("runtime script: injected once, failure is typed and retryable", async () => {
   const appended = [];
   const win = {};
   const doc = { createElement: () => ({}), head: { appendChild: (s) => appended.push(s) } };
+  await assert.rejects(loadPoseRuntime("movement/pose-runtime.js", doc, win, 1), (e) => e.code === "runtime_unavailable" && /timed out/.test(e.detail));
+  assert.equal(appended.length, 1, "a stalled script times out");
   const p1 = loadPoseRuntime("movement/pose-runtime.js", doc, win);
   const p2 = loadPoseRuntime("movement/pose-runtime.js", doc, win);
-  assert.equal(appended.length, 1, "concurrent calls share one script element");
-  appended[0].onerror();
+  assert.equal(appended.length, 2, "concurrent calls share one script element");
+  appended[1].onerror();
   await assert.rejects(p1, (e) => e.code === "runtime_unavailable");
   await assert.rejects(p2, (e) => e.code === "runtime_unavailable");
   const p3 = loadPoseRuntime("movement/pose-runtime.js", doc, win);
-  assert.equal(appended.length, 2, "a later explicit retry injects again");
+  assert.equal(appended.length, 3, "a later explicit retry injects again");
   win[RUNTIME_GLOBAL] = { ok: true };
-  appended[1].onload();
+  appended[2].onload();
   assert.deepEqual(await p3, { ok: true });
 });
 

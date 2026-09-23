@@ -1,7 +1,7 @@
 # Movement Assessment — video-estimated 2D squat mechanics (prototype)
 
 TissueOS Milestone 6. Versions: `movement-assessment-v0.1` (result contract),
-`squat-kinematics-v0.1` (algorithms and parameters), `pose-frame-v1`
+`squat-kinematics-v0.2` (algorithms and parameters), `pose-frame-v1`
 (internal landmark contract). This family is independent of
 `tissue-load-v0.1`, `exercise-tissue-map-v0.1`, `tissue-history-v1`,
 `load-baseline-v0.1` and `recovery-guidance-v0.1`, none of which it reads or
@@ -112,7 +112,7 @@ The non-SIMD fallback binary is not shipped; unsupported engines get a clear
 
 **Replacing the model or runtime** requires updating `POSE_PROVIDER`,
 `POSE_MODEL` and `RUNTIME_ASSETS` in `js/movement/modelVersion.js`,
-`vendor/mediapipe/NOTICE.md`, and bumping `squat-kinematics-v0.1`: different
+`vendor/mediapipe/NOTICE.md`, and bumping `squat-kinematics-v0.2`: different
 landmarks are a different measurement.
 
 ## 5. Architecture
@@ -221,7 +221,8 @@ app does not measure distance; the model card lists > 4 m as out of scope).
 4. Return to standing and hold still; capture ends automatically.
 
 Capture ends 1 s after a complete repetition is detected, when the user taps
-**Done**, or after 10 s. If no usable standing pose is found within 45 s the
+**Done**, after 10 s, or immediately if a second person enters the view.
+If no usable standing pose is found within 45 s the
 assessment ends as "insufficient" with the last guidance message.
 
 **Camera request:** `{ audio: false, video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } }`.
@@ -421,7 +422,7 @@ A future front-view assessment may support a validated symmetry metric.
 |---|---|---|
 | `usable_frames` | share of capture frames with a valid knee angle | < 0.8 limited; < 0.5 insufficient |
 | `landmark_confidence` | median over valid samples of the lowest hip/knee/ankle visibility | < 0.75 limited |
-| `single_person` | frames with two poses | any → limited |
+| `single_person` | frames with two poses | any → insufficient; stop capture because subject identity is ambiguous |
 | `body_in_frame` | share of pose frames with head and analysed leg/foot in view | < 0.9 limited |
 | `foot_stability` | 90th-percentile ankle displacement from its calibration position ÷ apparent standing height | > 0.08 limited (camera or feet moved; one camera cannot tell which) |
 | `repetition` | one repetition segmented | no → insufficient |

@@ -62,7 +62,7 @@ averages 91.8% across 14 geographic subregions, with per-skin-tone averages
 from 85.9% to 92.9%.
 
 **Replacing the weights** requires changing `POSE_MODEL` / `RUNTIME_ASSETS`
-in `js/movement/modelVersion.js`, bumping `squat-kinematics-v0.1`, and updating
+in `js/movement/modelVersion.js`, bumping `squat-kinematics-v0.2`, and updating
 this notice. `build.mjs` refuses to ship a model or runtime file whose SHA-256
 differs from the pinned value, and the app re-verifies the model's SHA-256 on
 the device before using it.
