@@ -219,3 +219,10 @@ test("the Exercise screen hands Movement Assessment nothing but an exit callback
   assert.equal(uses.length, 1);
   assert.match(uses[0], /^<MovementAssessment onExit=\{function\(\) \{ setView\("main"\); \}\} \/>$/);
 });
+
+test("displayed ROM always equals the displayed standing − minimum values", () => {
+  assert.equal(MAmod.formatAngleChange({ valueDeg: 79.8, referenceDeg: 175.4, minimumDeg: 95.6 }), "79°");
+  assert.equal(MAmod.formatAngleChange({ valueDeg: 80, referenceDeg: 175, minimumDeg: 95 }), "80°");
+  assert.equal(MAmod.formatAngleChange({ valueDeg: 42.4, referenceDeg: null, minimumDeg: 95 }), "42°");
+  assert.equal(MAmod.formatAngleChange(null), "Not available");
+});
