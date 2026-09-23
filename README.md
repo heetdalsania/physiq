@@ -74,7 +74,7 @@ The AI Search feature uses the **USDA FoodData Central API** — a free, governm
 
 ## Tech Stack
 
-Modular multi-file architecture · React 18 + Babel (CDN) · USDA FoodData Central API · OpenFoodFacts API · HTML5-QRCode · localStorage per-user · Pure SVG charts · CSS custom properties theming · Mobile-first
+Modular multi-file architecture · React 18 bundled with esbuild (`npm run build` → `dist/`) · Capacitor 8 iOS app · USDA FoodData Central API · OpenFoodFacts API · barcode camera scanning via `@capacitor/barcode-scanner` in the iOS app (manual barcode entry on the web) · on-device pose estimation via MediaPipe Tasks Vision 0.10.35 (Movement Assessment prototype) · localStorage per-user · Pure SVG charts · CSS custom properties theming · Mobile-first
 
 ## Project Structure
 

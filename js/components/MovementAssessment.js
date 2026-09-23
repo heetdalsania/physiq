@@ -90,6 +90,19 @@ export function formatDegrees(v) {
   return typeof v === "number" && Number.isFinite(v) ? Math.round(v) + "°" : "Not available";
 }
 
+/* A change between two angles, shown as whole degrees that always equal
+   the displayed "standing → minimum" pair (each side is rounded first, so
+   "175° → 96°" is never shown next to "80°"). Falls back to the stored
+   value when either end is unavailable. */
+export function formatAngleChange(metric) {
+  if (!metric) return formatDegrees(null);
+  const ref = metric.referenceDeg, min = metric.minimumDeg;
+  if (typeof ref === "number" && Number.isFinite(ref) && typeof min === "number" && Number.isFinite(min)) {
+    return (Math.round(ref) - Math.round(min)) + "°";
+  }
+  return formatDegrees(metric.valueDeg);
+}
+
 export function formatSeconds(ms) {
   return typeof ms === "number" && Number.isFinite(ms) && ms >= 0 ? (ms / 1000).toFixed(1) + " s" : "Not available";
 }
@@ -336,14 +349,14 @@ function Results({ result, onRetake, onExit, headingRef }) {
     <>
       <h3 className="ma-result-heading" tabIndex={-1} ref={headingRef}>Results</h3>
       <dl className="tl-stats ma-metrics">
-        <div><dt>Apparent 2D knee ROM</dt><dd className="mono">{formatDegrees(m.kneeRom.valueDeg)}<small>standing {formatDegrees(m.kneeRom.referenceDeg)} → minimum {formatDegrees(m.kneeRom.minimumDeg)}</small></dd></div>
+        <div><dt>Apparent 2D knee ROM</dt><dd className="mono">{formatAngleChange(m.kneeRom)}<small>standing {formatDegrees(m.kneeRom.referenceDeg)} → minimum {formatDegrees(m.kneeRom.minimumDeg)}</small></dd></div>
         <div><dt>Descent time</dt><dd className="mono">{formatSeconds(m.timing.descentMs)}</dd></div>
         <div><dt>Ascent time</dt><dd className="mono">{formatSeconds(m.timing.ascentMs)}</dd></div>
         <div><dt>Detected repetition time</dt><dd className="mono">{formatSeconds(m.timing.totalMs)}</dd></div>
         <div>
           <dt>Apparent 2D trunk–thigh angle change</dt>
           <dd className="mono">{m.trunkThighChange.state === "available"
-            ? <>{formatDegrees(m.trunkThighChange.valueDeg)}<small>standing {formatDegrees(m.trunkThighChange.referenceDeg)} → minimum {formatDegrees(m.trunkThighChange.minimumDeg)}</small></>
+            ? <>{formatAngleChange(m.trunkThighChange)}<small>standing {formatDegrees(m.trunkThighChange.referenceDeg)} → minimum {formatDegrees(m.trunkThighChange.minimumDeg)}</small></>
             : <>Not available<small>landmark quality too low for this angle</small></>}</dd>
         </div>
         <div><dt>Symmetry</dt><dd>Not estimated for this capture mode<small>{SYMMETRY_TEXT}</small></dd></div>

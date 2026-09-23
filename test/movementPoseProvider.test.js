@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { webcrypto } from "node:crypto";
 import {
-  createMediaPipePoseProvider, createFrameStager, resolveAssetBase, loadPoseRuntime, RUNTIME_GLOBAL
+  createMediaPipePoseProvider, createFrameStager, clearSessionModelCache, resolveAssetBase, loadPoseRuntime, RUNTIME_GLOBAL
 } from "../js/movement/poseProvider.js";
 import { POSE_MODEL } from "../js/movement/modelVersion.js";
 import { providerPose } from "./fixtures/syntheticPose.js";
@@ -53,6 +53,7 @@ function fakeRuntime(behaviour = {}) {
 const serveModel = (bytes = MODEL) => async () => ({ ok: true, status: 200, arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) });
 
 async function makeProvider(overrides = {}) {
+  if (!overrides.keepCache) clearSessionModelCache();
   const { runtime, log } = fakeRuntime(overrides.behaviour);
   const { doc, log: canvasLog } = fakeCanvasDoc();
   const win = { WebAssembly: {}, [RUNTIME_GLOBAL]: runtime };
@@ -173,4 +174,20 @@ test("frame stager tolerates a missing document or 2D context", () => {
   const noCtx = createFrameStager({ createElement: () => ({ getContext: () => null }) });
   assert.equal(noCtx.stage({}, 640, 480), null);
   noCtx.release();
+});
+
+test("app-session model cache: a reopened screen skips the download but still re-verifies", async () => {
+  clearSessionModelCache();
+  let fetched = 0;
+  const counting = async () => { fetched += 1; return serveModel()(); };
+  await makeProvider({ deps: { fetchImpl: counting } });
+  await makeProvider({ keepCache: true, deps: { fetchImpl: counting } });
+  assert.equal(fetched, 1, "second screen open reused the verified bytes");
+  // A tampered cached copy is dropped and the model is fetched again.
+  const { log } = await makeProvider({ keepCache: true, deps: { fetchImpl: counting } });
+  log.options.baseOptions.modelAssetBuffer[500] ^= 1;
+  const again = await makeProvider({ keepCache: true, deps: { fetchImpl: counting } });
+  assert.equal(fetched, 2, "tampered cache → fresh download");
+  assert.equal(again.log.options.baseOptions.modelAssetBuffer.length, POSE_MODEL.bytes);
+  clearSessionModelCache();
 });

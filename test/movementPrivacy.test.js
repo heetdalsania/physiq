@@ -60,7 +60,9 @@ test("the only fetch is the same-origin GET of the bundled model file", () => {
   const loader = src.slice(src.indexOf("export async function loadVerifiedModel"), src.indexOf("export async function createMediaPipePoseProvider"));
   assert.match(loader, /typeof fetch === "function" \? fetch : null/);
   assert.match(loader, /await f\(url, \{ method: "GET", credentials: "same-origin" \}\)/);
-  assert.match(src, /loadVerifiedModel\(base \+ RUNTIME_ASSETS\.model\.path/);
+  assert.match(src, /sessionCachedModel\(base \+ RUNTIME_ASSETS\.model\.path/);
+  const cacheFn = src.slice(src.indexOf("async function sessionCachedModel"), src.indexOf("export async function loadVerifiedModel"));
+  assert.match(cacheFn, /loadVerifiedModel\(url, fetchImpl, subtle\)/, "the cache only ever fetches the bundled model URL it was given");
   // detect() hands frames only to the local runtime and returns a normalised frame
   const detect = src.slice(src.indexOf("detect: function"), src.indexOf("close: function"));
   assert.doesNotMatch(detect, /fetch|send|post|upload/i);

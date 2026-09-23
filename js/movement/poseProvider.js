@@ -68,6 +68,23 @@ export function resolveAssetBase(doc) {
 
 let runtimePromise = null;
 
+/* Model bytes that passed verification, kept for the rest of the app session
+   so reopening Movement Assessment does not download 9.4 MB again. They are
+   the model's weights (no user data), are never written to storage, and are
+   still re-verified before every use; a copy that fails is dropped and the
+   model is downloaded again. */
+let sessionModelBytes = null;
+export function clearSessionModelCache() { sessionModelBytes = null; }
+
+async function sessionCachedModel(url, fetchImpl, subtle) {
+  if (sessionModelBytes) {
+    try { return await verifyModelBytes(sessionModelBytes, subtle); }
+    catch (e) { sessionModelBytes = null; }
+  }
+  sessionModelBytes = await loadVerifiedModel(url, fetchImpl, subtle);
+  return sessionModelBytes;
+}
+
 /* Injects movement/pose-runtime.js once and resolves with its global. */
 export function loadPoseRuntime(url, doc, win, timeoutMs = 30000) {
   const w = win || (typeof window !== "undefined" ? window : null);
@@ -148,7 +165,7 @@ export async function createMediaPipePoseProvider(deps) {
   // Cached bytes are mutable, so verify them again on every provider creation.
   const modelBytes = o.modelBytes
     ? await verifyModelBytes(o.modelBytes, o.subtle)
-    : await loadVerifiedModel(base + RUNTIME_ASSETS.model.path, o.fetchImpl, o.subtle);
+    : await sessionCachedModel(base + RUNTIME_ASSETS.model.path, o.fetchImpl, o.subtle);
 
   let landmarker;
   try {
