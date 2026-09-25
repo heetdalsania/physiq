@@ -1,0 +1,7 @@
+; macOS sandbox profile: allow everything except networking and DNS.
+; Used to observe what a runtime ATTEMPTS without letting anything leave the machine.
+(version 1)
+(allow default)
+(deny network*)
+(deny mach-lookup (global-name "com.apple.dnssd.service"))
+(deny mach-lookup (global-name "com.apple.mDNSResponder"))

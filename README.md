@@ -106,7 +106,15 @@ physiq/
 │   │   └── ProfileTab.js      # Projections, stats, settings
 │   └── App.js                 # Root component — state management + routing
 └── README.md
+
+research_backend/              # Milestone 7 LOCAL research service (Python) — not used by the app
 ```
+
+`research_backend/` is a separate, local/internal research prototype that turns
+approved research video into versioned derived movement data; the app never
+talks to it and needs neither Python nor Docker. See
+[RESEARCH_BACKEND.md](RESEARCH_BACKEND.md) and
+[MILESTONE_7_VERIFICATION.md](MILESTONE_7_VERIFICATION.md).
 
 ## License
 
