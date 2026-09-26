@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "physiq-research"
+version = "0.1.0"
+description = "PhysiQ / TissueOS Milestone 7 local research backend (Stage-3 video-estimated movement mechanics)"
+requires-python = ">=3.12,<3.13"
+license = { text = "Proprietary (PhysiQ); third-party components under their own licences, see RESEARCH_BACKEND.md" }
+# Direct runtime dependencies, pinned exactly. Full transitive pins:
+# requirements.lock.txt. Why each exists: RESEARCH_BACKEND.md §Dependencies.
+dependencies = [
+  "fastapi==0.141.1",          # HTTP API framework
+  "uvicorn==0.54.0",           # ASGI server for the API process
+  "pydantic==2.13.5",          # API schemas and stored-artifact validation
+  "python-multipart==0.0.32",  # streaming multipart parser (bounded upload intake)
+  "SQLAlchemy==2.1.1",         # database access (Postgres; SQLite in tests)
+  "alembic==1.20.0",           # schema migrations
+  "psycopg[binary]==3.3.6",    # Postgres driver
+  "av==18.1.0",                # PyAV: FFmpeg demux/decode with real presentation timestamps
+  "numpy==2.5.3",              # frame arrays handed to the pose runtime
+  "mediapipe==0.10.31",        # local pose runtime (worker only); version audited, see RESEARCH_BACKEND.md
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.1.1",
+  "httpx==0.28.1",             # FastAPI TestClient transport
+  "ruff==0.16.9",
+  "mypy==2.3.1",
+]
+
+[tool.setuptools.packages.find]
+include = ["physiq_research*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "postgres: needs a real Postgres (RESEARCH_TEST_POSTGRES_URL)",
+  "real_pose: runs the real MediaPipe runtime and model (needs the pinned test image; downloads it once)",
+  "netmon: macOS native network-call monitor around the real pose runtime",
+]
+filterwarnings = [
+  "error::pytest.PytestUnraisableExceptionWarning",
+  # starlette 1.7 announces a future move of its TestClient transport to httpx2;
+  # it concerns the test client only, not the service.
+  "ignore:Using `httpx` with `starlette.testclient` is deprecated:UserWarning",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "N", "C4", "SIM", "RUF", "PL"]
+ignore = [
+  "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004",  # algorithm ports keep the source's structure
+  "S101",     # assert is used for internal invariants and in tests
+  "RUF001", "RUF002", "RUF003",  # typographic characters in docs (°, ×, –) are intentional
+  "PLC0415",  # lazy imports keep the API process free of the pose runtime
+  "PLR0917",  # keyword-heavy constructors of records; positional count is not a smell here
+  "N818",     # exception names state outcomes (PipelineFailure, JobCancelled, LeaseLost)
+  "SIM108",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "PLR", "N802", "N806", "B017", "SIM"]
+"migrations/**" = ["S608"]
+"physiq_research/storage/tables.py" = ["S608"]
+
+[tool.mypy]
+python_version = "3.12"
+# Pydantic validates constructor input at run time (dicts become models);
+# init_typed = false types __init__ arguments accordingly, while
+# init_forbid_extra still rejects unknown keyword arguments.
+plugins = ["pydantic.mypy"]
+strict = true
+warn_unused_ignores = false
+disallow_any_generics = false
+packages = ["physiq_research"]
+exclude = ["tests/", "migrations/"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = false
+warn_required_dynamic_aliases = true
+
+[[tool.mypy.overrides]]
+module = ["av", "av.*", "mediapipe", "mediapipe.*", "python_multipart.*"]
+ignore_missing_imports = true

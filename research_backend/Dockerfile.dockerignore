@@ -1,0 +1,13 @@
+# Build context is the repository root; send only what the image needs.
+*
+!research_backend/requirements.lock.txt
+!research_backend/requirements-dev.lock.txt
+!research_backend/pyproject.toml
+!research_backend/alembic.ini
+!research_backend/migrations/**
+!research_backend/physiq_research/**
+!research_backend/tests/**
+!research_backend/tools/**
+!vendor/mediapipe/pose_landmarker_full.task
+**/__pycache__
+**/*.pyc

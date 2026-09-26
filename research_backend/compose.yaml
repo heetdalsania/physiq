@@ -1,0 +1,108 @@
+# Local research stack: Postgres + migration job + API + worker (+ tests).
+# LOCAL / INTERNAL RESEARCH PROTOTYPE — never expose publicly: there is no
+# authentication, authorization or participant-consent control.
+#
+#   docker compose -f research_backend/compose.yaml up --build -d
+#   curl -s -H 'X-Research-Client: cli' http://127.0.0.1:8765/health/ready
+#
+# Networks: the WORKER (which holds raw video and runs the pose model) is on
+# an `internal` network with no route to the Internet. Only the API and
+# Postgres are also on `edge`, solely so that their ports can be published —
+# to 127.0.0.1 only.
+name: physiq-research
+
+x-research-image: &research-image
+  image: physiq-research:local
+  platform: linux/amd64
+  build:
+    context: ..
+    dockerfile: research_backend/Dockerfile
+    target: runtime
+  environment: &research-env
+    RESEARCH_DATABASE_URL: postgresql+psycopg://research:${RESEARCH_PG_PASSWORD:-research-local-only}@postgres:5432/research
+    RESEARCH_LOG_LEVEL: INFO
+
+services:
+  postgres:
+    image: postgres:17.7-bookworm@sha256:86e0b703649d7a792bd9243ee28afc9d8f7c6b2b5638077c9d6882d4d472bbfd
+    environment:
+      POSTGRES_USER: research
+      POSTGRES_PASSWORD: ${RESEARCH_PG_PASSWORD:-research-local-only}
+      POSTGRES_DB: research
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${RESEARCH_PG_HOST_PORT:-55432}:5432"
+    networks: [internal, edge]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U research -d research"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    <<: *research-image
+    command: ["alembic", "upgrade", "head"]
+    networks: [internal]
+    depends_on:
+      postgres: {condition: service_healthy}
+    restart: "no"
+
+  api:
+    <<: *research-image
+    command: ["python", "-m", "physiq_research.api"]
+    environment:
+      <<: *research-env
+      # Inside the container the API must listen on all interfaces so the port
+      # can be published; the host side is bound to 127.0.0.1 below.
+      RESEARCH_API_HOST: 0.0.0.0
+      RESEARCH_ALLOW_NON_LOOPBACK_BIND: "1"
+    ports:
+      - "127.0.0.1:${RESEARCH_API_HOST_PORT:-8765}:8765"
+    volumes:
+      - uploads:/var/lib/research/uploads
+    networks: [internal, edge]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8765/health/ready'), timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  worker:
+    <<: *research-image
+    command: ["python", "-m", "physiq_research.workers"]
+    volumes:
+      - uploads:/var/lib/research/uploads
+    networks: [internal]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    stop_grace_period: 60s
+
+  tests:
+    profiles: [test]
+    image: physiq-research:test
+    platform: linux/amd64
+    build:
+      context: ..
+      dockerfile: research_backend/Dockerfile
+      target: test
+    environment:
+      RESEARCH_TEST_POSTGRES_URL: postgresql+psycopg://research:${RESEARCH_PG_PASSWORD:-research-local-only}@postgres:5432/research
+      RESEARCH_TEST_REAL_POSE: ${RESEARCH_TEST_REAL_POSE:-0}
+    volumes:
+      # hash-pinned MediaPipe test image, fetched on the host beforehand (no egress here)
+      - ./.local/fixtures:/srv/research_backend/.local/fixtures:ro
+    networks: [internal]
+    depends_on:
+      postgres: {condition: service_healthy}
+
+volumes:
+  pgdata:
+  uploads:
+
+networks:
+  internal:
+    internal: true
+  edge: {}
