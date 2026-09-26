@@ -8,6 +8,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import pool
 
+import physiq_research.force_plate.tables  # noqa: F401  (registers the Milestone 8 tables on `metadata`)
 from physiq_research.storage.db import make_engine
 from physiq_research.storage.tables import metadata
 

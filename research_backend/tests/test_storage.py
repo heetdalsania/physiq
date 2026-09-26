@@ -12,6 +12,7 @@ import pytest
 from sqlalchemy import inspect, select, text, update
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
+import physiq_research.force_plate.tables  # noqa: F401  (M8 tables share `metadata`; see test_force_plate_storage.py)
 from physiq_research.canonical import canonical_digest
 from physiq_research.config import Settings
 from physiq_research.pipeline.contract import processing_contract, processing_fingerprint
