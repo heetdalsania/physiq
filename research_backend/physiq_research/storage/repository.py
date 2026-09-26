@@ -287,6 +287,40 @@ class ResearchRepository:
             ).all()
         return {r[0] for r in rows}
 
+    def release_upload(
+        self, job_id: uuid.UUID, owner: str, attempt: int, token: str, remove: Callable[[], bool]
+    ) -> bool:
+        """Remove this attempt's upload unless a retry now owns it.
+
+        Locking the job across the filesystem unlink prevents lease recovery
+        from re-queuing the same file between the ownership check and unlink.
+        A failed attempt that still owns the row relinquishes the token so
+        recovery cannot later claim a file that has already been removed.
+        """
+        with self.engine.begin() as conn:
+            row = conn.execute(
+                select(jobs_t.c.status, jobs_t.c.lease_owner, jobs_t.c.attempts, jobs_t.c.upload_token)
+                .where(jobs_t.c.id == job_id)
+                .with_for_update()
+            ).first()
+            if (
+                row is not None
+                and row.upload_token == token
+                and (
+                    row.status == "queued"
+                    or (row.status == "processing" and row.lease_owner != owner and row.attempts > attempt)
+                )
+            ):
+                return False
+            removed = remove()
+            if row is not None and row.status == "processing" and row.attempts <= attempt:
+                conn.execute(
+                    update(jobs_t)
+                    .where(jobs_t.c.id == job_id, jobs_t.c.status == "processing", jobs_t.c.upload_token == token)
+                    .values(upload_token=None)
+                )
+            return removed
+
     def count_by_status(self) -> dict[str, int]:
         with self.engine.connect() as conn:
             rows = conn.execute(select(jobs_t.c.status, func.count()).group_by(jobs_t.c.status)).all()
@@ -498,6 +532,7 @@ class ResearchRepository:
                 & (jobs_t.c.status == "processing")
                 & (jobs_t.c.lease_owner == job.lease_owner)
                 & (jobs_t.c.lease_expires_at < now)
+                & (jobs_t.c.upload_token == job.upload_token)
             )
             with self.engine.begin() as conn:
                 if job.attempts < max_attempts and upload_exists(job.upload_token):
@@ -564,36 +599,48 @@ class ResearchRepository:
         )
         return result.rowcount, tokens
 
+    @staticmethod
+    def _lock_deletion(conn: Connection) -> None:
+        # Two deletion requests can target different jobs linked to one
+        # assessment. Serialize them before locking individual job rows.
+        if conn.dialect.name == "postgresql":
+            conn.exec_driver_sql("SELECT pg_advisory_xact_lock(731907001)")
+
+    def _delete_assessment_tx(self, conn: Connection, assessment_id: uuid.UUID, now: datetime) -> DeletionOutcome:
+        exists = conn.execute(select(assessments_t.c.id).where(assessments_t.c.id == assessment_id)).first()
+        if exists is None:
+            tomb = conn.execute(
+                select(func.count())
+                .select_from(jobs_t)
+                .where(jobs_t.c.assessment_id == assessment_id, jobs_t.c.status == "deleted")
+            ).scalar_one()
+            return DeletionOutcome("already_deleted" if tomb else "not_found", assessment_id, 0, 0)
+        jobs_n, tokens = self._tombstone(conn, jobs_t.c.assessment_id == assessment_id, now)
+        removed = conn.execute(delete(artifacts_t).where(artifacts_t.c.assessment_id == assessment_id)).rowcount
+        conn.execute(delete(assessments_t).where(assessments_t.c.id == assessment_id))
+        return DeletionOutcome("deleted", assessment_id, jobs_n, removed, tuple(tokens))
+
     def delete_assessment(self, assessment_id: uuid.UUID) -> DeletionOutcome:
-        now = self.clock()
         with self.engine.begin() as conn:
-            exists = conn.execute(select(assessments_t.c.id).where(assessments_t.c.id == assessment_id)).first()
-            if exists is None:
-                tomb = conn.execute(
-                    select(func.count())
-                    .select_from(jobs_t)
-                    .where(jobs_t.c.assessment_id == assessment_id, jobs_t.c.status == "deleted")
-                ).scalar_one()
-                return DeletionOutcome("already_deleted" if tomb else "not_found", assessment_id, 0, 0)
-            jobs_n, tokens = self._tombstone(conn, jobs_t.c.assessment_id == assessment_id, now)
-            removed = conn.execute(delete(artifacts_t).where(artifacts_t.c.assessment_id == assessment_id)).rowcount
-            conn.execute(delete(assessments_t).where(assessments_t.c.id == assessment_id))
-            return DeletionOutcome("deleted", assessment_id, jobs_n, removed, tuple(tokens))
+            self._lock_deletion(conn)
+            return self._delete_assessment_tx(conn, assessment_id, self.clock())
 
     def delete_job(self, job_id: uuid.UUID) -> DeletionOutcome:
         """Research deletion of one job: cancels queued/processing work,
         scrubs failed jobs, and deletes the assessment of a succeeded job."""
-        job = self.get_job(job_id)
-        if job is None:
-            return DeletionOutcome("not_found", None, 0, 0)
-        if job.status == "deleted":
-            return DeletionOutcome("already_deleted", job.assessment_id, 0, 0)
-        if job.status == "succeeded" and job.assessment_id is not None:
-            return self.delete_assessment(job.assessment_id)
-        now = self.clock()
         with self.engine.begin() as conn:
+            self._lock_deletion(conn)
+            row = conn.execute(select(jobs_t).where(jobs_t.c.id == job_id).with_for_update()).first()
+            if row is None:
+                return DeletionOutcome("not_found", None, 0, 0)
+            job = JobView.from_row(row)
+            if job.status == "deleted":
+                return DeletionOutcome("already_deleted", job.assessment_id, 0, 0)
+            now = self.clock()
+            if job.status == "succeeded" and job.assessment_id is not None:
+                return self._delete_assessment_tx(conn, job.assessment_id, now)
             n, tokens = self._tombstone(conn, (jobs_t.c.id == job_id) & (jobs_t.c.status != "deleted"), now)
-        return DeletionOutcome("deleted" if n else "already_deleted", None, n, 0, tuple(tokens))
+            return DeletionOutcome("deleted" if n else "already_deleted", None, n, 0, tuple(tokens))
 
     # ── assessments ─────────────────────────────────────────────────────
     def get_assessment(self, assessment_id: uuid.UUID, *, include_artifacts: bool = True) -> StoredAssessment | None:

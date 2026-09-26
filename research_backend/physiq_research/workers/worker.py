@@ -8,11 +8,10 @@ Process model
     * The API process never decodes or runs inference; it only enqueues.
 
 Raw-video lifecycle (the high-priority invariant)
-    ``process_job`` deletes the job's temporary upload in a ``finally``
-    block — after success, after every classified failure, after an
-    unexpected exception (including a failed database save), after
-    cancellation (job deleted via the API) and after losing the lease. The
-    decoder and pose session are closed inside the processor before that.
+    ``process_job`` releases the temporary upload in a ``finally`` block.
+    It deletes it after terminal outcomes, while preserving it if a newer
+    attempt has reclaimed the job. The decoder and pose session are closed
+    inside the processor before that.
 
     A process kill or power loss skips ``finally``. On start-up and every
     ``MAINTENANCE_INTERVAL_S`` the worker therefore (1) recovers jobs whose
@@ -20,8 +19,8 @@ Raw-video lifecycle (the high-priority invariant)
     fail as ``worker_lost`` and delete the upload), (2) expires queued jobs
     older than ``upload_max_age_s`` and deletes their uploads, and (3) sweeps
     our own upload directory for files no active job references that are
-    older than ``ORPHAN_GRACE_S`` (in-flight uploads are younger and keep
-    being written).
+    older than ``ORPHAN_GRACE_S`` (an in-flight upload is locked and skipped
+    even if its last write is old).
 """
 
 from __future__ import annotations
@@ -171,10 +170,24 @@ class Worker:
                 log.exception("traceback (development logging enabled)")
             self._fail(job, outcome, FailureCode.PIPELINE_ERROR, "unexpected_exception", processor.stage.value, None)
         finally:
-            removed = delete_upload(self.upload_dir, token)
+            removed = False
+            if token:
+                try:
+                    removed = self.repo.release_upload(
+                        job.id, self.owner, job.attempts, token, lambda: delete_upload(self.upload_dir, token)
+                    )
+                except Exception as exc:
+                    # If the database is unavailable, privacy takes priority:
+                    # do not leave raw media behind waiting for a lease sweep.
+                    log.error("job %s: upload ownership check failed (%s)", job.id, type(exc).__name__)
+                    removed = delete_upload(self.upload_dir, token)
             outcome.upload_deleted = not upload_exists(self.upload_dir, token)
             outcome.timings = dict(processor.timings)
-            log.info("job %s: temporary upload %s", job.id, "deleted" if removed else "already absent")
+            log.info(
+                "job %s: temporary upload %s",
+                job.id,
+                "deleted" if removed else ("already absent" if outcome.upload_deleted else "retained for retry"),
+            )
         return outcome
 
     def _fail(

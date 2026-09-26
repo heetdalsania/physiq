@@ -114,7 +114,8 @@ research_backend/              # Milestone 7 LOCAL research service (Python) —
 approved research video into versioned derived movement data; the app never
 talks to it and needs neither Python nor Docker. See
 [RESEARCH_BACKEND.md](RESEARCH_BACKEND.md) and
-[MILESTONE_7_VERIFICATION.md](MILESTONE_7_VERIFICATION.md).
+[MILESTONE_7_VERIFICATION.md](MILESTONE_7_VERIFICATION.md). The independent
+hardening review is [MILESTONE_7_ADVERSARIAL_REVIEW.md](MILESTONE_7_ADVERSARIAL_REVIEW.md).
 
 ## License
 

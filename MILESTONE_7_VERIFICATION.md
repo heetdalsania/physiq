@@ -1,5 +1,10 @@
 # Milestone 7 — Research Backend: Verification
 
+> This is the implementation-time verification snapshot. The independent
+> adversarial review, reproduced defects, review fixes, updated test results
+> and current dependency findings are in
+> [MILESTONE_7_ADVERSARIAL_REVIEW.md](MILESTONE_7_ADVERSARIAL_REVIEW.md).
+
 Verified 2026-09-25 on branch `claude/milestone-7-research-backend`, based on
 `origin/main` at `512e61f69511e52c63e0a86b7e3c393bf349853f` (PR #30). Design and
 contracts: [RESEARCH_BACKEND.md](RESEARCH_BACKEND.md). Setup:

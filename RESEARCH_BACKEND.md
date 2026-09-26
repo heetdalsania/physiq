@@ -109,7 +109,7 @@ These are safeguards against accidents, **not authentication**.
 
 | Question | Answer |
 |---|---|
-| Raw video retained after processing? | **No.** Deleted after success, every failure, cancellation and lease loss (`finally`); crash leftovers are removed by the worker's recovery and sweep (§6). |
+| Raw video retained after processing? | **No.** Deleted after terminal success/failure and cancellation. If an expired lease is re-queued, the upload remains only for the new attempt; its terminal outcome deletes it. Crash leftovers are removed by recovery and sweep (§6). |
 | Raw video uploaded externally / to object storage? | **No.** There is no S3/GCS/Azure/Supabase client or configuration; the only copy is one local temp file. |
 | Frames stored or sent anywhere? | **No.** Frames exist only in decoder buffers and as a single RGB array handed to the local pose runtime. |
 | Landmarks sent externally? | **No.** Inference is local; the pinned runtime was observed making no network calls (§9). |
@@ -122,6 +122,11 @@ raw video is deleted.** They are sensitive derived biometric/movement data and
 are *not* anonymous: a person's movement pattern can be identifying, and the
 source SHA-256 lets anyone holding the same video confirm it was processed.
 The digest is not anonymization.
+
+Job and result responses make no blanket `raw_video_retained: false` claim:
+a queued or processing job necessarily has a temporary upload, and a hard
+kill can leave an orphan until the worker's bounded-age sweep. The lifecycle
+and limits below describe when that temporary file is removed.
 
 **Consent.** A boolean such as `consent=true` would not constitute research
 consent, so the API has none. Real participant data may enter only through an
@@ -207,11 +212,15 @@ queued ──claim──▶ processing ──▶ succeeded | failed
 It is deleted: by the API on any upload rejection, on a deduplicated
 submission and on `DELETE` of a queued/processing job; by the worker in a
 `finally` after success, after every classified failure, after an unexpected
-exception (including a failed database write), after cancellation and after
-lease loss; by recovery when a crashed job fails; by the sweep when an
+exception (including a failed database write), and after cancellation. On
+lease loss, cleanup checks the locked job row: it preserves the upload only
+if the job has been re-queued or a newer attempt owns it. The terminal
+attempt deletes it. Recovery deletes uploads when a crashed job fails; the
+sweep deletes an
 unreferenced file is older than 10 minutes. The sweep touches only regular
 files matching `^rv-[A-Za-z0-9_]{8,64}\.upload$` in that directory, never
-symlinks and never anything else.
+symlinks and never anything else. The API holds an advisory lock while an
+upload is in flight, so the sweep skips a stalled but still-open upload.
 
 **Limitation:** a killed process or power loss skips `finally`; the file then
 remains until the next worker start/maintenance pass (at most `upload_max_age_s`

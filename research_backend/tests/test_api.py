@@ -70,7 +70,7 @@ def test_valid_upload_creates_a_durable_queued_job(
     assert resp.status_code == 202, resp.text
     body = resp.json()
     assert body["contract"] == "research-job-v1" and body["status"] == "queued" and body["deduplicated"] is False
-    assert body["research_subject_id"] == subject and body["raw_video_retained"] is False
+    assert body["research_subject_id"] == subject and "raw_video_retained" not in body
     assert body["source_sha256"] and body["source_bytes"] == squat_video.stat().st_size
     job = db_repo.get_job(uuid.UUID(body["job_id"]))
     assert job is not None and job.status == "queued"

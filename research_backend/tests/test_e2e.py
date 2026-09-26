@@ -137,9 +137,7 @@ def test_end_to_end_research_flow(
             ).all()
         deleted = client.delete(f"/research/v1/assessments/{aid}", headers=CLIENT_HEADERS).json()
         assert (
-            deleted["state"] == "deleted"
-            and deleted["artifacts_removed"] == 4
-            and deleted["raw_video_retained"] is False
+            deleted["state"] == "deleted" and deleted["artifacts_removed"] == 4 and "raw_video_retained" not in deleted
         )
         assert client.get(f"/research/v1/assessments/{aid}").status_code == 404
         with db_repo.engine.connect() as c:

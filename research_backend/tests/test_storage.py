@@ -284,6 +284,38 @@ def test_delete_failed_and_queued_jobs(db_settings: Settings, db_repo: ResearchR
     assert db_repo.claim_next("w", 60) is None  # a deleted job is never processed
 
 
+def test_delete_job_when_worker_succeeds_during_initial_read(
+    db_settings: Settings, db_repo: ResearchRepository, squat_video: Path
+) -> None:
+    job = enqueue_file(db_settings, db_repo, squat_video)
+
+    class ConcurrentSuccessRepo(ResearchRepository):
+        produced: Any = None
+
+        def _complete_job(self) -> None:
+            if self.produced is None:
+                self.produced = Worker(db_settings, db_repo, DotPoseProvider()).process_next()
+
+        def get_job(self, job_id: uuid.UUID) -> Any:
+            # Old implementation read outside its deletion transaction.
+            snapshot = super().get_job(job_id)
+            self._complete_job()
+            return snapshot
+
+        def _lock_deletion(self, conn: Any) -> None:
+            # New implementation starts its transaction before reading.
+            self._complete_job()
+            super()._lock_deletion(conn)
+
+    race = ConcurrentSuccessRepo(db_repo.engine)
+    deleted = race.delete_job(job.id)
+    assert race.produced is not None and race.produced.status == "succeeded"
+    assert deleted.state == "deleted" and deleted.artifacts_removed == 4
+    assert db_repo.get_assessment(race.produced.assessment_id) is None
+    tombstone = db_repo.get_job(job.id)
+    assert tombstone is not None and tombstone.status == "deleted"
+
+
 def test_atomic_claim_two_workers_never_share_a_job(
     db_settings: Settings, db_repo: ResearchRepository, squat_video: Path
 ) -> None:

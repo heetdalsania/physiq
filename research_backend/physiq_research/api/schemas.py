@@ -50,7 +50,6 @@ class ResearchJobResponseV1(ApiModel):
     deleted_at: datetime | None
     assessment_id: uuid.UUID | None
     failure: FailureV1 | None
-    raw_video_retained: Literal[False] = False
     links: JobLinksV1
 
 
@@ -106,7 +105,6 @@ class ResearchAssessmentResultV1(ApiModel):
     artifacts: dict[str, ArtifactV1]
     artifacts_included: bool
     scientific_scope: ScientificScopeV1
-    raw_video_retained: Literal[False] = False
 
 
 class ResearchDeletionResponseV1(ApiModel):
@@ -117,7 +115,6 @@ class ResearchDeletionResponseV1(ApiModel):
     assessment_id: uuid.UUID | None
     jobs_tombstoned: int = Field(ge=0)
     artifacts_removed: int = Field(ge=0)
-    raw_video_retained: Literal[False] = False
 
 
 class HealthV1(ApiModel):

@@ -4,6 +4,7 @@ Local research prototype that turns an approved research video of one
 bodyweight squat into versioned derived Stage-3 movement data. Design,
 contracts, privacy and non-claims: [../RESEARCH_BACKEND.md](../RESEARCH_BACKEND.md).
 Verification: [../MILESTONE_7_VERIFICATION.md](../MILESTONE_7_VERIFICATION.md).
+Independent review: [../MILESTONE_7_ADVERSARIAL_REVIEW.md](../MILESTONE_7_ADVERSARIAL_REVIEW.md).
 
 > Local / internal use only. Never expose it publicly: there is no
 > authentication, authorization or participant-consent control. Only approved

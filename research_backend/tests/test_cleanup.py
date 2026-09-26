@@ -202,6 +202,38 @@ def test_lease_lost_discards_result_and_deletes_video(
     assert no_assessments(repo)
 
 
+def test_reclaimed_attempt_keeps_video_for_new_owner(
+    db_settings: Settings, db_repo: ResearchRepository, squat_video: Path
+) -> None:
+    from datetime import timedelta
+
+    from physiq_research.media.tempfiles import upload_exists
+
+    job = enqueue_file(db_settings, db_repo, squat_video)
+    successor: dict[str, Any] = {}
+
+    def reclaim(stage: Stage) -> None:
+        if stage != Stage.FEATURES:
+            return
+        current = db_repo.get_job(job.id)
+        assert current is not None and current.lease_expires_at is not None
+        later = ResearchRepository(db_repo.engine, clock=lambda: current.lease_expires_at + timedelta(seconds=1))
+        recovered = later.recover_expired(
+            max_attempts=2, upload_exists=lambda token: upload_exists(db_settings.upload_dir, token)
+        )
+        assert recovered == [(job.id, "requeued", None)]
+        successor["repo"] = later
+        successor["claim"] = later.claim_next("successor", db_settings.lease_seconds)
+        assert successor["claim"] is not None
+
+    old = Worker(db_settings, db_repo, DotPoseProvider(), faults=reclaim, owner="original").process_next()
+    assert old is not None and old.status == "lease_lost" and not old.upload_deleted
+    assert upload_exists(db_settings.upload_dir, job.upload_token)
+    newer = Worker(db_settings, successor["repo"], DotPoseProvider(), owner="successor").process_job(successor["claim"])
+    assert newer.status == "succeeded" and newer.upload_deleted
+    assert not upload_exists(db_settings.upload_dir, job.upload_token)
+
+
 def test_success_deletes_the_raw_video(settings: Settings, repo: ResearchRepository, squat_video: Path) -> None:
     job = enqueue_file(settings, repo, squat_video)
     outcome = Worker(settings, repo, DotPoseProvider()).process_next()
@@ -238,6 +270,24 @@ def test_sweeper_removes_only_our_old_unreferenced_files(
     assert (upload_dir / active.upload_token).exists()  # type: ignore[operator]
     assert foreign.exists() and decoy_outside.exists()  # never touch files that are not ours
     assert os.path.lexists(link) and decoy_outside.exists()  # symlinks are not followed or treated as uploads
+
+
+def test_sweeper_does_not_unlink_a_stalled_in_flight_upload(settings: Settings) -> None:
+    from physiq_research.media.tempfiles import create_upload_file, ensure_upload_dir
+
+    folder = ensure_upload_dir(settings.upload_dir)
+    token, fd = create_upload_file(folder)
+    path = folder / token
+    try:
+        os.write(fd, b"partial upload")
+        old = time.time() - ORPHAN_GRACE_S - 1
+        os.utime(path, (old, old))
+        assert sweep_stale(folder, max_age_s=ORPHAN_GRACE_S, keep=set()) == []
+        assert path.exists()
+    finally:
+        os.close(fd)
+    assert sweep_stale(folder, max_age_s=ORPHAN_GRACE_S, keep=set()) == [token]
+    assert not path.exists()
 
 
 def test_recovery_after_worker_crash(settings: Settings, repo: ResearchRepository, squat_video: Path) -> None:
