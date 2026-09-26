@@ -372,3 +372,54 @@ def test_linked_from_stored_requires_media_support(
     with pytest.raises(ForcePlateError) as info:
         linked_from_stored(replace(stored, provenance=broken))
     assert info.value.code == "assessment_media_support_unavailable"
+
+
+def test_trial_provenance_identifies_every_required_item(
+    settings: Settings, repo: ResearchRepository, squat_video: Path
+) -> None:
+    """The minimum provenance of a force trial (Milestone 8 specification)."""
+    subject = uuid.uuid4()
+    stored = process_assessment(settings, repo, squat_video, subject=subject)
+    fx = make_fixture(stored.id, subject=subject, method="two_anchor_affine", positive_direction="down")
+    out = import_trial(repo.engine, fx.manifest_bytes(), fx.csv, LIMITS)
+    trial = ForcePlateRepository(repo.engine).get_trial(out.trial_id)
+    assert trial is not None
+    p = trial.provenance
+    link, src, sync, gt = p["link"], p["source"], p["synchronization"], p["ground_truth"]
+    required = {
+        "M7 assessment id": link["assessment_id"] == str(stored.id),
+        "M7 record digest": link["assessment_record_sha256"] == stored.record_sha256,
+        "research subject id": link["research_subject_id"] == str(subject),
+        "movement type": link["movement_type"] == "bodyweight_squat_sagittal",
+        "capture mode": link["capture_mode"] == "single_camera_sagittal",
+        "force source SHA-256": src["sha256"] == fx.manifest["source"]["sha256"] == trial.force_source_sha256,
+        "force signal contract": p["signal"]["contract"] == "force-plate-signal-v0.1",
+        "synchronization contract": sync["version"] == "force-video-sync-v0.1",
+        "validation protocol": p["validation_protocol"]["version"] == "grf-validation-v0.1",
+        "input units": (src["declared_time_unit"], src["declared_force_unit"], src["unit_conversion"])
+        == ("s", "N", "none"),
+        "canonical units": src["canonical"]
+        == {"time_axis": "seconds_since_force_acquisition_start", "unit": "N", "positive_direction": "up"},
+        "sign mapping": (src["declared_vertical_force_positive_direction"], src["sign_multiplier"]) == ("down", -1),
+        "body mass": gt["body_mass_kg"] == 70.0 and gt["standard_gravity_m_s2"] == 9.80665,
+        "synchronization method": sync["method"] == "two_anchor_affine",
+        "synchronization parameters": sync["parameters"]["min_anchor_separation_ms"] == 1000.0
+        and len(sync["anchors"]) == 2
+        and set(sync["mapping"]) == {"offset_ms", "rate"},
+        "force time support": sync["force_support_s"] == [0.0, 10.0],
+        "overlapping media-time support": sync["overlap_media_ms"] == [0.0, 7000.0],
+        "parser implementation": src["csv_parser"] == "force-plate-csv-parser-v0.1",
+        "pipeline version": p["pipeline"]["version"] == "force-plate-pipeline-v0.1"
+        and p["pipeline"]["service_version"],
+        "raw bytes not persisted": src["raw_bytes_persisted"] is False,
+        "limits": p["limits"]["max_samples"] == LIMITS.max_samples,
+        "declared manifest": p["manifest"]["content"]["body_mass_kg"] == 70.0,
+    }
+    missing = [name for name, ok in required.items() if not ok]
+    assert not missing, missing
+    assert (
+        trial.versions["ground_truth"] == "force-ground-truth-v0.1"
+        and trial.pipeline_version == "force-plate-pipeline-v0.1"
+    )
+    text = json.dumps(p)
+    assert "force.csv" not in text and "manifest.json" not in text  # no file names anywhere
