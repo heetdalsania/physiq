@@ -1,10 +1,15 @@
-# PhysiQ research backend (Milestone 7) — setup and commands
+# PhysiQ research backend (Milestones 7–8) — setup and commands
 
 Local research prototype that turns an approved research video of one
-bodyweight squat into versioned derived Stage-3 movement data. Design,
-contracts, privacy and non-claims: [../RESEARCH_BACKEND.md](../RESEARCH_BACKEND.md).
-Verification: [../MILESTONE_7_VERIFICATION.md](../MILESTONE_7_VERIFICATION.md).
+bodyweight squat into versioned derived Stage-3 movement data (Milestone 7),
+and pairs such an assessment with measured force-plate data (Milestone 8).
+Design, contracts, privacy and non-claims:
+[../RESEARCH_BACKEND.md](../RESEARCH_BACKEND.md) and
+[../FORCE_PLATE_VALIDATION.md](../FORCE_PLATE_VALIDATION.md).
+Verification: [../MILESTONE_7_VERIFICATION.md](../MILESTONE_7_VERIFICATION.md),
+[../MILESTONE_8_VERIFICATION.md](../MILESTONE_8_VERIFICATION.md).
 Independent review: [../MILESTONE_7_ADVERSARIAL_REVIEW.md](../MILESTONE_7_ADVERSARIAL_REVIEW.md).
+Milestone 8 review: [../MILESTONE_8_ADVERSARIAL_REVIEW.md](../MILESTONE_8_ADVERSARIAL_REVIEW.md).
 
 > Local / internal use only. Never expose it publicly: there is no
 > authentication, authorization or participant-consent control. Only approved
@@ -68,6 +73,32 @@ curl -s http://127.0.0.1:8765/research/v1/assessments/<assessment_id>
 curl -s -X DELETE -H 'X-Research-Client: cli' http://127.0.0.1:8765/research/v1/assessments/<assessment_id>
 ```
 
+## Force-plate validation (Milestone 8, command line only)
+
+Scientific status: **engineering infrastructure only; scientific force-plate
+validation is pending approved paired human data.** There is no estimator.
+
+```bash
+source .venv/bin/activate
+export RESEARCH_DATABASE_URL=postgresql+psycopg://research:research-local-only@127.0.0.1:55432/research
+alembic upgrade head    # 0002_force_plate_validation
+python -m physiq_research.force_plate import --manifest manifest.json --force-csv force.csv
+python -m physiq_research.force_plate inspect <trial_id> [--include-artifacts]
+python -m physiq_research.force_plate list [--assessment <assessment_id>]
+python -m physiq_research.force_plate evaluate <trial_id> --estimate estimate.json
+python -m physiq_research.force_plate export <trial_id> [--include-estimates]
+python -m physiq_research.force_plate study --definition study.json
+python -m physiq_research.force_plate delete <trial_id>
+```
+
+JSON on stdout; errors as `force-plate-error-v1` on stderr (exit 3 rejected,
+4 not found, 5 integrity, 6 environment). The CSV is read once into memory
+and never copied, moved or deleted. Contracts, rules and limits:
+[../FORCE_PLATE_VALIDATION.md](../FORCE_PLATE_VALIDATION.md).
+`RESEARCH_FORCE_MAX_SOURCE_BYTES`, `RESEARCH_FORCE_MAX_SAMPLES`,
+`RESEARCH_FORCE_MAX_DURATION_S` and `RESEARCH_FORCE_MAX_ESTIMATE_SAMPLES`
+override the input bounds.
+
 ## Docker Compose stack
 
 ```bash
@@ -113,3 +144,4 @@ SHA-256 checked at build).
 | `tools/netmon/` | macOS libc network-call monitor, deny-network sandbox profile, runtime comparison loop |
 | `tools/real_pose_smoke.py` | sustained real-runtime smoke run (JSON report) |
 | `tools/measure_performance.py` | timing and derived-data size sanity measurement |
+| `tools/measure_force_plate_performance.py` | Milestone 8 import/evaluate timing and stored-size measurement (synthetic fixtures) |

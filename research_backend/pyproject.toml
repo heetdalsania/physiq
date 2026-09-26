@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "physiq-research"
 version = "0.1.0"
-description = "PhysiQ / TissueOS Milestone 7 local research backend (Stage-3 video-estimated movement mechanics)"
+description = "PhysiQ / TissueOS local research backend: Milestone 7 (Stage-3 video-estimated movement mechanics) and Milestone 8 (force-plate validation infrastructure)"
 requires-python = ">=3.12,<3.13"
 license = { text = "Proprietary (PhysiQ); third-party components under their own licences, see RESEARCH_BACKEND.md" }
 # Direct runtime dependencies, pinned exactly. Full transitive pins:

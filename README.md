@@ -107,7 +107,7 @@ physiq/
 │   └── App.js                 # Root component — state management + routing
 └── README.md
 
-research_backend/              # Milestone 7 LOCAL research service (Python) — not used by the app
+research_backend/              # Milestones 7–8 LOCAL research tooling (Python) — not used by the app
 ```
 
 `research_backend/` is a separate, local/internal research prototype that turns
@@ -116,6 +116,11 @@ talks to it and needs neither Python nor Docker. See
 [RESEARCH_BACKEND.md](RESEARCH_BACKEND.md) and
 [MILESTONE_7_VERIFICATION.md](MILESTONE_7_VERIFICATION.md). The independent
 hardening review is [MILESTONE_7_ADVERSARIAL_REVIEW.md](MILESTONE_7_ADVERSARIAL_REVIEW.md).
+Milestone 8 adds local force-plate validation infrastructure (measured
+ground truth and an evaluator; no force estimator, and scientific validation
+is pending approved paired human data): [FORCE_PLATE_VALIDATION.md](FORCE_PLATE_VALIDATION.md),
+[MILESTONE_8_VERIFICATION.md](MILESTONE_8_VERIFICATION.md).
+The independent review is [MILESTONE_8_ADVERSARIAL_REVIEW.md](MILESTONE_8_ADVERSARIAL_REVIEW.md).
 
 ## License
 

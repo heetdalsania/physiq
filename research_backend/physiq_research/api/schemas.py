@@ -114,7 +114,12 @@ class ResearchDeletionResponseV1(ApiModel):
     state: Literal["deleted", "already_deleted"]
     assessment_id: uuid.UUID | None
     jobs_tombstoned: int = Field(ge=0)
-    artifacts_removed: int = Field(ge=0)
+    artifacts_removed: int = Field(
+        ge=0,
+        description=(
+            "M7 assessment artifacts removed; excludes M8 trial artifacts and validation results removed by cascade."
+        ),
+    )
 
 
 class HealthV1(ApiModel):

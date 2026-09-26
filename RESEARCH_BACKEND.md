@@ -47,7 +47,10 @@ Setup and commands: [research_backend/README.md](research_backend/README.md).
 - The pose model is used for inference only. There is no training,
   fine-tuning, classifier or force estimator, and no data becomes training data.
 
-Milestone 8 (force-plate validation) is **not** started; its boundary is §19.
+Milestone 8 adds a separate, local force-plate validation layer on top of
+this backend (measured-force ground truth and an evaluator for future
+estimates; no estimator): [FORCE_PLATE_VALIDATION.md](FORCE_PLATE_VALIDATION.md).
+Nothing in this document's M7 pipeline changes; §17–§19 note the additions.
 
 ## 2. Architecture
 
@@ -149,7 +152,7 @@ text, paths or tracebacks). Mutating requests need `X-Research-Client: <any>`.
 | `GET /research/v1/assessments/{id}[?include_artifacts=false]` | `research-assessment-result-v1`: versions, provenance, summary, integrity digests, the four artifacts (or their descriptors), and `scientific_scope.non_claims` |
 | `DELETE /research/v1/assessments/{id}` | `research-deletion-v1` (`deleted` → `already_deleted` on repeat; `404` if it never existed) |
 | `GET /health/live` | liveness, no dependencies (does not load the model) |
-| `GET /health/ready` | database reachable, schema at the expected Alembic revision, upload directory usable; `503` otherwise |
+| `GET /health/ready` | database reachable, schema at or after M7's minimum Alembic revision `0001_research_initial`, upload directory usable; `503` otherwise |
 
 There is **no route that returns video, frames or images**.
 
@@ -479,7 +482,7 @@ which pipeline version and processing fingerprint, the media limits, and when
 | Artifact schemas | `research-pose-series-v1`, `research-normalized-skeleton-v1`, `research-kinematic-traces-v1`, `research-time-normalized-traces-v1`, `research-assessment-summary-v1`, `research-failure-diagnostics-v1` |
 | Pose runtime / model | `mediapipe` 0.10.31 / `pose_landmarker_full` `float16/1` `5134a3aa…11b1` |
 | Source semantics (recorded, not ours) | `squat-kinematics-v0.2`, `movement-assessment-v0.1`, `pose-frame-v1` |
-| Database migration | Alembic `0001_research_initial` — independent of every scientific version |
+| Database migration | Alembic `0001_research_initial`; `0002_force_plate_validation` (Milestone 8, additive) — independent of every scientific version |
 
 None is shared with TissueOS (`tissue-load-v0.1` …) or the app's storage
 contracts.
@@ -510,14 +513,24 @@ malformed row is refused (`stored_data_integrity_error`), never served.
 
 Postgres 17 is the target (JSONB); SQLite is used for isolated tests. The
 schema is created **only** by Alembic migrations (`migrations/versions/
-0001_research_initial.py`), never at service start. The worker refuses to start
-and readiness fails unless the database is at the expected revision.
+0001_research_initial.py`, and `0002_force_plate_validation.py` for the
+Milestone 8 tables), never at service start. The M7 worker and readiness
+require `0001_research_initial` or a descendant. The M8 force-plate CLI
+requires `0002_force_plate_validation` or a descendant; run `alembic upgrade
+head` to use that layer. Downgrading from `0002` to `0001` leaves the M7 API
+and worker usable and removes M8 records as the migration specifies.
+
+On M7 assessment deletion, `artifacts_removed` counts only the four M7
+assessment artifacts. Any linked M8 trials, their artifacts and validation
+results are also removed by database cascade; the M7 response does not count
+those rows.
 
 | Table | Purpose |
 |---|---|
 | `research_jobs` | one row per submission: status, movement, capture mode, optional subject UUID, source digest and size, opaque upload token, idempotency key, fingerprint, lease fields, attempts, timestamps, stable failure fields and diagnostics, assessment id |
 | `research_assessments` | one immutable row per success: identities, versions, provenance, summary, their digests, record digest, processing times |
 | `research_assessment_artifacts` | the four immutable artifacts (`ON DELETE CASCADE` from the assessment) |
+| `force_plate_trials`, `force_plate_trial_artifacts`, `grf_validation_results`, `force_plate_trial_tombstones` | Milestone 8 (FORCE_PLATE_VALIDATION.md §20–§21); trials reference an assessment `ON DELETE CASCADE` |
 
 ## 18. Deletion
 
@@ -534,11 +547,23 @@ data-management plan.
 Retention: derived data is kept until research deletion; the service has no
 automatic expiry of successful assessments.
 
+Milestone 8: deleting an assessment also removes every force-plate trial
+derived from it, with its artifacts and validation results (foreign key
+`ON DELETE CASCADE`; a trigger records trial tombstones). The API response
+above is unchanged and counts M7 artifacts only. Deleting an M8 trial never
+touches the assessment (FORCE_PLATE_VALIDATION.md §20).
+
 ## 19. Milestone 8 boundary
 
-Milestone 8 is expected to begin force-plate validation. Milestone 7 contains
-none of it: no force plates, no GRF, no kinetics, no OpenSim, no PyTorch or
-other force/tissue model, no training, and no validation numbers.
+Milestone 7 itself contains no force plates, GRF, kinetics, OpenSim, PyTorch
+or other force/tissue model, training or validation numbers, and still
+estimates no GRF. Milestone 8 is a separate package
+(`physiq_research/force_plate/`, command line only) that stores MEASURED
+force-plate ground truth linked to an immutable M7 assessment and evaluates
+separately supplied estimates; it contains no estimator and no validation
+result — see [FORCE_PLATE_VALIDATION.md](FORCE_PLATE_VALIDATION.md). The M7
+boundary test (`tests/test_boundaries.py`) still covers every M7 module; the
+M8 package has its own (`tests/test_force_plate_boundaries.py`).
 `tools/` contains no fabricated evaluation metrics; future joint-angle
 MAE/RMSE, repeatability or camera-angle sensitivity analyses require ground
 truth that does not exist here.

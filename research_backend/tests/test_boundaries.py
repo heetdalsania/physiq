@@ -2,7 +2,11 @@
 
 * No output key, enum or code identifier for force, GRF, moments, kinetics,
   tissue load/stress, injury/risk, readiness, capacity, diagnosis or any
-  score/grade (Stage 3 only; Milestone 8 is not started).
+  score/grade in the Milestone 7 (Stage 3) service. The Milestone 8
+  measured-force layer (physiq_research/force_plate/) is the only place
+  where measured force and GRF may be named; it has its own boundary test
+  (tests/test_force_plate_boundaries.py) that still forbids joint kinetics,
+  tissue, injury/risk, readiness, capacity, diagnosis, scores and verdicts.
 * No training code, no remote inference, no object-storage or HTTP clients
   in the service code.
 * The consumer app (js/, index.html, build.mjs, dist/) has no reference to
@@ -25,6 +29,13 @@ from physiq_research.api import schemas as api_schemas
 BACKEND = Path(__file__).resolve().parents[1]
 REPO = BACKEND.parent
 PACKAGE = BACKEND / "physiq_research"
+FORCE_PLATE = PACKAGE / "force_plate"  # Milestone 8; see tests/test_force_plate_boundaries.py
+
+
+def m7_modules() -> list[Path]:
+    """Every service module except the Milestone 8 force-plate layer."""
+    return [p for p in PACKAGE.rglob("*.py") if FORCE_PLATE not in p.parents]
+
 
 FORBIDDEN_TOKENS = {
     "grf",
@@ -133,7 +144,9 @@ def test_stored_record_keys_have_no_forbidden_concepts(settings: Any, repo: Any,
 
 def test_no_forbidden_identifiers_in_service_code() -> None:
     offenders = []
-    for path in PACKAGE.rglob("*.py"):
+    modules = m7_modules()
+    assert len(modules) > 40 and not [p for p in modules if "force_plate" in p.parts]
+    for path in modules:
         tree = ast.parse(path.read_text())
         for node in ast.walk(tree):
             name = None

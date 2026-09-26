@@ -70,7 +70,8 @@ CAPTURE_MODE_SINGLE_CAMERA_SAGITTAL: Final = "single_camera_sagittal"
 SUPPORTED_MOVEMENTS: Final = (MOVEMENT_BODYWEIGHT_SQUAT_SAGITTAL,)
 SUPPORTED_CAPTURE_MODES: Final = (CAPTURE_MODE_SINGLE_CAMERA_SAGITTAL,)
 
-# Alembic head this code expects (readiness checks it).
+# Minimum Alembic revision required by the M7 API and worker. M8 has its own
+# minimum revision; adding optional research tables must not stop M7 service.
 DATABASE_SCHEMA_REVISION: Final = "0001_research_initial"
 
 
