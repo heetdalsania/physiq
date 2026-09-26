@@ -1,5 +1,5 @@
 """Canonical measured force signal (``force-plate-signal-v0.1``) and its
-strict CSV parser (``force-plate-csv-parser-v0.1``).
+strict CSV parser (``force-plate-csv-parser-v0.2``).
 
 Accepted file (``force-plate-csv-v0.1``)
     * UTF-8, no byte-order mark; LF or CRLF line endings; comma-separated;
@@ -200,6 +200,8 @@ def parse_force_csv(
         raise ForcePlateError("too_few_samples", field="force_csv")
     if times[-1] - times[0] > limits.max_duration_s:
         raise ForcePlateError("duration_exceeded", field=TIME_COLUMN)
+    if not math.isfinite((len(times) - 1) / (times[-1] - times[0])):
+        raise ForcePlateError("non_finite_derived_value", field=TIME_COLUMN)
     return MeasuredForceSignal(
         time_s=_readonly(times), vertical_grf_n=_readonly(forces), source_positive_direction=positive_direction
     )

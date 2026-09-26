@@ -28,7 +28,7 @@ def main() -> int:
     ready = check_ready(engine)
     if not ready["schema_current"]:
         log.error(
-            "database schema is %s, expected %s; run `alembic upgrade head`",
+            "database schema is %s, requires %s or a known descendant; run `alembic upgrade head`",
             ready["schema_revision"],
             DATABASE_SCHEMA_REVISION,
         )

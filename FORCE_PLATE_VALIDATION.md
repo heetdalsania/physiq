@@ -132,7 +132,7 @@ Rules (every violation is a stable error code, never a repair):
 |---|---|
 | any key not listed | `unknown_field` (the unknown key is never echoed) |
 | `contract` | exactly `force-plate-manifest-v0.1` |
-| `data_origin` | `research_recording` or `synthetic_test_fixture` — a provenance label that travels into every report (§16). It is **not** an approval, ethics or consent record. |
+| `data_origin` | `research_recording` or `synthetic_test_fixture` — an operator-declared provenance label that travels into every report (§16). It is **not** verified sensor origin, approval, ethics or consent evidence. |
 | `assessment_id` | canonical UUID of an existing, non-deleted M7 assessment |
 | `research_subject_id` | **required key**; must equal the assessment's value (both `null`, or the same version-4 UUID). The trial inherits it from M7; the manifest can only confirm it. |
 | `movement_type`, `capture_mode`, `plate_configuration` | the only supported values |
@@ -228,6 +228,11 @@ place the two anchors **several seconds apart** (e.g. one event before the
 squat and one after). Anchor residuals (mapped − declared video time) are
 stored; with one or two anchors they are zero up to rounding by construction,
 so they check arithmetic, not synchronization quality.
+Event labels are provenance only and do not change the clock calculation.
+The two anchors may name different event types; for each pair, an operator
+must establish that its video and force times refer to the same physical
+event. The software cannot detect a transcribed time, mismatched event,
+sensor-authenticity error or uncertainty in the event observation.
 
 **Nothing is derived from the signals.** There is no cross-correlation, peak
 matching or other signal-based alignment, and no lag search anywhere — not in
@@ -335,12 +340,16 @@ An estimate is bound to the exact M7 record it was computed from
 (`estimate_assessment_mismatch` otherwise). Timestamps must be finite,
 non-negative and strictly increasing; values finite; lengths equal.
 
-**Held-out participants.** If `development_research_subject_ids` is not
-empty, a trial of one of those participants is refused
-(`subject_not_held_out`), and a trial without a `research_subject_id` is
-refused because held-out status cannot be verified
-(`held_out_status_unverifiable`). Partitioning is by participant only — never
-by frame or trial (`SubjectPartition`).
+**Held-out participants.** A trial without a `research_subject_id` is refused
+(`held_out_status_unverifiable`). A trial whose subject appears in the
+estimate's `development_research_subject_ids` is refused
+(`subject_not_held_out`). An empty list is accepted for a trial with a subject,
+but the result records `no_development_participants_declared`. This list is
+supplied by the estimator author; the software has no independent training
+membership record and cannot prove the participant was genuinely unseen.
+External study governance must verify that claim. `SubjectPartition` enforces
+disjoint sets only for the sets supplied to it; partitioning is by participant,
+never by frame or trial.
 
 ### 11.2 Per-trial metrics
 
@@ -362,7 +371,7 @@ prediction's `[first, last]` timestamp, J = I ∩ S.
 There is no combined score, ranking, threshold, good/bad or pass/fail label.
 Each result stores the estimate itself, so it can be re-examined.
 
-### 11.3 Study-level aggregation (`grf-study-aggregation-v0.1`)
+### 11.3 Study-level aggregation (`grf-study-aggregation-v0.2`)
 
 A study definition (`grf-study-definition-v0.1`) names one estimator version,
 the protocol and the trials, each optionally with a declared exclusion from
@@ -514,7 +523,8 @@ A future estimator implements `VerticalGrfEstimator` (`estimate.py`): its
 input (`EstimatorInputs`) is the M7 record and the declared body mass —
 **never measured force**. It must be separately versioned
 (`name`, `version`, `parameters_sha256`) and declare every participant used to
-build, train or tune it. Only after evaluation on real held-out trials may a
+build, train or tune it. That declaration needs independent verification under
+the study protocol. Only after evaluation on real held-out trials may a
 result be reported, and then only in the form:
 
 > Estimator X, version Y, evaluated on N participants / M held-out trials
@@ -561,12 +571,13 @@ every M7 processing fingerprint — pinned by a test):
 |---|---|
 | pipeline | `force-plate-pipeline-v0.1` |
 | input contracts | `force-plate-manifest-v0.1`, `force-plate-csv-v0.1`, `vertical-grf-estimate-v0.1`, `grf-study-definition-v0.1` |
-| parser | `force-plate-csv-parser-v0.1` |
+| parser | `force-plate-csv-parser-v0.2` (finite sampling-rate guard) |
+| numerical implementation | `force-numerics-v0.2` (finite trapezoid, RMSE and Pearson arithmetic) |
 | signal / trial | `force-plate-signal-v0.1` / `force-plate-trial-v0.1` |
 | synchronization | `force-video-sync-v0.1` |
 | ground truth | `force-ground-truth-v0.1` |
 | validation protocol | `grf-validation-v0.1` |
-| aggregation | `grf-study-aggregation-v0.1` |
+| aggregation | `grf-study-aggregation-v0.2` |
 | stored schemas | `force-plate-signal-artifact-v1`, `force-video-sync-artifact-v1`, `force-ground-truth-artifact-v1`, `force-plate-trial-summary-v1`, `grf-validation-metrics-v1` |
 | command-line output | `force-plate-trial-report-v1`, `force-plate-trial-list-v1`, `grf-validation-report-v1`, `grf-validation-export-v1`, `grf-study-report-v1`, `force-plate-deletion-v1`, `force-plate-error-v1` |
 | database | Alembic `0002_force_plate_validation` (additive; revises `0001_research_initial`) |

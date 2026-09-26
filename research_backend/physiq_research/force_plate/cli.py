@@ -53,6 +53,7 @@ from physiq_research.force_plate.reports import (
 )
 from physiq_research.force_plate.repository import ForcePlateRepository
 from physiq_research.force_plate.study import ResultFacts, TrialFacts, aggregate, parse_study_definition
+from physiq_research.force_plate.versions import DATABASE_SCHEMA_REVISION as M8_DATABASE_SCHEMA_REVISION
 from physiq_research.storage.db import check_ready, make_engine
 from physiq_research.storage.repository import StoredDataError
 
@@ -198,7 +199,7 @@ def _engine() -> Engine:
         raise ForcePlateError("database_not_configured")
     engine = make_engine(url)
     try:
-        ready = check_ready(engine)
+        ready = check_ready(engine, required_revision=M8_DATABASE_SCHEMA_REVISION)
     except OperationalError:
         engine.dispose()
         raise ForcePlateError("database_unavailable") from None

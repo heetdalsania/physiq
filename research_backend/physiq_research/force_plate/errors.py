@@ -96,6 +96,7 @@ ERROR_MESSAGES: Final[dict[str, str]] = {
         "Measured vertical force is zero or negative within the repetition; check the declared positive direction "
         "and the plate zero. Nothing is flipped or corrected automatically."
     ),
+    "non_finite_derived_value": "A derived force or metric exceeds the supported finite numeric range.",
     # trials and storage
     "invalid_identifier": "The identifier must be a UUID in canonical form.",
     "trial_not_found": "No force-plate trial with this identifier exists.",
@@ -113,8 +114,7 @@ ERROR_MESSAGES: Final[dict[str, str]] = {
     "estimate_assessment_mismatch": "The estimate was not produced from this trial's Milestone 7 assessment record.",
     "subject_not_held_out": "The trial's participant was used to develop the estimator; it is not held out.",
     "held_out_status_unverifiable": (
-        "The estimator declares development participants but the trial has no research_subject_id, so held-out "
-        "status cannot be verified."
+        "The trial has no research_subject_id, so participant-level held-out status cannot be verified."
     ),
     "no_prediction_in_repetition": "No prediction sample lies inside the repetition interval.",
     "insufficient_prediction_samples": "Too few prediction samples lie inside the repetition interval.",

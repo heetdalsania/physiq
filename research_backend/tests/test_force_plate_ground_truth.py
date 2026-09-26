@@ -91,6 +91,21 @@ def test_bodyweight_uses_standard_gravity_exactly() -> None:
     assert gt.standing_reference["mean_vertical_grf_bw"] == pytest.approx(686.4655 / (70 * 9.80665), abs=1e-12)
 
 
+def test_large_finite_force_does_not_overflow_intermediate_impulse_math() -> None:
+    signal = measured(np.array([0.0, 0.01, 0.02]), np.full(3, 1e308))
+    assessment = linked(
+        media_end_ms=20.0,
+        descent_start_ms=0.0,
+        deepest_ms=10.0,
+        ascent_end_ms=20.0,
+        calibration_start_ms=0.0,
+        calibration_end_ms=20.0,
+    )
+    result = truth_for(signal, ClockMapping("one_anchor_offset", 0.0, 1.0), assessment)
+    assert result.repetition["measured_impulse_n_s"] == pytest.approx(2e306)
+    assert result.standing_reference["mean_vertical_grf_n"] == pytest.approx(1e308)
+
+
 def test_samples_are_the_native_signal_in_the_closed_overlap() -> None:
     t = np.arange(0, 10_001) / 1000.0
     f = 700.0 + np.arange(t.size) * 0.01
@@ -408,7 +423,7 @@ def test_trial_provenance_identifies_every_required_item(
         and set(sync["mapping"]) == {"offset_ms", "rate"},
         "force time support": sync["force_support_s"] == [0.0, 10.0],
         "overlapping media-time support": sync["overlap_media_ms"] == [0.0, 7000.0],
-        "parser implementation": src["csv_parser"] == "force-plate-csv-parser-v0.1",
+        "parser implementation": src["csv_parser"] == "force-plate-csv-parser-v0.2",
         "pipeline version": p["pipeline"]["version"] == "force-plate-pipeline-v0.1"
         and p["pipeline"]["service_version"],
         "raw bytes not persisted": src["raw_bytes_persisted"] is False,

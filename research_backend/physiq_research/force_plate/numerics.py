@@ -62,8 +62,15 @@ def restrict(t: np.ndarray, v: np.ndarray, a: float, b: float) -> tuple[np.ndarr
 
 def integral_ms_to_s(t_ms: np.ndarray, v: np.ndarray) -> float:
     """∫ v dt with t in milliseconds; result in value·seconds (trapezoidal)."""
-    dt = np.diff(t_ms)
-    return float(np.sum(0.5 * (v[:-1] + v[1:]) * dt) / 1000.0)
+    dt_s = np.diff(t_ms) / 1000.0
+    # Halve before adding and convert the time interval before multiplying:
+    # both the midpoint force and the true integral may be finite even when
+    # (v0 + v1) or a millisecond-scaled intermediate would overflow.
+    with np.errstate(over="ignore", invalid="ignore"):
+        result = float(np.sum((0.5 * v[:-1] + 0.5 * v[1:]) * dt_s))
+    if not np.isfinite(result):
+        raise ForcePlateError("non_finite_derived_value")
+    return result
 
 
 def peak(t: np.ndarray, v: np.ndarray) -> tuple[float, float]:
@@ -81,14 +88,50 @@ def pearson(x: np.ndarray, y: np.ndarray) -> float | None:
     # its elements by one ulp, which would leave a meaningless ~1e-16 variance.
     if x.size < 2 or np.all(x == x[0]) or np.all(y == y[0]):
         return None
-    dx = x - np.mean(x)
-    dy = y - np.mean(y)
+
+    def centered_scaled(values: np.ndarray) -> np.ndarray:
+        # Subtract a reference before scaling so tiny variation on a large
+        # offset survives. Fall back to scaling first if subtraction itself
+        # overflows (e.g. opposite-sign values near the float limit).
+        with np.errstate(over="ignore", invalid="ignore"):
+            shifted = values - values[0]
+        if not np.all(np.isfinite(shifted)):
+            magnitude = float(np.max(np.abs(values)))
+            shifted = values / magnitude - values[0] / magnitude
+        scale = float(np.max(np.abs(shifted)))
+        if scale == 0.0:
+            zeros: np.ndarray = np.zeros(values.shape, dtype=np.float64)
+            return zeros
+        scaled = shifted / scale
+        centered: np.ndarray = scaled - np.mean(scaled)
+        return centered
+
+    dx = centered_scaled(x)
+    dy = centered_scaled(y)
     sxx = float(np.sum(dx * dx))
     syy = float(np.sum(dy * dy))
-    if sxx == 0.0 or syy == 0.0:  # pragma: no cover - excluded by the exact test above
+    if sxx == 0.0 or syy == 0.0:
         return None
     r = float(np.sum(dx * dy)) / float(np.sqrt(sxx * syy))
+    if not np.isfinite(r):
+        raise ForcePlateError("non_finite_derived_value")
     return max(-1.0, min(1.0, r))  # rounding guard only
+
+
+def stable_mean(values: np.ndarray) -> float:
+    """Mean without overflow in an intermediate sum."""
+    scale = float(np.max(np.abs(values)))
+    if scale == 0.0:
+        return 0.0
+    return float(np.mean(values / scale) * scale)
+
+
+def stable_rmse(values: np.ndarray) -> float:
+    """Root mean square without squaring full-magnitude values."""
+    scale = float(np.max(np.abs(values)))
+    if scale == 0.0:
+        return 0.0
+    return float(np.sqrt(np.mean((values / scale) ** 2)) * scale)
 
 
 def max_interval(t: np.ndarray) -> float:

@@ -1,5 +1,5 @@
 """Study-level aggregation of already-computed per-trial results
-(``grf-study-aggregation-v0.1``).
+(``grf-study-aggregation-v0.2``).
 
 Input: a study definition (``grf-study-definition-v0.1``) naming ONE
 estimator version, the validation protocol, and the trials (optionally with
@@ -28,6 +28,7 @@ Synthetic-fixture studies are labelled SOFTWARE TEST OUTPUT — NOT EVIDENCE.
 
 from __future__ import annotations
 
+import math
 import statistics
 import uuid
 from collections import defaultdict
@@ -171,14 +172,41 @@ def _metric(metrics: dict[str, Any], path: str) -> float | None:
 
 
 def _describe(values: list[float]) -> dict[str, Any]:
+    ordered = sorted(values)
+    middle = len(ordered) // 2
+    if len(ordered) % 2:
+        median = ordered[middle]
+    else:
+        a, b = ordered[middle - 1], ordered[middle]
+        median = a + (b - a) / 2.0
+        if not math.isfinite(median):
+            median = a / 2.0 + b / 2.0
+    try:
+        sd = statistics.stdev(values) if len(values) > 1 else None
+    except OverflowError:
+        raise ForcePlateError("non_finite_derived_value") from None
+    if not math.isfinite(median) or (sd is not None and not math.isfinite(sd)):
+        raise ForcePlateError("non_finite_derived_value")
     return {
         "n": len(values),
-        "mean": statistics.fmean(values),
-        "sd": statistics.stdev(values) if len(values) > 1 else None,
-        "median": statistics.median(values),
+        "mean": _finite_mean(values),
+        "sd": sd,
+        "median": median,
         "min": min(values),
         "max": max(values),
     }
+
+
+def _finite_mean(values: list[float]) -> float:
+    if not all(math.isfinite(value) for value in values):
+        raise ForcePlateError("non_finite_derived_value")
+    scale = max(abs(value) for value in values)
+    if scale == 0.0:
+        return 0.0
+    mean = statistics.fmean(value / scale for value in values) * scale
+    if not math.isfinite(mean):
+        raise ForcePlateError("non_finite_derived_value")
+    return mean
 
 
 def aggregate(
@@ -249,9 +277,9 @@ def aggregate(
             values = [v for v in (_metric(r.metrics, path) for _, r in rows) if v is not None]
             undefined[path] += len(rows) - len(values)
             trial_values[path].extend(values)
-            means[path] = statistics.fmean(values) if values else None
+            means[path] = _finite_mean(values) if values else None
             if values:
-                participant_values[path].append(statistics.fmean(values))
+                participant_values[path].append(_finite_mean(values))
         participants.append(
             {
                 "research_subject_id": str(subject),
@@ -268,7 +296,7 @@ def aggregate(
             "trial_level_descriptive": (
                 {
                     "n_trials": len(trial_values[path]),
-                    "mean": statistics.fmean(trial_values[path]),
+                    "mean": _finite_mean(trial_values[path]),
                     "note": "trials of one participant are not independent observations",
                 }
                 if trial_values[path]

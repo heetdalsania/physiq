@@ -35,6 +35,7 @@ from physiq_research.force_plate.repository import ForcePlateRepository, StoredT
 from physiq_research.force_plate.versions import (
     ESTIMATE_CONTRACT,
     FORCE_PLATE_PIPELINE_VERSION,
+    NUMERICS_VERSION,
     VALIDATION_METRICS_SCHEMA,
     VALIDATION_PROTOCOL,
 )
@@ -50,6 +51,7 @@ def evaluation_fingerprint() -> str:
             "parameters": EVALUATION_PARAMETERS,
             "estimate_contract": ESTIMATE_CONTRACT,
             "metrics_schema": VALIDATION_METRICS_SCHEMA,
+            "numerics": NUMERICS_VERSION,
         }
     )
 

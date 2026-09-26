@@ -154,7 +154,7 @@ def _standing(t: np.ndarray, n: np.ndarray, bw: float, linked: LinkedAssessment)
     if not (ce > cs and t[0] <= cs and ce <= t[-1]):
         return {**base, "state": "not_covered", "mean_vertical_grf_n": None, "mean_vertical_grf_bw": None}
     wt, wv = restrict(t, n, cs, ce)
-    mean_n = integral_ms_to_s(wt, wv) * 1000.0 / (ce - cs)
+    mean_n = integral_ms_to_s(wt, wv) / ((ce - cs) / 1000.0)
     return {**base, "state": "covered", "mean_vertical_grf_n": mean_n, "mean_vertical_grf_bw": mean_n / bw}
 
 

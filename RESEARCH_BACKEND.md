@@ -152,7 +152,7 @@ text, paths or tracebacks). Mutating requests need `X-Research-Client: <any>`.
 | `GET /research/v1/assessments/{id}[?include_artifacts=false]` | `research-assessment-result-v1`: versions, provenance, summary, integrity digests, the four artifacts (or their descriptors), and `scientific_scope.non_claims` |
 | `DELETE /research/v1/assessments/{id}` | `research-deletion-v1` (`deleted` → `already_deleted` on repeat; `404` if it never existed) |
 | `GET /health/live` | liveness, no dependencies (does not load the model) |
-| `GET /health/ready` | database reachable, schema at the expected Alembic revision, upload directory usable; `503` otherwise |
+| `GET /health/ready` | database reachable, schema at or after M7's minimum Alembic revision `0001_research_initial`, upload directory usable; `503` otherwise |
 
 There is **no route that returns video, frames or images**.
 
@@ -514,9 +514,16 @@ malformed row is refused (`stored_data_integrity_error`), never served.
 Postgres 17 is the target (JSONB); SQLite is used for isolated tests. The
 schema is created **only** by Alembic migrations (`migrations/versions/
 0001_research_initial.py`, and `0002_force_plate_validation.py` for the
-Milestone 8 tables), never at service start. The worker refuses to start
-and readiness fails unless the database is at the expected revision (now
-`0002_force_plate_validation`; run `alembic upgrade head`).
+Milestone 8 tables), never at service start. The M7 worker and readiness
+require `0001_research_initial` or a descendant. The M8 force-plate CLI
+requires `0002_force_plate_validation` or a descendant; run `alembic upgrade
+head` to use that layer. Downgrading from `0002` to `0001` leaves the M7 API
+and worker usable and removes M8 records as the migration specifies.
+
+On M7 assessment deletion, `artifacts_removed` counts only the four M7
+assessment artifacts. Any linked M8 trials, their artifacts and validation
+results are also removed by database cascade; the M7 response does not count
+those rows.
 
 | Table | Purpose |
 |---|---|

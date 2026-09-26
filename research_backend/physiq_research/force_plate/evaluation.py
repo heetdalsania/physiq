@@ -54,6 +54,8 @@ from physiq_research.force_plate.numerics import (
     peak,
     pearson,
     restrict,
+    stable_mean,
+    stable_rmse,
 )
 
 MAX_PREDICTION_GAP_MS: Final = 300.0  # = M6/M7 segmentation maxGapMs, fixed here as a protocol value
@@ -123,17 +125,19 @@ def evaluate(truth: TruthSeries, t_pred: np.ndarray, f_pred: np.ndarray) -> dict
     fp = f_pred[in_rep]
     fm = interpolate_linear(truth.t_media_ms, truth.vertical_grf_n, tp)
     e = fp - fm
+    if not np.all(np.isfinite(e)):
+        raise ForcePlateError("non_finite_derived_value")
     pointwise = {
         "comparison_samples": int(tp.size),
-        "mean_signed_error_n": float(np.mean(e)),
-        "mae_n": float(np.mean(np.abs(e))),
-        "rmse_n": float(np.sqrt(np.mean(e * e))),
+        "mean_signed_error_n": stable_mean(e),
+        "mae_n": stable_mean(np.abs(e)),
+        "rmse_n": stable_rmse(e),
     }
     e_bw = e / bw
     pointwise |= {
-        "mean_signed_error_bw": float(np.mean(e_bw)),
-        "mae_bw": float(np.mean(np.abs(e_bw))),
-        "rmse_bw": float(np.sqrt(np.mean(e_bw * e_bw))),
+        "mean_signed_error_bw": stable_mean(e_bw),
+        "mae_bw": stable_mean(np.abs(e_bw)),
+        "rmse_bw": stable_rmse(e_bw),
     }
     r = pearson(fp, fm)
 

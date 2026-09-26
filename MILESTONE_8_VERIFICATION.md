@@ -1,9 +1,14 @@
 # Milestone 8 — Force-plate validation infrastructure: Verification
 
+This records implementation-time checks at `ac637eb`. The independent review
+in [MILESTONE_8_ADVERSARIAL_REVIEW.md](MILESTONE_8_ADVERSARIAL_REVIEW.md)
+supersedes its schema-readiness and held-out enforcement conclusions and
+contains final branch verification after review fixes.
+
 > **M8 engineering infrastructure complete; scientific force-plate validation
 > pending approved paired human data.**
 >
-> Everything below is observed on this branch. Every force signal, pairing and
+> Everything below was observed at the implementation head. Every force signal, pairing and
 > "estimate" used is a **SYNTHETIC TEST FIXTURE — NOT HUMAN DATA — NOT
 > VALIDATION EVIDENCE**; no number in this report is a scientific result.
 
@@ -46,7 +51,7 @@ file** (`js/`, `index.html`, `build.mjs`, `dist/`, `package*.json`, iOS) changed
 |---|---|
 | New package `physiq_research/force_plate/` (≈ 4,500 lines) | `versions`, `errors`, `limits`, `inputs`, `manifest`, `signal`, `sync`, `linkage`, `numerics`, `ground_truth`, `records`, `tables`, `repository`, `importer`, `estimate`, `evaluation`, `comparison`, `study`, `reports`, `cli`, `__main__`, `__init__` |
 | Migration | `migrations/versions/0002_force_plate_validation.py` (new); `migrations/env.py` (+1 import registering the M8 tables) |
-| M7 files touched | `physiq_research/versions.py` (`DATABASE_SCHEMA_REVISION` → `0002_force_plate_validation`); `physiq_research/__init__.py` and `pyproject.toml` (description text); `tests/test_boundaries.py` (identifier scan scoped to M7 modules — M8 has its own suite); `tests/test_storage.py` (+1 explicit import of the M8 tables for the schema diff) |
+| M7 files touched at implementation head | `physiq_research/versions.py` (`DATABASE_SCHEMA_REVISION` → `0002_force_plate_validation`, reversed by the adversarial review); `physiq_research/__init__.py` and `pyproject.toml` (description text); `tests/test_boundaries.py` (identifier scan scoped to M7 modules — M8 has its own suite); `tests/test_storage.py` (+1 explicit import of the M8 tables for the schema diff) |
 | New tests | `tests/support/force_fixtures.py`; `tests/test_force_plate_{parser,sync,ground_truth,evaluation,study,storage,cli,boundaries}.py` |
 | Tool | `tools/measure_force_plate_performance.py` |
 | Docs | `FORCE_PLATE_VALIDATION.md`, this report (new); `RESEARCH_BACKEND.md`, `research_backend/README.md`, `README.md` (pointers, database and deletion notes) |
@@ -333,7 +338,7 @@ deletion; M3/M4/M5 models and Tissue Load. Evidence: M7's processing
 fingerprint is byte-identical to the base (pinned test); M7's version families
 are unchanged; every pre-existing M7 test passes (the parity suite included);
 no JS file changed; `npm test` and the browser suites pass. Operational
-notes (not contract changes): M7 services now require the database at Alembic
+notes at implementation head: M7 services required the database at Alembic
 head `0002_force_plate_validation` (`alembic upgrade head`; additive), and an
 M7 research deletion now also removes M8 rows derived from that assessment
 (its API response is unchanged). **No COORDINATION / CONTRACT CHANGE REQUIRED

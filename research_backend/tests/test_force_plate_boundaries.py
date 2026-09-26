@@ -231,6 +231,12 @@ def test_non_claims_are_negations() -> None:
         assert re.search(r"\b(no|not|only|nothing|external)\b", text.lower()), text
 
 
+def test_research_origin_report_does_not_claim_sensor_authentication() -> None:
+    statement = reports.EVIDENCE_STATEMENTS["research_recording"]
+    assert "Operator-declared" in statement
+    assert "does not authenticate the sensor origin" in statement
+
+
 def test_no_estimator_training_network_or_http_surface() -> None:
     banned_roots = {
         "torch",
@@ -393,3 +399,19 @@ def test_m7_processing_contract_is_unchanged_by_m8() -> None:
         "source_semantics_result",
         "source_semantics_pose_frame",
     }
+
+
+def test_numeric_implementation_version_changes_m8_identity_only(monkeypatch: pytest.MonkeyPatch) -> None:
+    import physiq_research.force_plate.comparison as comparison
+    import physiq_research.force_plate.versions as force_versions
+    from physiq_research.force_plate.importer import processing_fingerprint as m8_fingerprint
+    from physiq_research.pipeline.contract import processing_fingerprint as m7_fingerprint
+
+    before_m7 = m7_fingerprint()
+    before_trial = m8_fingerprint()
+    before_evaluation = comparison.evaluation_fingerprint()
+    monkeypatch.setattr(force_versions, "NUMERICS_VERSION", "force-numerics-v0.3")
+    monkeypatch.setattr(comparison, "NUMERICS_VERSION", "force-numerics-v0.3")
+    assert m8_fingerprint() != before_trial
+    assert comparison.evaluation_fingerprint() != before_evaluation
+    assert m7_fingerprint() == before_m7

@@ -70,10 +70,9 @@ CAPTURE_MODE_SINGLE_CAMERA_SAGITTAL: Final = "single_camera_sagittal"
 SUPPORTED_MOVEMENTS: Final = (MOVEMENT_BODYWEIGHT_SQUAT_SAGITTAL,)
 SUPPORTED_CAPTURE_MODES: Final = (CAPTURE_MODE_SINGLE_CAMERA_SAGITTAL,)
 
-# Alembic head this code expects (readiness checks it). 0002 adds the
-# Milestone 8 force-plate tables only (physiq_research/force_plate/tables.py);
-# no Milestone 7 table or stored value changes.
-DATABASE_SCHEMA_REVISION: Final = "0002_force_plate_validation"
+# Minimum Alembic revision required by the M7 API and worker. M8 has its own
+# minimum revision; adding optional research tables must not stop M7 service.
+DATABASE_SCHEMA_REVISION: Final = "0001_research_initial"
 
 
 def version_families() -> dict[str, str]:

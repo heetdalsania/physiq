@@ -23,7 +23,10 @@ from physiq_research.force_plate.versions import (
 CLAIM_STAGE: Final = "measured_force_plate_ground_truth_and_comparison_framework"
 
 NON_CLAIMS: Final[tuple[str, ...]] = (
-    "The force-plate measurement is the ground truth; nothing derived from video is ground truth.",
+    (
+        "The declared plate trace is treated as measured ground truth only when its sensor origin is externally "
+        "verified; nothing derived from video is ground truth."
+    ),
     "This software contains no video-based force estimator and produces no force estimate.",
     "A per-trial comparison is not evidence that an estimator is accurate, valid or generalizable.",
     "Only total vertical ground-reaction force from one plate with both feet on it; no left/right asymmetry.",
@@ -36,7 +39,8 @@ NON_CLAIMS: Final[tuple[str, ...]] = (
 EVIDENCE_STATEMENTS: Final[dict[str, str]] = {
     "synthetic_test_fixture": "SYNTHETIC TEST FIXTURE — NOT HUMAN DATA — NOT VALIDATION EVIDENCE",
     "research_recording": (
-        "Measured force-plate data paired with one Milestone 7 assessment under the recorded versions. "
+        "Operator-declared force-plate recording paired with one Milestone 7 assessment under the recorded versions. "
+        "This software does not authenticate the sensor origin or the declared data origin. "
         "Any comparison describes this trial only; conclusions require the external, pre-specified "
         "analysis plan and held-out participants."
     ),

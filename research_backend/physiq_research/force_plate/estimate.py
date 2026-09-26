@@ -159,11 +159,11 @@ class SubjectPartition:
 
 def check_held_out(estimate: VerticalGrfEstimate, trial_subject: uuid.UUID | None) -> str:
     """Refuse a comparison that would reuse a development participant."""
+    if trial_subject is None:
+        raise ForcePlateError("held_out_status_unverifiable")
     development = set(estimate.estimator.development_research_subject_ids)
     if not development:
         return "no_development_participants_declared"
-    if trial_subject is None:
-        raise ForcePlateError("held_out_status_unverifiable")
     if trial_subject in development:
         raise ForcePlateError("subject_not_held_out")
     return "trial_participant_not_in_development_set"

@@ -13,8 +13,9 @@ from fastapi.testclient import TestClient
 
 from physiq_research.api.app import create_app
 from physiq_research.config import MediaLimits, Settings
+from physiq_research.force_plate.versions import DATABASE_SCHEMA_REVISION as M8_DATABASE_SCHEMA_REVISION
 from physiq_research.media.tempfiles import list_uploads
-from physiq_research.storage.db import make_engine
+from physiq_research.storage.db import check_ready, downgrade, make_engine, upgrade
 from physiq_research.storage.repository import ResearchRepository
 from physiq_research.workers.worker import Worker
 from tests.conftest import API_BASE, CLIENT_HEADERS
@@ -360,6 +361,31 @@ def test_health_live_and_ready(client: TestClient, db_settings: Settings) -> Non
     assert live.status_code == 200 and live.json() == {"status": "ok", "checks": {}}
     ready = client.get("/health/ready")
     assert ready.status_code == 200 and ready.json()["checks"]["schema_current"] is True
+
+
+@pytest.mark.parametrize("schema_path", ["direct", "downgrade"])
+def test_m7_readiness_accepts_m7_only_schema(db_settings: Settings, squat_video: Path, schema_path: str) -> None:
+    if schema_path == "direct":
+        upgrade(db_settings.database_url, "0001_research_initial")
+    else:
+        upgrade(db_settings.database_url)
+        downgrade(db_settings.database_url, "0001_research_initial")
+    engine = make_engine(db_settings.database_url)
+    try:
+        assert check_ready(engine)["schema_current"] is True
+        assert check_ready(engine, required_revision=M8_DATABASE_SCHEMA_REVISION)["schema_current"] is False
+        with TestClient(create_app(db_settings, engine=engine), base_url=API_BASE) as client:
+            response = client.get("/health/ready")
+            submission = submit(client, squat_video.read_bytes())
+        assert response.status_code == 200
+        assert response.json()["checks"]["schema_revision"] == "0001_research_initial"
+        assert submission.status_code == 202
+        repository = ResearchRepository(engine)
+        outcome = Worker(db_settings, repository, DotPoseProvider()).process_next()
+        assert outcome is not None and outcome.status == "succeeded"
+        assert repository.get_assessment(outcome.assessment_id) is not None
+    finally:
+        engine.dispose()
 
 
 def test_readiness_fails_without_database_or_migrations(tmp_path: Path) -> None:

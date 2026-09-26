@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
+from alembic.script import ScriptDirectory
+from alembic.util import CommandError
 from sqlalchemy import Engine, create_engine, event, text
 
 from physiq_research.canonical import strict_json_dumps, strict_json_loads
@@ -67,9 +70,16 @@ def current_revision(engine: Engine) -> str | None:
     return row[0] if row else None
 
 
-def check_ready(engine: Engine) -> dict[str, Any]:
-    """Database reachable and migrated to the revision this code expects."""
+def check_ready(engine: Engine, *, required_revision: str = DATABASE_SCHEMA_REVISION) -> dict[str, Any]:
+    """Database reachable and at or after the service's minimum revision."""
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
     revision = current_revision(engine)
-    return {"database": "ok", "schema_revision": revision, "schema_current": revision == DATABASE_SCHEMA_REVISION}
+    compatible = False
+    if revision is not None:
+        script = ScriptDirectory.from_config(alembic_config(str(engine.url)))
+        with suppress(CommandError):  # unknown or incompatible database revision
+            compatible = required_revision in {
+                step.revision for step in script.walk_revisions(base="base", head=revision)
+            }
+    return {"database": "ok", "schema_revision": revision, "schema_current": compatible}

@@ -1,4 +1,4 @@
-"""Study-level aggregation rules (grf-study-aggregation-v0.1).
+"""Study-level aggregation rules (grf-study-aggregation-v0.2).
 
 SYNTHETIC TEST FIXTURE — NOT HUMAN DATA — NOT VALIDATION EVIDENCE. Every
 number below is a hand-written software-test input; the resulting "study"
@@ -141,6 +141,15 @@ def test_participants_not_trials_are_the_unit_of_analysis() -> None:
     text = json.dumps(out)
     for word in ("score", "grade", "pass", "fail", "accura", "validated", "ranking"):
         assert word not in text
+
+
+def test_large_finite_metrics_do_not_overflow_study_mean_or_median() -> None:
+    s = Study()
+    s.add(P1, 1e308)
+    s.add(P2, 1e308)
+    output = s.run()["metrics"]["pointwise.rmse_n"]["participant_level"]
+    assert output["mean"] == 1e308
+    assert output["median"] == 1e308
 
 
 def test_single_participant_has_no_sd_and_undefined_r_is_counted() -> None:

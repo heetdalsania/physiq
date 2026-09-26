@@ -18,6 +18,7 @@ from sqlalchemy import func, insert, inspect, select, text, update
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
 import physiq_research.force_plate.tables as m8
+from physiq_research.api.schemas import ResearchDeletionResponseV1
 from physiq_research.canonical import canonical_digest
 from physiq_research.config import Settings
 from physiq_research.force_plate import importer as importer_module
@@ -26,10 +27,10 @@ from physiq_research.force_plate.errors import ForcePlateError
 from physiq_research.force_plate.importer import ImportOutcome, import_trial
 from physiq_research.force_plate.limits import ForcePlateLimits
 from physiq_research.force_plate.repository import ForcePlateRepository, trial_record_digest
+from physiq_research.force_plate.versions import DATABASE_SCHEMA_REVISION
 from physiq_research.storage.db import current_revision, downgrade, make_engine, upgrade
 from physiq_research.storage.repository import ResearchRepository, StoredAssessment, StoredDataError
 from physiq_research.storage.tables import metadata, research_assessment_artifacts, research_assessments
-from physiq_research.versions import DATABASE_SCHEMA_REVISION
 from tests.support.force_fixtures import ForceFixture, make_fixture, null_baseline_estimate, process_assessment
 
 LIMITS = ForcePlateLimits()
@@ -389,6 +390,8 @@ def test_deleting_the_m7_assessment_cascades_to_every_derived_m8_row(
     evaluate_null(db_repo, assessment, out.trial_id)
     outcome = db_repo.delete_assessment(assessment.id)
     assert outcome.state == "deleted" and outcome.artifacts_removed == 4
+    count_description = ResearchDeletionResponseV1.model_json_schema()["properties"]["artifacts_removed"]["description"]
+    assert "M7 assessment artifacts" in count_description and "excludes M8" in count_description
     for table in (m8.force_plate_trials, m8.force_plate_trial_artifacts, m8.grf_validation_results):
         assert count(db_repo, table) == 0
     repo = ForcePlateRepository(db_repo.engine)

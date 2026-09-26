@@ -15,11 +15,11 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 import physiq_research.force_plate.tables  # noqa: F401  (M8 tables share `metadata`; see test_force_plate_storage.py)
 from physiq_research.canonical import canonical_digest
 from physiq_research.config import Settings
+from physiq_research.force_plate.versions import DATABASE_SCHEMA_REVISION as M8_DATABASE_SCHEMA_REVISION
 from physiq_research.pipeline.contract import processing_contract, processing_fingerprint
 from physiq_research.storage.db import check_ready, current_revision, downgrade, make_engine, upgrade
 from physiq_research.storage.repository import ResearchRepository, StoredDataError
 from physiq_research.storage.tables import metadata, research_assessment_artifacts, research_assessments, research_jobs
-from physiq_research.versions import DATABASE_SCHEMA_REVISION
 from physiq_research.workers.worker import Worker
 from tests.support.jobs import enqueue_file
 from tests.support.providers import DotPoseProvider
@@ -37,10 +37,10 @@ def test_migration_from_empty_database(db_settings: Settings) -> None:
     assert current_revision(engine) is None
     assert not check_ready(engine)["schema_current"]
     upgrade(db_settings.database_url)
-    assert current_revision(engine) == DATABASE_SCHEMA_REVISION
+    assert current_revision(engine) == M8_DATABASE_SCHEMA_REVISION
     assert check_ready(engine) == {
         "database": "ok",
-        "schema_revision": DATABASE_SCHEMA_REVISION,
+        "schema_revision": M8_DATABASE_SCHEMA_REVISION,
         "schema_current": True,
     }
     names = set(inspect(engine).get_table_names())
@@ -56,7 +56,7 @@ def test_migration_from_empty_database(db_settings: Settings) -> None:
     downgrade(db_settings.database_url, "base")
     assert "research_jobs" not in set(inspect(engine).get_table_names())
     upgrade(db_settings.database_url)
-    assert current_revision(engine) == DATABASE_SCHEMA_REVISION
+    assert current_revision(engine) == M8_DATABASE_SCHEMA_REVISION
     engine.dispose()
 
 

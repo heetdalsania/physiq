@@ -89,6 +89,14 @@ def test_perfect_prediction_at_every_measured_sample_gives_zero_error() -> None:
     assert m["intervals"]["comparison_media_ms"] == list(REP) and m["intervals"]["repetition_coverage_fraction"] == 1.0
 
 
+def test_pearson_of_huge_nearly_constant_anticorrelated_series_is_negative() -> None:
+    times = np.arange(8, dtype=float) * 100.0
+    measured = np.array([1e308 + i * 1e293 for i in range(8)])
+    predicted = measured[::-1].copy()
+    result = evaluate(TruthSeries(times, measured, BW, (0.0, 700.0)), times, predicted)
+    assert result["waveform_shape"]["pearson_r"] == pytest.approx(-1.0, abs=1e-12)
+
+
 def test_perfect_prediction_at_video_rate_has_zero_pointwise_error() -> None:
     t = grid()
     m = run(truth(), t, triangle(t))
@@ -325,7 +333,9 @@ def test_held_out_participants() -> None:
     a, b = uuid.uuid4(), uuid.uuid4()
     none = validate_estimate_document(estimate_doc(), LIMITS)
     assert check_held_out(none, a) == "no_development_participants_declared"
-    assert check_held_out(none, None) == "no_development_participants_declared"
+    with pytest.raises(ForcePlateError) as info:
+        check_held_out(none, None)
+    assert info.value.code == "held_out_status_unverifiable"
     dev = validate_estimate_document(estimate_doc(estimator__development_research_subject_ids=[str(a)]), LIMITS)
     assert check_held_out(dev, b) == "trial_participant_not_in_development_set"
     with pytest.raises(ForcePlateError) as info:

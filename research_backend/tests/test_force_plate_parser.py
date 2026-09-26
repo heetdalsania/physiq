@@ -76,6 +76,11 @@ def test_sampling_statistics_use_real_timestamps() -> None:
     assert stats["mean_rate_hz"] == pytest.approx(750.0)
 
 
+def test_subnormal_timestamp_span_cannot_persist_infinite_sampling_rate() -> None:
+    error = code_of(parse, HEADER + b"0,700\n5e-324,700\n")
+    assert error.code == "non_finite_derived_value"
+
+
 # ── malformed input ─────────────────────────────────────────────────────
 
 

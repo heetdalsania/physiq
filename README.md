@@ -120,6 +120,7 @@ Milestone 8 adds local force-plate validation infrastructure (measured
 ground truth and an evaluator; no force estimator, and scientific validation
 is pending approved paired human data): [FORCE_PLATE_VALIDATION.md](FORCE_PLATE_VALIDATION.md),
 [MILESTONE_8_VERIFICATION.md](MILESTONE_8_VERIFICATION.md).
+The independent review is [MILESTONE_8_ADVERSARIAL_REVIEW.md](MILESTONE_8_ADVERSARIAL_REVIEW.md).
 
 ## License
 

@@ -9,6 +9,7 @@ Design, contracts, privacy and non-claims:
 Verification: [../MILESTONE_7_VERIFICATION.md](../MILESTONE_7_VERIFICATION.md),
 [../MILESTONE_8_VERIFICATION.md](../MILESTONE_8_VERIFICATION.md).
 Independent review: [../MILESTONE_7_ADVERSARIAL_REVIEW.md](../MILESTONE_7_ADVERSARIAL_REVIEW.md).
+Milestone 8 review: [../MILESTONE_8_ADVERSARIAL_REVIEW.md](../MILESTONE_8_ADVERSARIAL_REVIEW.md).
 
 > Local / internal use only. Never expose it publicly: there is no
 > authentication, authorization or participant-consent control. Only approved

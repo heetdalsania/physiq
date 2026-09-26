@@ -13,6 +13,8 @@ Bump rules
     CSV_FORMAT                    the accepted canonical exchange file.
     CSV_PARSER_VERSION            the parser implementation (strictness,
                                   number grammar, bounds handling).
+    NUMERICS_VERSION              floating-point implementation of integration,
+                                  statistics and finite-range checks.
     SIGNAL_CONTRACT               the canonical measured signal (quantity,
                                   unit, sign, time reference).
     TRIAL_CONTRACT                the stored trial record (identity/provenance).
@@ -35,9 +37,11 @@ from __future__ import annotations
 from typing import Final
 
 FORCE_PLATE_PIPELINE_VERSION: Final = "force-plate-pipeline-v0.1"
+DATABASE_SCHEMA_REVISION: Final = "0002_force_plate_validation"
 MANIFEST_CONTRACT: Final = "force-plate-manifest-v0.1"
 CSV_FORMAT: Final = "force-plate-csv-v0.1"
-CSV_PARSER_VERSION: Final = "force-plate-csv-parser-v0.1"
+CSV_PARSER_VERSION: Final = "force-plate-csv-parser-v0.2"
+NUMERICS_VERSION: Final = "force-numerics-v0.2"
 SIGNAL_CONTRACT: Final = "force-plate-signal-v0.1"
 TRIAL_CONTRACT: Final = "force-plate-trial-v0.1"
 SYNC_VERSION: Final = "force-video-sync-v0.1"
@@ -45,7 +49,7 @@ GROUND_TRUTH_VERSION: Final = "force-ground-truth-v0.1"
 VALIDATION_PROTOCOL: Final = "grf-validation-v0.1"
 ESTIMATE_CONTRACT: Final = "vertical-grf-estimate-v0.1"
 STUDY_DEFINITION_CONTRACT: Final = "grf-study-definition-v0.1"
-STUDY_AGGREGATION_VERSION: Final = "grf-study-aggregation-v0.1"
+STUDY_AGGREGATION_VERSION: Final = "grf-study-aggregation-v0.2"
 
 # Stored JSON shapes (each stored document carries its own schema identity).
 SIGNAL_ARTIFACT_SCHEMA: Final = "force-plate-signal-artifact-v1"
@@ -87,6 +91,7 @@ def version_families() -> dict[str, str]:
         "manifest": MANIFEST_CONTRACT,
         "csv_format": CSV_FORMAT,
         "csv_parser": CSV_PARSER_VERSION,
+        "numerics": NUMERICS_VERSION,
         "signal": SIGNAL_CONTRACT,
         "trial": TRIAL_CONTRACT,
         "synchronization": SYNC_VERSION,
